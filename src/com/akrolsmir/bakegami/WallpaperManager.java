@@ -1,21 +1,16 @@
 package com.akrolsmir.bakegami;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -42,7 +37,7 @@ public class WallpaperManager {
 
 	public void favoriteWallpaper() {
 		getCurrentWallpaper().favorite();
-		Toast.makeText(context, "Favorited", Toast.LENGTH_LONG).show();
+		Log.d("Favorited", getCurrentWallpaper().getCacheFile().toString());
 	}
 	
 	public void tweakWallpaper(){

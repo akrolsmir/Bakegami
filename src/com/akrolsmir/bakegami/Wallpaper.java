@@ -89,7 +89,7 @@ public class Wallpaper {
 			OutputStream output = new FileOutputStream(new File(CACHE_DIR, imageName));
 
 			input = new URL(imageURL).openStream();
-			Log.d("downloadImage", "Downloading...");
+			Log.d("downloadImage", "Downloading " + imageURL);
 			try {
 				byte[] buffer = new byte[8192];
 				int bytesRead = 0;
@@ -101,6 +101,7 @@ public class Wallpaper {
 			}
 		} finally {
 			input.close();
+			Log.d("downloadImage", "Finished " + imageURL);
 		}
 	}
 
@@ -108,6 +109,8 @@ public class Wallpaper {
 	private void copy(File src, File dst) throws IOException {
 		InputStream in = new FileInputStream(src);
 		OutputStream out = new FileOutputStream(dst);
+		
+		Log.d("copy", "Copying " + imageURL);
 
 		// Transfer bytes from in to out
 		byte[] buf = new byte[1024];
@@ -117,6 +120,7 @@ public class Wallpaper {
 		}
 		in.close();
 		out.close();
+		Log.d("copy", "Finished " + imageURL);
 	}
 
 	public void favorite() {

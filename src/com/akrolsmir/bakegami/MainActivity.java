@@ -3,8 +3,10 @@ package com.akrolsmir.bakegami;
 import java.io.File;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -32,7 +34,7 @@ public class MainActivity extends Activity {
 			public void onClick(View arg0) {
 
 				MainActivity.this.startService(new Intent(MainActivity.this,
-						WallpaperControlWidgetProvider.RefreshService.class));
+						WallpaperControlWidgetProvider.RefreshService.class).setAction("start"));
 
 				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().putString("subreddit",
 						subredditText.getText().toString()).commit();
@@ -106,5 +108,19 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+	
+//	public void updateConnectedFlags() {
+//        ConnectivityManager connMgr = (ConnectivityManager) 
+//                getSystemService(Context.CONNECTIVITY_SERVICE);
+//        
+//        NetworkInfo activeInfo = connMgr.getActiveNetworkInfo();
+//        if (activeInfo != null && activeInfo.isConnected()) {
+//            wifiConnected = activeInfo.getType() == ConnectivityManager.TYPE_WIFI;
+//            mobileConnected = activeInfo.getType() == ConnectivityManager.TYPE_MOBILE;
+//        } else {
+//            wifiConnected = false;
+//            mobileConnected = false;
+//        }  
+//    }
 
 }
