@@ -1,6 +1,8 @@
 package com.akrolsmir.bakegami;
 
-import java.util.Arrays;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.StringUtils;
@@ -9,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 
 import com.google.gson.JsonArray;
@@ -21,9 +23,6 @@ public class WallpaperManager {
 	private SharedPreferences settings;
 	private Context context;
 
-	//	private List<String> urls = new ArrayList<String>(
-	//			Arrays.asList(new String[] { "http://i.imgur.com/iCQxSJZ.jpg" }));
-
 	public WallpaperManager(Context context) {
 		this.settings = context.getSharedPreferences("com.akrolsmir.bakegami", 0);
 		this.context = context;
@@ -31,7 +30,7 @@ public class WallpaperManager {
 	}
 
 	public void nextWallpaper() {
-		advanceIndex();
+		advanceCurrent();
 		getCurrentWallpaper().setAsBackground();
 	}
 
@@ -40,20 +39,27 @@ public class WallpaperManager {
 		Log.d("Favorited", getCurrentWallpaper().getCacheFile().toString());
 	}
 	
+	public static List<String> getFavorites(){
+		List<String> result = new ArrayList<String>(); 
+		
+		File PIC_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+		PIC_DIR = new File(PIC_DIR, "bakegami");
+		PIC_DIR.mkdirs();
+		
+		for(File file : PIC_DIR.listFiles()){
+			result.add(file.getPath());
+		}
+		
+		return result;
+	}
+	
 	public void tweakWallpaper(){
-		Intent intent = new Intent(Intent.ACTION_CHOOSER);
-		intent.setType("*/*");
-		Uri uri = Uri.fromFile(getCurrentWallpaper().getCacheFile());
-		intent.setData(uri);
-		intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        context.startActivity(Intent.createChooser(intent, "Custom Heading..."));
-//		intent.setClipData(new clip);
+		// TODO allow user to adjust wallpaper
 	}
 
 	private void fetchNextUrls() {
 		int index = settings.getInt("index", 0);
-		int total = StringUtils.countOccurrencesOf(settings.getString("history", ""), " ");
+		int total = StringUtils.countOccurrencesOf(settings.getString(QUEUE, ""), " ");
 		fetchNextUrls(3 + index - total);
 	}
 
@@ -75,7 +81,6 @@ public class WallpaperManager {
 	}
 
 	private void parseUrlFromReddit(String rawJson, int numToFetch) {
-		//		urls.clear();
 		JsonElement object = new JsonParser().parse(rawJson);
 		JsonArray children = object.getAsJsonObject().get("data").getAsJsonObject().get("children").getAsJsonArray();
 		for (JsonElement child : children) {
@@ -92,30 +97,40 @@ public class WallpaperManager {
 	// Returns true if URL has no spaces, ends in .jpg/.png and is not enqueued
 	private boolean validImageUrl(String imageURL) {
 		return !imageURL.contains(" ") && imageURL.matches("http://.*\\.(jpg|png)$")
-				&& !enqueued(imageURL);
+				&& isNew(imageURL);
+	}
+	
+	private String HISTORY = "history", QUEUE = "queue";
+	private boolean isNew(String imageURL){
+		return !((settings.getString(HISTORY, "") + settings.getString(QUEUE, "")).contains(imageURL));
 	}
 
-	//TODO replace with a more reliable history
-	private boolean enqueued(String imageURL) {
-		return settings.getString("history", "").contains(imageURL);
-	}
 
 	private void enqueueURL(String imageURL) {
 		Log.d("enqueueURL", imageURL);
-		new Wallpaper(context, imageURL).cache(); //caches this URL
-		String URLS = settings.getString("history", "");
-		settings.edit().putString("history", URLS + imageURL + " ").commit();
+		new Wallpaper(context, imageURL).cache();
+		String queue = settings.getString(QUEUE, "");
+		settings.edit().putString(QUEUE, queue + imageURL + " ").commit();
 	}
 
-	private Wallpaper getCurrentWallpaper() {
-		int index = settings.getInt("index", 0);
-		String[] parts = settings.getString("history", "http://cdn.awwni.me/maav.jpg ").split(" ");
-		Log.d("getCurrentURL", "parts: " + Arrays.toString(parts) + "\nindex: " + index);
-		return new Wallpaper(context, parts[index]);
+	public Wallpaper getCurrentWallpaper() {
+		return new Wallpaper(context, getCurrentWallpaperURL());
+	}
+	
+	private String DEFAULT_URL = "http://cdn.awwni.me/maav.jpg ";
+	private String getCurrentWallpaperURL(){
+		return settings.getString(QUEUE, DEFAULT_URL).split(" ")[0];
 	}
 
-	private void advanceIndex() {
-		settings.edit().putInt("index", settings.getInt("index", 0) + 1).commit();
+	private void advanceCurrent() {
+		// move current from queue to history
+		String history = settings.getString(HISTORY, "");
+		settings.edit().putString(HISTORY, history + getCurrentWallpaperURL() + " ").commit();
+		String queue = settings.getString(QUEUE, "");
+		settings.edit().putString(QUEUE, queue.substring(queue.indexOf(" ") + 1)).commit();
+		Log.d("HISTORY", settings.getString(HISTORY, ""));
+		Log.d("QUEUE", settings.getString(QUEUE, ""));
+		
 		fetchNextUrls(1);
 	}
 }

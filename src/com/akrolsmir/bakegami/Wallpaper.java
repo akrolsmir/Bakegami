@@ -63,7 +63,7 @@ public class Wallpaper {
 
 					// Grab the picture from cache
 					WallpaperManager wpm = WallpaperManager.getInstance(context);
-					FileInputStream fis = new FileInputStream(new File(CACHE_DIR, imageName));
+					FileInputStream fis = new FileInputStream(getCacheFile());
 					wpm.setStream(fis);
 
 					Log.d("Changed wallpaper", imageURL);
@@ -78,7 +78,7 @@ public class Wallpaper {
 	}
 
 	private boolean imageInCache() {
-		Log.d("imageInCache", CACHE_DIR.getAbsolutePath() + imageName);
+//		Log.d("imageInCache", CACHE_DIR.getAbsolutePath() + imageName);
 		File imageFile = new File(CACHE_DIR, imageName);
 		return imageFile.exists();
 	}
@@ -89,7 +89,7 @@ public class Wallpaper {
 			OutputStream output = new FileOutputStream(new File(CACHE_DIR, imageName));
 
 			input = new URL(imageURL).openStream();
-			Log.d("downloadImage", "Downloading " + imageURL);
+//			Log.d("downloadImage", "Downloading " + imageURL);
 			try {
 				byte[] buffer = new byte[8192];
 				int bytesRead = 0;
@@ -101,7 +101,7 @@ public class Wallpaper {
 			}
 		} finally {
 			input.close();
-			Log.d("downloadImage", "Finished " + imageURL);
+//			Log.d("downloadImage", "Finished " + imageURL);
 		}
 	}
 
@@ -110,7 +110,7 @@ public class Wallpaper {
 		InputStream in = new FileInputStream(src);
 		OutputStream out = new FileOutputStream(dst);
 		
-		Log.d("copy", "Copying " + imageURL);
+//		Log.d("copy", "Copying " + imageURL);
 
 		// Transfer bytes from in to out
 		byte[] buf = new byte[1024];
@@ -120,7 +120,7 @@ public class Wallpaper {
 		}
 		in.close();
 		out.close();
-		Log.d("copy", "Finished " + imageURL);
+//		Log.d("copy", "Finished " + imageURL);
 	}
 
 	public void favorite() {
