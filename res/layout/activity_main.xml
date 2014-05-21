@@ -82,12 +82,12 @@
         android:layout_height="wrap_content"
         android:text="Gallery" />
 
-    <GridView
+    <com.akrolsmir.bakegami.FavoritesView
         android:id="@+id/favorites"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawSelectorOnTop="true"
         android:numColumns="3">
-    </GridView>
+    </com.akrolsmir.bakegami.FavoritesView>
 
 </LinearLayout>
