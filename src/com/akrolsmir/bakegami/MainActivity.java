@@ -1,15 +1,12 @@
 package com.akrolsmir.bakegami;
 
 import java.io.File;
+import java.util.ArrayList;
 
-import android.R.integer;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -21,11 +18,9 @@ import android.view.View.OnLongClickListener;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -107,8 +102,11 @@ public class MainActivity extends Activity {
 //			}
 //		});
 		
+		// Set up the favorites GridView
+		
 		final GridView gv = (GridView) findViewById(R.id.favorites);
-		gv.setAdapter(new GridViewAdapter(this));
+		final GridViewAdapter gva = new GridViewAdapter(this);
+		gv.setAdapter(gva);
 		gv.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -127,23 +125,39 @@ public class MainActivity extends Activity {
 		                                          long id, boolean checked) {
 		        // Here you can do something when items are selected/de-selected,
 		        // such as update the title in the CAB
-//		    	gv.getChildAt(position).setSelected(true);
-		    	
 		    }
 
 		    @Override
 		    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+		    	SparseBooleanArray checked = gv.getCheckedItemPositions();
 		        // Respond to clicks on the actions in the CAB
 		        switch (item.getItemId()) {
-		            case R.id.ic_action_delete:
-		            	SparseBooleanArray checked = gv.getCheckedItemPositions();
-		            	for(int i = 0; i < checked.size(); i++) {
-		            		if(checked.get(i))
-		            			Log.d("Checked", gv.getItemAtPosition(i) + "");
+		            case R.id.menu_item_delete:
+		            	for(int i = 0; i < gv.getAdapter().getCount(); i++) {
+		            		if(checked.get(i)) {
+		            			WallpaperManager.removeFavorite(i);
+		            		}
 		            	}
-//		                deleteSelectedItems();
+		            	Toast.makeText(MainActivity.this, gv.getCheckedItemCount() + " unfavorited.", Toast.LENGTH_LONG).show();
 		                mode.finish(); // Action picked, so close the CAB
+		                gva.notifyDataSetChanged();
 		                return true;
+		            case R.id.menu_item_share:
+		            	Intent intent = new Intent();
+		            	intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+		            	intent.setType("image/*"); /* This example is sharing jpeg images. */
+		            	
+		            	ArrayList<Uri> files = new ArrayList<Uri>();
+		            	for(int i = 0; i < gv.getAdapter().getCount(); i++) {
+		            		if(checked.get(i)) {
+		            			files.add(Uri.fromFile(new File(WallpaperManager.getFavorites().get(i))));
+		            		}
+		            	}
+		            	
+		            	intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
+		            	startActivity(intent);
+		            	mode.finish();
+		            	return true;
 		            default:
 		                return false;
 		        }

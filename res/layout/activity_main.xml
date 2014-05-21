@@ -83,14 +83,11 @@
         android:text="Gallery" />
 
     <GridView
-        
         android:id="@+id/favorites"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawSelectorOnTop="true"
-        android:listSelector="@drawable/gridview_background"
-        android:background="?android:attr/activatedBackgroundIndicator"
-        android:numColumns="3" >
+        android:numColumns="3">
     </GridView>
 
 </LinearLayout>

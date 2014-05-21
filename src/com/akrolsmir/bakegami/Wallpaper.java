@@ -31,7 +31,7 @@ public class Wallpaper {
 
 		CACHE_DIR = context.getExternalCacheDir();
 		PIC_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-		PIC_DIR = new File(PIC_DIR, "bakegami");
+		PIC_DIR = new File(PIC_DIR, "bakegami"); //TODO replace with name of app
 		CACHE_DIR.mkdirs();
 		PIC_DIR.mkdirs();
 	}
@@ -105,7 +105,7 @@ public class Wallpaper {
 		}
 	}
 
-	//UGLY UGLY CODE DUPLICATION. F*** JAVA I/O
+	// TODO UGLY UGLY CODE DUPLICATION. F*** JAVA I/O
 	private void copy(File src, File dst) throws IOException {
 		InputStream in = new FileInputStream(src);
 		OutputStream out = new FileOutputStream(dst);

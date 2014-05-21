@@ -20,6 +20,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
+//TODO rename to BackgroundManager, rename Wallpaper to Background
 public class WallpaperManager {
 
 	private SharedPreferences settings;
@@ -41,25 +42,28 @@ public class WallpaperManager {
 		Log.d("Favorited", getCurrentWallpaper().getCacheFile().toString());
 	}
 	
-	public static List<String> getFavorites(){
-		List<String> result = new ArrayList<String>(); 
-		
-		
+	public static void removeFavorite(int i) {
+		Log.d("DELETING...", ""+ new File(getFavorites().get(i)).delete());
+	}
+	
+	public static List<String> getFavorites() {
+		List<String> result = new ArrayList<String>();
+
 		File PIC_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-		PIC_DIR = new File(PIC_DIR, "bakegami");
+		PIC_DIR = new File(PIC_DIR, "bakegami"); //TODO replace with app name
 		PIC_DIR.mkdirs();
-		
+
 		File[] files = PIC_DIR.listFiles();
-		Arrays.sort(files, new Comparator<File>(){
-		    public int compare(File f1, File f2)
-		    {
-		        return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
-		    } });
-		
-		for(File file : files){
+		Arrays.sort(files, new Comparator<File>() {
+			public int compare(File f1, File f2) {
+				return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+			}
+		});
+
+		for (File file : files) {
 			result.add(file.getPath());
 		}
-		
+
 		return result;
 	}
 	
