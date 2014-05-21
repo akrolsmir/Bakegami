@@ -2,6 +2,8 @@ package com.akrolsmir.bakegami;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -42,11 +44,19 @@ public class WallpaperManager {
 	public static List<String> getFavorites(){
 		List<String> result = new ArrayList<String>(); 
 		
+		
 		File PIC_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 		PIC_DIR = new File(PIC_DIR, "bakegami");
 		PIC_DIR.mkdirs();
 		
-		for(File file : PIC_DIR.listFiles()){
+		File[] files = PIC_DIR.listFiles();
+		Arrays.sort(files, new Comparator<File>(){
+		    public int compare(File f1, File f2)
+		    {
+		        return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+		    } });
+		
+		for(File file : files){
 			result.add(file.getPath());
 		}
 		

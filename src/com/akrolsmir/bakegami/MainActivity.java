@@ -2,19 +2,30 @@ package com.akrolsmir.bakegami;
 
 import java.io.File;
 
+import android.R.integer;
+import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.widget.Button;
+import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -67,10 +78,6 @@ public class MainActivity extends Activity {
 				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().putLong("refreshTime",
 						Long.parseLong(refreshTimeText.getText().toString())).commit();
 				
-				// clears cache
-//				for(File file : getExternalCacheDir().listFiles())
-//					file.delete();
-				
 				// Loads the first 5:
 				new WallpaperManager(MainActivity.this);
 				
@@ -90,14 +97,78 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-		Button buttonButton = (Button) findViewById(R.id.buttonbutton);
-		buttonButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View arg0) {
-				new WallpaperManager(MainActivity.this).tweakWallpaper();
+//		Button buttonButton = (Button) findViewById(R.id.buttonbutton);
+//		buttonButton.setOnClickListener(new OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View arg0) {
+//				new WallpaperManager(MainActivity.this).tweakWallpaper();
+//
+//			}
+//		});
+		
+		final GridView gv = (GridView) findViewById(R.id.favorites);
+		gv.setAdapter(new GridViewAdapter(this));
+		gv.setOnItemClickListener(new OnItemClickListener() {
 
+			@Override
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_VIEW);
+				intent.setDataAndType(Uri.parse("file://" + WallpaperManager.getFavorites().get(position)), "image/*");
+				startActivity(intent);
 			}
+		});
+		gv.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
+		gv.setMultiChoiceModeListener(new MultiChoiceModeListener() {
+
+		    @Override
+		    public void onItemCheckedStateChanged(ActionMode mode, int position,
+		                                          long id, boolean checked) {
+		        // Here you can do something when items are selected/de-selected,
+		        // such as update the title in the CAB
+//		    	gv.getChildAt(position).setSelected(true);
+		    	
+		    }
+
+		    @Override
+		    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+		        // Respond to clicks on the actions in the CAB
+		        switch (item.getItemId()) {
+		            case R.id.ic_action_delete:
+		            	SparseBooleanArray checked = gv.getCheckedItemPositions();
+		            	for(int i = 0; i < checked.size(); i++) {
+		            		if(checked.get(i))
+		            			Log.d("Checked", gv.getItemAtPosition(i) + "");
+		            	}
+//		                deleteSelectedItems();
+		                mode.finish(); // Action picked, so close the CAB
+		                return true;
+		            default:
+		                return false;
+		        }
+		    }
+
+		    @Override
+		    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+		        // Inflate the menu for the CAB
+		        MenuInflater inflater = mode.getMenuInflater();
+		        inflater.inflate(R.menu.gridview_menu, menu);
+		        return true;
+		    }
+
+		    @Override
+		    public void onDestroyActionMode(ActionMode mode) {
+		        // Here you can make any necessary updates to the activity when
+		        // the CAB is removed. By default, selected items are deselected/unchecked.
+		    }
+
+		    @Override
+		    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+		        // Here you can perform updates to the CAB due to
+		        // an invalidate() request
+		        return false;
+		    }
 		});
 
 	}
