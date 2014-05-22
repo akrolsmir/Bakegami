@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -35,16 +36,17 @@ public class MainActivity extends Activity {
 		
 		//TODO move out into refresh method
 		ImageButton favButton = (ImageButton) findViewById(R.id.favButton);
-		if(wp.getCurrentWallpaper().imageInFavorites()) {
-			favButton.setImageResource(android.R.drawable.star_big_on);
-		} else {
-			favButton.setImageResource(android.R.drawable.star_big_off);
-		}
+		try { //TODO more robust/better handling
+			if(wp.getCurrentWallpaper().imageInFavorites()) {
+				favButton.setImageResource(android.R.drawable.star_big_on);
+			} else {
+				favButton.setImageResource(android.R.drawable.star_big_off);
+			}
 		
-		try {
 			ImageView currentBG = (ImageView) findViewById(R.id.currentBG);
 			Picasso.with(this).load(wp.getCurrentWallpaper().getCacheFile())
-					.fit().centerCrop().into(currentBG);
+					.fit().centerInside().into(currentBG);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -139,16 +141,18 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-//		Button buttonButton = (Button) findViewById(R.id.buttonbutton);
-//		buttonButton.setOnClickListener(new OnClickListener() {
-//			
-//			@Override
-//			public void onClick(View arg0) {
-//				new WallpaperManager(MainActivity.this).tweakWallpaper();
-//
-//			}
-//		});
-
+		
+		findViewById(R.id.currentBG).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_VIEW);
+				intent.setDataAndType(
+						Uri.fromFile(new WallpaperManager(MainActivity.this).getCurrentWallpaper().getCacheFile()),
+						"image/*");
+				startActivity(intent);
+			}
+		});
 	}
 
 	@Override

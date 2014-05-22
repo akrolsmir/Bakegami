@@ -11,7 +11,6 @@ Tired of stock wallpapers? Background Refresh pulls popular images onto your dev
 Free and open source, Background Refresh aims to improve your Android experience by delivering quality content straight to your background.
 
 Fix:
-* Favorites multi-select
 
 Todo:
 * Reset time counter on skip
@@ -34,3 +33,6 @@ Ideally:
 * Grab images from RES
 * Grab images from next page on exhaust
 * Undo delete - https://github.com/soarcn/UndoBar/blob/master/example/src/com/cocosw/undobar/example/UndoStyle.java
+* Dynamic grid sizing ala Scrolldit
+* Resize gigantic images - http://stackoverflow.com/questions/10271020/bitmap-too-large-to-be-uploaded-into-a-texture
+* Improve landscape layout

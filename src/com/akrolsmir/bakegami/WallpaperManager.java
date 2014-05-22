@@ -35,6 +35,8 @@ public class WallpaperManager {
 	public void nextWallpaper() {
 		advanceCurrent();
 		getCurrentWallpaper().setAsBackground();
+		// Notify MainActivity and the widget, somehow...
+		
 	}
 	
 	public static void removeFavorite(int i) {
