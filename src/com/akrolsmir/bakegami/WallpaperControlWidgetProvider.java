@@ -53,7 +53,7 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
 		@Override
 		protected void onHandleIntent(Intent intent) {
-			new WallpaperManager(this).favoriteWallpaper();
+			new WallpaperManager(this).getCurrentWallpaper().favorite();
 		}
 	}
 

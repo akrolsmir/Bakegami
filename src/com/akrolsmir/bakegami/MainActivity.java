@@ -1,27 +1,28 @@
 package com.akrolsmir.bakegami;
 
 import java.io.File;
-import java.util.ArrayList;
 
+import android.R.drawable;
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.app.PendingIntent.CanceledException;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.SparseBooleanArray;
-import android.view.ActionMode;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.view.Window;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.FavoriteWallpaperService;
+import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.NextWallpaperService;
+import com.squareup.picasso.Picasso;
 
 public class MainActivity extends Activity {
 
@@ -29,31 +30,77 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		WallpaperManager wp = new WallpaperManager(this);
+		
+		//TODO move out into refresh method
+		ImageButton favButton = (ImageButton) findViewById(R.id.favButton);
+		if(wp.getCurrentWallpaper().imageInFavorites()) {
+			favButton.setImageResource(android.R.drawable.star_big_on);
+		} else {
+			favButton.setImageResource(android.R.drawable.star_big_off);
+		}
+		
+		try {
+			ImageView currentBG = (ImageView) findViewById(R.id.currentBG);
+			Picasso.with(this).load(wp.getCurrentWallpaper().getCacheFile())
+					.fit().centerCrop().into(currentBG);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-		final EditText subredditText = (EditText) findViewById(R.id.subredditText);
-		final EditText refreshTimeText = (EditText) findViewById(R.id.refreshTimeText);
+//		final EditText subredditText = (EditText) findViewById(R.id.subredditText);
+//		final EditText refreshTimeText = (EditText) findViewById(R.id.refreshTimeText);
+		
+		favButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this, FavoriteWallpaperService.class);
+				PendingIntent pendingIntent = PendingIntent.getService(MainActivity.this, 0, intent, 0);
+				try {
+					pendingIntent.send();
+				} catch (CanceledException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		final EditText subredditText = new EditText(this);
+		subredditText.setText("awwnime");
+		final EditText refreshTimeText = new EditText(this);
+		refreshTimeText.setText("200");
 
-		ImageButton nextButton = (ImageButton) findViewById(R.id.startButton);
+		ImageButton nextButton = (ImageButton) findViewById(R.id.nextButton);
 		nextButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
+				Intent intent = new Intent(MainActivity.this, NextWallpaperService.class);
+				PendingIntent pendingIntent = PendingIntent.getService(MainActivity.this, 0, intent, 0);
+				try {
+					pendingIntent.send();
+				} catch (CanceledException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-				MainActivity.this.startService(new Intent(MainActivity.this,
-						WallpaperControlWidgetProvider.RefreshService.class).setAction("start"));
-
-				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().putString("subreddit",
-						subredditText.getText().toString()).commit();
-
-				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().putLong("refreshTime",
-						Long.parseLong(refreshTimeText.getText().toString())).commit();
-
-				Toast.makeText(MainActivity.this, "Cycling through r/" + subredditText.getText()
-						+ " every " + refreshTimeText.getText() + " sec", Toast.LENGTH_LONG).show();
+//				MainActivity.this.startService(new Intent(MainActivity.this,
+//						WallpaperControlWidgetProvider.RefreshService.class).setAction("start"));
+//
+//				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().putString("subreddit",
+//						subredditText.getText().toString()).commit();
+//
+//				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().putLong("refreshTime",
+//						Long.parseLong(refreshTimeText.getText().toString())).commit();
+//
+//				Toast.makeText(MainActivity.this, "Cycling through r/" + subredditText.getText()
+//						+ " every " + refreshTimeText.getText() + " sec", Toast.LENGTH_LONG).show();
 			}
 		});
 
-		ImageButton clearButton = (ImageButton) findViewById(R.id.clearButton);
+		ImageButton clearButton = (ImageButton) findViewById(R.id.pausePlayButton);
 		clearButton.setOnClickListener(new OnClickListener() {
 
 			@Override

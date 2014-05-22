@@ -32,7 +32,7 @@ public class FavoritesView extends GridView {
 				Intent intent = new Intent();
 				intent.setAction(Intent.ACTION_VIEW);
 				intent.setDataAndType(
-						Uri.parse("file://" + WallpaperManager.getFavorites().get(position)),
+						Uri.parse("file://" + Wallpaper.getFavorites().get(position)),
 						"image/*");
 				context.startActivity(intent);
 			}
@@ -72,7 +72,7 @@ public class FavoritesView extends GridView {
 					ArrayList<Uri> files = new ArrayList<Uri>();
 					for (int i = 0; i < getAdapter().getCount(); i++) {
 						if (checked.get(i)) {
-							files.add(Uri.fromFile(new File(WallpaperManager.getFavorites().get(i))));
+							files.add(Uri.fromFile(new File(Wallpaper.getFavorites().get(i))));
 						}
 					}
 

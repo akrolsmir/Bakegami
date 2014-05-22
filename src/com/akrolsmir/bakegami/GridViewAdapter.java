@@ -21,7 +21,7 @@ final class GridViewAdapter extends BaseAdapter {
 
 	public GridViewAdapter(Context context) {
 		this.context = context;
-		this.favorites = WallpaperManager.getFavorites();
+		this.favorites = Wallpaper.getFavorites();
 	}
 
 	@Override
@@ -49,7 +49,7 @@ final class GridViewAdapter extends BaseAdapter {
 
 	@Override
 	public void notifyDataSetChanged() {
-		favorites = WallpaperManager.getFavorites();
+		favorites = Wallpaper.getFavorites();
 		super.notifyDataSetChanged();
 	}
 

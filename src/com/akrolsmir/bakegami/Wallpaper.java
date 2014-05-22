@@ -9,6 +9,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 import android.app.WallpaperManager;
 import android.content.Context;
@@ -22,7 +26,9 @@ public class Wallpaper {
 	private String imageURL;
 	private String imageName;
 
-	private File CACHE_DIR, PIC_DIR;
+	private File CACHE_DIR;
+	private static File PIC_DIR = new File(Environment.getExternalStoragePublicDirectory(
+			Environment.DIRECTORY_PICTURES), "bakegami"); //TODO replace with name of app
 
 	public Wallpaper(Context context, String imageURL) {
 		this.context = context;
@@ -30,8 +36,6 @@ public class Wallpaper {
 		this.imageName = imageURL.substring(imageURL.lastIndexOf('/'));
 
 		CACHE_DIR = context.getExternalCacheDir();
-		PIC_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-		PIC_DIR = new File(PIC_DIR, "bakegami"); //TODO replace with name of app
 		CACHE_DIR.mkdirs();
 		PIC_DIR.mkdirs();
 	}
@@ -80,6 +84,11 @@ public class Wallpaper {
 	private boolean imageInCache() {
 //		Log.d("imageInCache", CACHE_DIR.getAbsolutePath() + imageName);
 		File imageFile = new File(CACHE_DIR, imageName);
+		return imageFile.exists();
+	}
+	
+	public boolean imageInFavorites() {
+		File imageFile = new File(PIC_DIR, imageName);
 		return imageFile.exists();
 	}
 
@@ -134,5 +143,22 @@ public class Wallpaper {
 	
 	public File getCacheFile(){
 		return new File(CACHE_DIR, imageName);
+	}
+	
+	public static List<String> getFavorites() {
+		List<String> result = new ArrayList<String>();
+
+		File[] files = PIC_DIR.listFiles();
+		Arrays.sort(files, new Comparator<File>() {
+			public int compare(File f1, File f2) {
+				return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+			}
+		});
+
+		for (File file : files) {
+			result.add(file.getPath());
+		}
+
+		return result;
 	}
 }

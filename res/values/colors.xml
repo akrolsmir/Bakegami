@@ -3,6 +3,7 @@
     <drawable name="list_normal">#96FFFFFF</drawable>
     <drawable name="list_active">#66000000</drawable>
     <drawable name="list_pressed">#CA000000</drawable>
+    <drawable name="actionbar_background">#AA303030</drawable>
     <color name="blue">#660000FF</color>
     <color name="green">#66008000</color>
 </resources>
