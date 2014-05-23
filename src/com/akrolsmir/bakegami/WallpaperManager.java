@@ -83,7 +83,7 @@ public class WallpaperManager {
 				numToFetch--;
 			}
 		}
-		// Placeholder. TODO remove
+		// TODO handle case when out of images
 		//		return "http://i.imgur.com/iCQxSJZ.jpg";
 	}
 

@@ -20,8 +20,6 @@ Todo:
 UI improvements:
 * [Widget] Favorite button colors when clicked
 * [Widget] Unfavorite on next click
-* Improve main app usability:
-	* Integrate 
 
 Ideally:
 * Allow user to adjust wallpaper
@@ -36,3 +34,4 @@ Ideally:
 * Dynamic grid sizing ala Scrolldit
 * Resize gigantic images - http://stackoverflow.com/questions/10271020/bitmap-too-large-to-be-uploaded-into-a-texture
 * Improve landscape layout
+* Animate transitions - http://stackoverflow.com/a/6857762/1222351

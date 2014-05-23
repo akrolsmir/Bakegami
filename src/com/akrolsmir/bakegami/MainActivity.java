@@ -13,13 +13,14 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.FavoriteWallpaperService;
 import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.NextWallpaperService;
+import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.RefreshService;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends Activity {
@@ -49,7 +50,7 @@ public class MainActivity extends Activity {
 		final EditText subredditText = new EditText(this);
 		subredditText.setText("awwnime");
 		final EditText refreshTimeText = new EditText(this);
-		refreshTimeText.setText("200");
+		refreshTimeText.setText("30");
 
 		ImageButton nextButton = (ImageButton) findViewById(R.id.nextButton);
 		nextButton.setOnClickListener(new OnClickListener() {
@@ -79,16 +80,38 @@ public class MainActivity extends Activity {
 			}
 		});
 
-		ImageButton clearButton = (ImageButton) findViewById(R.id.pausePlayButton);
-		clearButton.setOnClickListener(new OnClickListener() {
+		final ImageButton playPauseButton = (ImageButton) findViewById(R.id.pausePlayButton);
+		if (RefreshService.isCycling) {
+			playPauseButton.setImageResource(android.R.drawable.ic_media_play);
+		} else {
+			playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
+		}
+		playPauseButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				//stops refreshing
+				if (RefreshService.isCycling) {
+					playPauseButton.setImageResource(android.R.drawable.ic_media_play);
+				} else {
+					playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
+				}
+				
 				Intent intent = new Intent(MainActivity.this,
 						WallpaperControlWidgetProvider.RefreshService.class);
-				MainActivity.this.startService(intent.setAction("stop"));//TODO unhardcode
-
+				startService(intent.setAction(RefreshService.TOGGLE));
+			}
+		});
+		
+		//TODO remove backdoor
+		playPauseButton.setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View arg0) {
+				// clears cache
+//				for(File file : getExternalCacheDir().listFiles())
+//					file.delete();
+//				
+//				Toast.makeText(MainActivity.this, "Cleared cache", Toast.LENGTH_SHORT).show();
+				
 				//clears history
 				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().clear().commit();
 				
@@ -98,25 +121,9 @@ public class MainActivity extends Activity {
 
 				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().putLong("refreshTime",
 						Long.parseLong(refreshTimeText.getText().toString())).commit();
-				
-				// Loads the first 5:
-				new WallpaperManager(MainActivity.this);
-				
-				Toast.makeText(MainActivity.this, "Stopped cycling", Toast.LENGTH_SHORT).show();
+				return false;
 			}
 		});
-		
-//		clearButton.setOnLongClickListener(new OnLongClickListener() {
-//			@Override
-//			public boolean onLongClick(View arg0) {
-//				// clears cache
-//				for(File file : getExternalCacheDir().listFiles())
-//					file.delete();
-//				
-//				Toast.makeText(MainActivity.this, "Cleared cache", Toast.LENGTH_SHORT).show();
-//				return false;
-//			}
-//		});
 		
 		
 		findViewById(R.id.currentBG).setOnClickListener(new OnClickListener() {

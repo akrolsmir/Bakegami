@@ -8,6 +8,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.NetworkInfo.State;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -53,7 +54,7 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
 		@Override
 		protected void onHandleIntent(Intent intent) {
-			new WallpaperManager(this).getCurrentWallpaper().favorite();
+			new WallpaperManager(this).getCurrentWallpaper().toggleFavorite();
 		}
 	}
 
@@ -75,6 +76,14 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 		public RefreshService() {
 			super("RefreshService");
 		}
+		
+		public static boolean isCycling(Context context) {
+			Intent intent = new Intent(context, NextWallpaperService.class);
+			return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_NO_CREATE) == null;
+		}
+		
+		public static boolean isCycling = false;
+		public final static String TOGGLE = "com.akrolsmir.bakegami.TOGGLE", BOOT = "com.akrolsmir.bakegami.BOOT";
 
 		@Override
 		protected void onHandleIntent(Intent intent) {
@@ -88,13 +97,17 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 			alarmManager.cancel(pendingIntent); //Cancels any past refresh
 
 			Log.d("intent.getAction()", intent.getAction());
-			if (intent.getAction().equals("boot")) {
+			if (intent.getAction().equals(BOOT)) {
 				alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME,
 						SystemClock.elapsedRealtime() + period / 2, period, pendingIntent);
-			} else if (intent.getAction().equals("stop")) {
-				// do nothing
-			} else if (intent.getAction().equals("start")) {
-				alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, 0, period, pendingIntent);
+				isCycling = true;
+			} else if (intent.getAction().equals(TOGGLE)) {
+				if(isCycling) {
+					// stop by doing nothing
+				} else {
+					alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, 0, period, pendingIntent);
+				}
+				isCycling = !isCycling;
 			}
 
 		}
@@ -112,7 +125,7 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			context.startService(new Intent(context, RefreshService.class).setAction("boot"));
+			context.startService(new Intent(context, RefreshService.class).setAction(RefreshService.BOOT));
 		}
 	}
 }
