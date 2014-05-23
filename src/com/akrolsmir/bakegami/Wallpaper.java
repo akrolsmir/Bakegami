@@ -51,8 +51,10 @@ public class Wallpaper {
 				public void run() {
 					try {
 						// Download stuff to cache folder
-						downloadImage();
+						downloadFile(imageURL, getCacheFile());
 					} catch (Exception e) {
+						//TODO handle?
+						e.printStackTrace();
 					}
 				}
 			}).start();
@@ -65,7 +67,7 @@ public class Wallpaper {
 			public void run() {
 				try {
 					if (!imageInCache())
-						downloadImage();
+						downloadFile(imageURL, getCacheFile());
 
 					// Grab the picture from cache
 					WallpaperManager wpm = WallpaperManager.getInstance(context);
@@ -75,8 +77,10 @@ public class Wallpaper {
 					Log.d("Changed wallpaper", imageURL);
 
 				} catch (FileNotFoundException e) {
+					// TODO handle?
 					e.printStackTrace();
 				} catch (IOException e) {
+					// TODO handle?
 					e.printStackTrace();
 				}
 			}
@@ -84,68 +88,54 @@ public class Wallpaper {
 	}
 
 	private boolean imageInCache() {
-//		Log.d("imageInCache", CACHE_DIR.getAbsolutePath() + imageName);
-		File imageFile = new File(CACHE_DIR, imageName);
-		return imageFile.exists();
+		return getCacheFile().exists();
 	}
 	
 	public boolean imageInFavorites() {
-		File imageFile = new File(PIC_DIR, imageName);
-		return imageFile.exists();
+		return getFavoriteFile().exists();
 	}
 
-	private void downloadImage() throws MalformedURLException, IOException {
-		InputStream input = null;
-		try {
-			OutputStream output = new FileOutputStream(new File(CACHE_DIR, imageName));
+	private void downloadFile(String url, File dst) throws MalformedURLException, IOException {
+		transfer(new URL(url).openStream(), new FileOutputStream(dst));
+	}
 
-			input = new URL(imageURL).openStream();
-//			Log.d("downloadImage", "Downloading " + imageURL);
-			try {
-				byte[] buffer = new byte[8192];
-				int bytesRead = 0;
-				while ((bytesRead = input.read(buffer, 0, buffer.length)) >= 0) {
-					output.write(buffer, 0, bytesRead);
-				}
-			} finally {
-				output.close();
+	private void copyFile(File src, File dst) throws IOException {
+		transfer(new FileInputStream(src), new FileOutputStream(dst));
+	}
+	
+	private void transfer(InputStream in, OutputStream out) throws IOException {
+		try {
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
 			}
 		} finally {
-			input.close();
-//			Log.d("downloadImage", "Finished " + imageURL);
+			in.close();
+			out.close();
 		}
 	}
 
-	// TODO UGLY UGLY CODE DUPLICATION. F*** JAVA I/O
-	private void copy(File src, File dst) throws IOException {
-		InputStream in = new FileInputStream(src);
-		OutputStream out = new FileOutputStream(dst);
-		
-//		Log.d("copy", "Copying " + imageURL);
-
-		// Transfer bytes from in to out
-		byte[] buf = new byte[1024];
-		int len;
-		while ((len = in.read(buf)) > 0) {
-			out.write(buf, 0, len);
-		}
-		in.close();
-		out.close();
-//		Log.d("copy", "Finished " + imageURL);
-	}
-
-	public void favorite() {
-		try {
-			copy(new File(CACHE_DIR, imageName), new File(PIC_DIR, imageName));
-			Log.d("PIC", PIC_DIR.getAbsolutePath());
-		} catch (IOException e) {
-			e.printStackTrace();
+	public void toggleFavorite() {
+		if (imageInFavorites()) {
+			getFavoriteFile().delete();
+		} else {
+			try {
+				copyFile(getCacheFile(), getFavoriteFile());
+			} catch (IOException e) {
+				// TODO handle?
+				e.printStackTrace();
+			}
 		}
 		LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.FAVORITE));
 	}
 	
-	public File getCacheFile(){
+	public File getCacheFile() {
 		return new File(CACHE_DIR, imageName);
+	}
+	
+	public File getFavoriteFile() {
+		return new File(PIC_DIR, imageName);
 	}
 	
 	public static List<String> getFavorites() {
