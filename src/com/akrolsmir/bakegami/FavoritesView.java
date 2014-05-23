@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -18,7 +19,7 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 public class FavoritesView extends GridView {
-
+	
 	public FavoritesView(final Context context, AttributeSet attrs) {
 		super(context, attrs);
 
@@ -61,7 +62,7 @@ public class FavoritesView extends GridView {
 					}
 					Toast.makeText(context, getCheckedItemCount() + " unfavorited.",
 							Toast.LENGTH_LONG).show();
-					gva.notifyDataSetChanged();
+					LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.FAVORITE));
 					mode.finish();
 					return true;
 				case R.id.menu_item_share:
@@ -106,5 +107,9 @@ public class FavoritesView extends GridView {
 				return false;
 			}
 		});
+	}
+	
+	public void onFavorite() {
+		((GridViewAdapter)this.getAdapter()).notifyDataSetChanged();
 	}
 }

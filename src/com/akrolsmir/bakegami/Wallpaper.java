@@ -16,7 +16,9 @@ import java.util.List;
 
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Environment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class Wallpaper {
@@ -139,6 +141,7 @@ public class Wallpaper {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.FAVORITE));
 	}
 	
 	public File getCacheFile(){

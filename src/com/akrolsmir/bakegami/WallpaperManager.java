@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Environment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.gson.JsonArray;
@@ -35,7 +36,8 @@ public class WallpaperManager {
 	public void nextWallpaper() {
 		advanceCurrent();
 		getCurrentWallpaper().setAsBackground();
-		// Notify MainActivity and the widget, somehow...
+		// Notify MainActivity to update its views
+		LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.NEXT));
 		
 	}
 	
