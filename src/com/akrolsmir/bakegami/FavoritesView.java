@@ -57,7 +57,7 @@ public class FavoritesView extends GridView {
 					//TODO confirm discard
 					for (int i = 0; i < getAdapter().getCount(); i++) {
 						if (checked.get(i)) {
-							WallpaperManager.removeFavorite(i);
+							Wallpaper.removeFavorite(i);
 						}
 					}
 					Toast.makeText(context, getCheckedItemCount() + " unfavorited.",

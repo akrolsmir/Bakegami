@@ -8,9 +8,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.NetworkInfo.State;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -18,7 +16,6 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		Log.d("TAG", "onUpdate");
-		context.startService(new Intent(context, NextWallpaperService.class));
 
 		// Perform this loop procedure for each App Widget that belongs to this provider
 		for (int appWidgetId : appWidgetIds) {
@@ -55,7 +52,7 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
 		@Override
 		protected void onHandleIntent(Intent intent) {
-			new WallpaperManager(this).getCurrentWallpaper().toggleFavorite();
+			WallpaperManager.with(this).getCurrentWallpaper().toggleFavorite();
 		}
 	}
 
@@ -68,7 +65,7 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 		@Override
 		protected void onHandleIntent(Intent intent) {
 			Log.d("Changing wallpaper", "...");
-			new WallpaperManager(this).nextWallpaper();
+			WallpaperManager.with(this).nextWallpaper();
 		}
 	}
 
@@ -78,13 +75,18 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 			super("RefreshService");
 		}
 		
+		private static String KEY_CYCLING = "com.akrolsmir.bakegami.cycling";
+		
 		public static boolean isCycling(Context context) {
-			Intent intent = new Intent(context, NextWallpaperService.class);
-			return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_NO_CREATE) == null;
+			return context.getSharedPreferences(KEY_CYCLING, 0).getBoolean(KEY_CYCLING, false);
 		}
 		
-		public static boolean isCycling = false;
-		public final static String TOGGLE = "com.akrolsmir.bakegami.TOGGLE", BOOT = "com.akrolsmir.bakegami.BOOT";
+		private void setCycling(boolean value) {
+			getSharedPreferences(KEY_CYCLING, 0).edit().putBoolean(KEY_CYCLING, value).commit();
+		}
+		
+		public final static String TOGGLE = "com.akrolsmir.bakegami.TOGGLE",
+				BOOT = "com.akrolsmir.bakegami.BOOT";
 
 		@Override
 		protected void onHandleIntent(Intent intent) {
@@ -94,23 +96,24 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
 			AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-			long period = SettingsActivity.getRefreshSeconds(this);
+			long period = SettingsActivity.getRefreshSeconds(this) * 1000;
 			alarmManager.cancel(pendingIntent); //Cancels any past refresh
-
-			Log.d("intent.getAction()", intent.getAction());
+			
+			
+			Log.d("REPEATING intent.getAction()", intent.getAction());
 			if (intent.getAction().equals(BOOT)) {
 				alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME,
 						SystemClock.elapsedRealtime() + period / 2, period, pendingIntent);
-				isCycling = true;
+				setCycling(true);
 			} else if (intent.getAction().equals(TOGGLE)) {
-				if(isCycling) {
+				if(isCycling(this)) {
 					// stop by doing nothing
 					Log.d("REPEATING EVERY", "PAUSED");
 				} else {
 					alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, 0, period, pendingIntent);
-					Log.d("REPEATING EVERY", period + "s");
+					Log.d("REPEATING EVERY", period + "ms");
 				}
-				isCycling = !isCycling;
+				setCycling(!isCycling(this));
 			}
 
 		}

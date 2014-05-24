@@ -154,4 +154,8 @@ public class Wallpaper {
 
 		return result;
 	}
+	
+	public static void removeFavorite(int i) {
+		Log.d("DELETING...", ""+ new File(Wallpaper.getFavorites().get(i)).delete());
+	}
 }

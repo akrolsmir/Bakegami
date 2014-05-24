@@ -11,13 +11,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.widget.EditText;
+import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -81,21 +81,21 @@ public class MainActivity extends Activity {
 		});
 
 		final ImageButton playPauseButton = (ImageButton) findViewById(R.id.pausePlayButton);
-		if (RefreshService.isCycling) {
-			playPauseButton.setImageResource(android.R.drawable.ic_media_play);
-		} else {
-			playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
-		}
+		Log.d("REPEATING", "" + RefreshService.isCycling(this));
+		playPauseButton.setImageResource(
+				RefreshService.isCycling(this) ?
+					android.R.drawable.ic_media_pause :
+					android.R.drawable.ic_media_play
+		);
 		playPauseButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				if (RefreshService.isCycling) {
-					playPauseButton.setImageResource(android.R.drawable.ic_media_play);
-				} else {
-					playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
-				}
-				
+				playPauseButton.setImageResource(
+						RefreshService.isCycling(MainActivity.this) ?
+							android.R.drawable.ic_media_play :
+							android.R.drawable.ic_media_pause
+				);
 				Intent intent = new Intent(MainActivity.this,
 						WallpaperControlWidgetProvider.RefreshService.class);
 				startService(intent.setAction(RefreshService.TOGGLE));
@@ -112,9 +112,7 @@ public class MainActivity extends Activity {
 //				
 //				Toast.makeText(MainActivity.this, "Cleared cache", Toast.LENGTH_SHORT).show();
 				
-				//clears history
-				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().clear().commit();
-				
+				WallpaperManager.with(MainActivity.this).clearHistory();
 				return false;
 			}
 		});
@@ -126,7 +124,7 @@ public class MainActivity extends Activity {
 				Intent intent = new Intent();
 				intent.setAction(Intent.ACTION_VIEW);
 				intent.setDataAndType(
-						Uri.fromFile(new WallpaperManager(MainActivity.this).getCurrentWallpaper().getCacheFile()),
+						Uri.fromFile(WallpaperManager.with(MainActivity.this).getCurrentWallpaper().getCacheFile()),
 						"image/*");
 				startActivity(intent);
 			}
@@ -181,33 +179,21 @@ public class MainActivity extends Activity {
 	};
 	
 	private void onNextBG() {
-		try { //TODO more robust/better handling
-			WallpaperManager wp = new WallpaperManager(this);
-			ImageView currentBG = (ImageView) findViewById(R.id.currentBG);
-			Picasso.with(this).load(wp.getCurrentWallpaper().getCacheFile())
-					.fit().centerInside().into(currentBG);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		ImageView currentBG = (ImageView) findViewById(R.id.currentBG);
+		Picasso.with(this).load(
+				WallpaperManager.with(this).getCurrentWallpaper().getCacheFile())
+				.fit().centerInside().into(currentBG);
 		onFavorite();
 	}
 	
 	private void onFavorite() {
-		try { //TODO more robust/better handling
-			FavoritesView fv = (FavoritesView) findViewById(R.id.favorites);
-			fv.onFavorite();
-			
-			WallpaperManager wp = new WallpaperManager(this);
-			
-			ImageButton favButton = (ImageButton) findViewById(R.id.favButton);
-			if(wp.getCurrentWallpaper().imageInFavorites()) {
-				favButton.setImageResource(android.R.drawable.star_big_on);
-			} else {
-				favButton.setImageResource(android.R.drawable.star_big_off);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		((FavoritesView) findViewById(R.id.favorites)).onFavorite();
+		
+		((ImageButton) findViewById(R.id.favButton)).setImageResource(
+				WallpaperManager.with(this).getCurrentWallpaper().imageInFavorites() ?
+					android.R.drawable.star_big_on :
+					android.R.drawable.star_big_off
+		);
 	}
 	
 //	public void updateConnectedFlags() {

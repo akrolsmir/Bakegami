@@ -1,11 +1,5 @@
 package com.akrolsmir.bakegami;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -13,8 +7,6 @@ import org.springframework.web.client.RestTemplate;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -22,16 +14,20 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
-//TODO rename to BackgroundManager, rename Wallpaper to Background
 public class WallpaperManager {
 
 	private SharedPreferences settings;
 	private Context context;
+	private static WallpaperManager instance;
 
-	public WallpaperManager(Context context) {
-		this.settings = context.getSharedPreferences("com.akrolsmir.bakegami", 0);
+	private WallpaperManager(Context context) {
+		this.settings = context.getSharedPreferences("com.akrolsmir.bakegami.WallpaperManager", 0);
 		this.context = context;
 		fetchNextUrls();
+	}
+	
+	public static WallpaperManager with(Context context) {
+		return instance == null ? instance = new WallpaperManager(context) : instance; 
 	}
 
 	public void nextWallpaper() {
@@ -42,14 +38,20 @@ public class WallpaperManager {
 		
 	}
 	
-	public static void removeFavorite(int i) {
-		Log.d("DELETING...", ""+ new File(Wallpaper.getFavorites().get(i)).delete());
+	public Wallpaper getCurrentWallpaper() {
+		return new Wallpaper(context, getCurrentWallpaperURL());
 	}
-
+	
+	public void clearHistory() {
+		settings.edit().clear().commit();
+		fetchNextUrls();
+	}
 	
 	public void tweakWallpaper(){
 		// TODO allow user to adjust wallpaper
 	}
+	
+	/* Private helper methods */
 
 	private void fetchNextUrls() {
 		int index = settings.getInt("index", 0);
@@ -106,14 +108,12 @@ public class WallpaperManager {
 		String queue = settings.getString(QUEUE, "");
 		settings.edit().putString(QUEUE, queue + imageURL + " ").commit();
 	}
-
-	public Wallpaper getCurrentWallpaper() {
-		return new Wallpaper(context, getCurrentWallpaperURL());
-	}
 	
-	private String DEFAULT_URL = "http://cdn.awwni.me/maav.jpg ";
+	private String DEFAULT_URL = "http://cdn.awwni.me/maav.jpg";
 	private String getCurrentWallpaperURL(){
-		return settings.getString(QUEUE, DEFAULT_URL).split(" ")[0];
+		String url = settings.getString(QUEUE, DEFAULT_URL + " ").split(" ")[0];
+		Log.d("URLURLURL", "url: " + url);
+		return url.contains("/") ? url : DEFAULT_URL;
 	}
 
 	private void advanceCurrent() {
