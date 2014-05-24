@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -70,7 +71,7 @@ public class WallpaperManager {
 	}
 
 	private String getSubreddit() {
-		return settings.getString("subreddit", "awwnime");
+		return SettingsActivity.with(context).getString(SettingsActivity.KEY_PREF_SUBREDDIT, "");
 	}
 
 	private void parseUrlFromReddit(String rawJson, int numToFetch) {

@@ -9,9 +9,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.EditText;
@@ -28,6 +31,8 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setContentView(R.layout.activity_main);
 		
 		onNextBG();
@@ -46,11 +51,6 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
-		
-		final EditText subredditText = new EditText(this);
-		subredditText.setText("awwnime");
-		final EditText refreshTimeText = new EditText(this);
-		refreshTimeText.setText("30");
 
 		ImageButton nextButton = (ImageButton) findViewById(R.id.nextButton);
 		nextButton.setOnClickListener(new OnClickListener() {
@@ -115,12 +115,6 @@ public class MainActivity extends Activity {
 				//clears history
 				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().clear().commit();
 				
-				// loads from current stuff
-				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().putString("subreddit",
-						subredditText.getText().toString()).commit();
-
-				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().putLong("refreshTime",
-						Long.parseLong(refreshTimeText.getText().toString())).commit();
 				return false;
 			}
 		});
@@ -144,6 +138,15 @@ public class MainActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+		case R.id.action_settings:
+			startActivity(new Intent(this, SettingsActivity.class));
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	/* Listen for changes made by services/the widget */

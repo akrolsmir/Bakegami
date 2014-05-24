@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <EditTextPreference
+        android:defaultValue="1"
+        android:key="pref_update_freq"
+        android:summary="Update every ___ ___s"
+        android:title="Refresh frequency" />
+
+    <ListPreference
+        android:defaultValue="1"
+        android:dialogTitle="Update block"
+        android:entries="@array/pref_update_block_entries"
+        android:entryValues="@array/pref_update_block_values"
+        android:key="pref_update_block"
+        android:title="Refresh block" />
+
+    <EditTextPreference
+        android:defaultValue="wallpaper"
+        android:key="pref_subreddit"
+        android:summary="r/wallpaper_"
+        android:title="Subreddit" />
+
+</PreferenceScreen>

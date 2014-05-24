@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo.State;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -93,7 +94,7 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
 			AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-			long period = getRefreshTime() * 1000;
+			long period = SettingsActivity.getRefreshSeconds(this);
 			alarmManager.cancel(pendingIntent); //Cancels any past refresh
 
 			Log.d("intent.getAction()", intent.getAction());
@@ -104,16 +105,14 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 			} else if (intent.getAction().equals(TOGGLE)) {
 				if(isCycling) {
 					// stop by doing nothing
+					Log.d("REPEATING EVERY", "PAUSED");
 				} else {
 					alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, 0, period, pendingIntent);
+					Log.d("REPEATING EVERY", period + "s");
 				}
 				isCycling = !isCycling;
 			}
 
-		}
-
-		private long getRefreshTime() {
-			return getSharedPreferences("com.akrolsmir.bakegami", 0).getLong("refreshTime", 20);
 		}
 	}
 
