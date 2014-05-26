@@ -73,7 +73,7 @@ public class WallpaperManager {
 	}
 
 	private String getSubreddit() {
-		return SettingsActivity.with(context).getString(SettingsActivity.KEY_PREF_SUBREDDIT, "");
+		return SettingsActivity.getSubreddit(context);
 	}
 
 	private void parseUrlFromReddit(String rawJson, int numToFetch) {

@@ -33,3 +33,5 @@ Ideally:
 * Improve landscape layout
 * Animate transitions - http://stackoverflow.com/a/6857762/1222351
 * Grab images from next page on exhaust / Cycle through favorites
+* Disable autocorrect
+* Immediately propagate changes to settings (i.e. reset refresh time, recache images)
