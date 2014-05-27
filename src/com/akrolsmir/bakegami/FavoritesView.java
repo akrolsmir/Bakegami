@@ -55,7 +55,8 @@ public class FavoritesView extends GridView {
 				switch (item.getItemId()) {
 				case R.id.menu_item_delete:
 					//TODO confirm discard
-					for (int i = 0; i < getAdapter().getCount(); i++) {
+					// Count backwards to ensure correct index is used
+					for (int i = getAdapter().getCount() - 1; i >= 0; i--) {
 						if (checked.get(i)) {
 							Wallpaper.removeFavorite(i);
 						}
