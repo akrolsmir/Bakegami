@@ -11,19 +11,19 @@
             android:id="@+id/manageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu_manage" />
-
-        <ImageButton
-            android:id="@+id/skipButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_media_next" />
+            android:src="@drawable/ic_launcher" />
 
         <ImageButton
             android:id="@+id/favButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@android:drawable/star_big_off" />
+
+        <ImageButton
+            android:id="@+id/skipButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_media_next" />
     </LinearLayout>
 
 </FrameLayout>

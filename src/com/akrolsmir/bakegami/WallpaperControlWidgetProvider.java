@@ -31,13 +31,18 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 			views.setOnClickPendingIntent(R.id.skipButton, pendingIntent);
 
 			intent = new Intent(context, MainActivity.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 			views.setOnClickPendingIntent(R.id.manageButton, pendingIntent);
 
 			intent = new Intent(context, FavoriteWallpaperService.class);
 			pendingIntent = PendingIntent.getService(context, 0, intent, 0);
 			views.setOnClickPendingIntent(R.id.favButton, pendingIntent);
+			
+			views.setImageViewResource(R.id.favButton,
+					WallpaperManager.with(context).getCurrentWallpaper().imageInFavorites() ?
+						android.R.drawable.star_big_on : 
+						android.R.drawable.star_big_off);
 
 			// Tell the AppWidgetManager to perform an update on the current app widget
 			appWidgetManager.updateAppWidget(appWidgetId, views);
