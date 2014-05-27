@@ -151,18 +151,18 @@ public class Wallpaper {
 	
 	public static List<String> getFavorites() {
 		List<String> result = new ArrayList<String>();
-
 		File[] files = PIC_DIR.listFiles();
-		Arrays.sort(files, new Comparator<File>() {
-			public int compare(File f1, File f2) {
-				return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+		
+		if (files != null) {
+			Arrays.sort(files, new Comparator<File>() {
+				public int compare(File f1, File f2) {
+					return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+				}
+			});
+			for (File file : files) {
+				result.add(file.getPath());
 			}
-		});
-
-		for (File file : files) {
-			result.add(file.getPath());
 		}
-
 		return result;
 	}
 	
