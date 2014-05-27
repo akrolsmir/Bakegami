@@ -35,8 +35,6 @@ public class MainActivity extends Activity {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setContentView(R.layout.activity_main);
 		
-		onNextBG();
-		
 		findViewById(R.id.favButton).setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -130,7 +128,7 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -154,6 +152,8 @@ public class MainActivity extends Activity {
 	
 	@Override
 	protected void onResume() {
+		onNextBG();
+		
 		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
 		manager.registerReceiver(updateReceiver, new IntentFilter(NEXT));
 		manager.registerReceiver(updateReceiver, new IntentFilter(FAVORITE));
@@ -179,6 +179,7 @@ public class MainActivity extends Activity {
 	};
 	
 	private void onNextBG() {
+		Log.d("TAG", "onNextBG");
 		ImageView currentBG = (ImageView) findViewById(R.id.currentBG);
 		Picasso.with(this).load(
 				WallpaperManager.with(this).getCurrentWallpaper().getCacheFile())

@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
 
     <uses-sdk
         android:minSdkVersion="11"
@@ -24,6 +23,7 @@
         <activity
             android:name="com.akrolsmir.bakegami.MainActivity"
             android:label="@string/app_name"
+            android:launchMode="singleInstance"
             android:windowSoftInputMode="stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,8 +49,8 @@
         </receiver>
 
         <service android:name="WallpaperControlWidgetProvider$NextWallpaperService" />
-        <service android:name="WallpaperControlWidgetProvider$RefreshService"/>
-        <service android:name="WallpaperControlWidgetProvider$FavoriteWallpaperService"/>
+        <service android:name="WallpaperControlWidgetProvider$RefreshService" />
+        <service android:name="WallpaperControlWidgetProvider$FavoriteWallpaperService" />
     </application>
 
 </manifest>

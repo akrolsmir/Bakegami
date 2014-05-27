@@ -6,9 +6,11 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.SystemClock;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -31,7 +33,6 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 			views.setOnClickPendingIntent(R.id.skipButton, pendingIntent);
 
 			intent = new Intent(context, MainActivity.class);
-//			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 			views.setOnClickPendingIntent(R.id.manageButton, pendingIntent);
 
@@ -39,14 +40,21 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 			pendingIntent = PendingIntent.getService(context, 0, intent, 0);
 			views.setOnClickPendingIntent(R.id.favButton, pendingIntent);
 			
-			views.setImageViewResource(R.id.favButton,
-					WallpaperManager.with(context).getCurrentWallpaper().imageInFavorites() ?
-						android.R.drawable.star_big_on : 
-						android.R.drawable.star_big_off);
+			updateViews(context);
 
 			// Tell the AppWidgetManager to perform an update on the current app widget
 			appWidgetManager.updateAppWidget(appWidgetId, views);
 		}
+	}
+	
+	public static void updateViews(Context context) { 
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.wallpaper_control_widget);
+		remoteViews.setImageViewResource(R.id.favButton,
+				WallpaperManager.with(context).getCurrentWallpaper().imageInFavorites() ?
+					android.R.drawable.star_big_on : 
+					android.R.drawable.star_big_off);
+		ComponentName thisWidget = new ComponentName(context, WallpaperControlWidgetProvider.class);
+		AppWidgetManager.getInstance(context).updateAppWidget(thisWidget, remoteViews);
 	}
 
 	public static class FavoriteWallpaperService extends IntentService {
@@ -58,6 +66,9 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 		@Override
 		protected void onHandleIntent(Intent intent) {
 			WallpaperManager.with(this).getCurrentWallpaper().toggleFavorite();
+			// Notify MainActivity and the widget to update their views
+			LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(MainActivity.FAVORITE));
+			WallpaperControlWidgetProvider.updateViews(this);
 		}
 	}
 
@@ -71,6 +82,9 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 		protected void onHandleIntent(Intent intent) {
 			Log.d("Changing wallpaper", "...");
 			WallpaperManager.with(this).nextWallpaper();
+			// Notify MainActivity and the widget to update their views
+			LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(MainActivity.NEXT));
+			WallpaperControlWidgetProvider.updateViews(this);
 		}
 	}
 

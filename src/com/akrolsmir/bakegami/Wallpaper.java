@@ -15,14 +15,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import android.app.WallpaperManager;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Environment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.RemoteViews;
 
 public class Wallpaper {
 
@@ -130,15 +125,6 @@ public class Wallpaper {
 				e.printStackTrace();
 			}
 		}
-		LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.FAVORITE));
-		// Update widget's favorite button. Kind of hacky.
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.wallpaper_control_widget);
-		remoteViews.setImageViewResource(R.id.favButton,
-				imageInFavorites() ?
-					android.R.drawable.star_big_on : 
-					android.R.drawable.star_big_off);
-		ComponentName thisWidget = new ComponentName(context, WallpaperControlWidgetProvider.class);
-		AppWidgetManager.getInstance(context).updateAppWidget(thisWidget, remoteViews);
 	}
 	
 	public File getCacheFile() {
