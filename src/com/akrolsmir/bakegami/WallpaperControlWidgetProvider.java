@@ -10,7 +10,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.SystemClock;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -65,10 +64,7 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
 		@Override
 		protected void onHandleIntent(Intent intent) {
-			WallpaperManager.with(this).getCurrentWallpaper().toggleFavorite();
-			// Notify MainActivity and the widget to update their views
-			LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(MainActivity.FAVORITE));
-			WallpaperControlWidgetProvider.updateViews(this);
+			WallpaperManager.with(this).toggleFavorite();
 		}
 	}
 
@@ -82,9 +78,6 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 		protected void onHandleIntent(Intent intent) {
 			Log.d("Changing wallpaper", "...");
 			WallpaperManager.with(this).nextWallpaper();
-			// Notify MainActivity and the widget to update their views
-			LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(MainActivity.NEXT));
-			WallpaperControlWidgetProvider.updateViews(this);
 		}
 	}
 

@@ -5,7 +5,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.gson.JsonArray;
@@ -17,6 +19,7 @@ public class WallpaperManager {
 	private SharedPreferences settings;
 	private Context context;
 	private static WallpaperManager instance;
+	private boolean setNextWallpaperAsBG = false;
 
 	private WallpaperManager(Context context) {
 		this.settings = context.getSharedPreferences("com.akrolsmir.bakegami.WallpaperManager", 0);
@@ -31,14 +34,30 @@ public class WallpaperManager {
 	public void nextWallpaper() {
 		advanceCurrent();
 		getCurrentWallpaper().setAsBackground();
+		// Notify MainActivity and the widget to update their views
+		LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.NEXT));
+		WallpaperControlWidgetProvider.updateViews(context);
+	}
+	
+	public void toggleFavorite() {
+		getCurrentWallpaper().toggleFavorite();
+		// Notify MainActivity and the widget to update their views
+		LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.FAVORITE));
+		WallpaperControlWidgetProvider.updateViews(context);
 	}
 	
 	public Wallpaper getCurrentWallpaper() {
 		return new Wallpaper(context, getCurrentWallpaperURL());
 	}
 	
-	public void clearHistory() {
-		settings.edit().clear().commit();
+	public void resetQueueAndHistory() {
+		settings.edit().clear().apply();
+		fetchNextUrls();
+	}
+	
+	public void resetQueue() {
+		settings.edit().putString(QUEUE, "").apply();
+		setNextWallpaperAsBG = true;
 		fetchNextUrls();
 	}
 	
@@ -96,27 +115,33 @@ public class WallpaperManager {
 		return !((settings.getString(HISTORY, "") + settings.getString(QUEUE, "")).contains(imageURL));
 	}
 
-
 	private void enqueueURL(String imageURL) {
 		Log.d("enqueueURL", imageURL);
-		new Wallpaper(context, imageURL).cache();
 		String queue = settings.getString(QUEUE, "");
-		settings.edit().putString(QUEUE, queue + imageURL + " ").commit();
+		settings.edit().putString(QUEUE, queue + imageURL + " ").apply();
+		
+		if (setNextWallpaperAsBG) { // || settings.getString(QUEUE, "").length == 0
+			nextWallpaper();
+			setNextWallpaperAsBG = false;
+		} else {
+			new Wallpaper(context, imageURL).cache();
+		}
+
 	}
 	
+	// The current wallpaper is at the top of the history stack
 	private String DEFAULT_URL = "http://cdn.awwni.me/maav.jpg";
 	private String getCurrentWallpaperURL(){
-		String url = settings.getString(QUEUE, DEFAULT_URL + " ").split(" ")[0];
-		Log.d("URLURLURL", "url: " + url);
+		String url = settings.getString(HISTORY, DEFAULT_URL + " ").split(" ")[0];
 		return url.contains("/") ? url : DEFAULT_URL;
 	}
 
+	// Push the head of the queue onto history, which marks it as current
 	private void advanceCurrent() {
-		// move current from queue to history
-		String history = settings.getString(HISTORY, "");
-		settings.edit().putString(HISTORY, history + getCurrentWallpaperURL() + " ").commit();
 		String queue = settings.getString(QUEUE, "");
-		settings.edit().putString(QUEUE, queue.substring(queue.indexOf(" ") + 1)).commit();
+		settings.edit().putString(QUEUE, queue.substring(queue.indexOf(" ") + 1)).apply();
+		String history = settings.getString(HISTORY, "");
+		settings.edit().putString(HISTORY, queue.split(" ")[0] + " " + history).apply();
 		Log.d("HISTORY", settings.getString(HISTORY, ""));
 		Log.d("QUEUE", settings.getString(QUEUE, ""));
 		

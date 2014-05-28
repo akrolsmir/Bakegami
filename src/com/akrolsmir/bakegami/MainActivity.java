@@ -1,8 +1,6 @@
 package com.akrolsmir.bakegami;
 
 import android.app.Activity;
-import android.app.PendingIntent;
-import android.app.PendingIntent.CanceledException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,8 +19,6 @@ import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.FavoriteWallpaperService;
-import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.NextWallpaperService;
 import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.RefreshService;
 import com.squareup.picasso.Picasso;
 
@@ -36,17 +32,9 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		findViewById(R.id.favButton).setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, FavoriteWallpaperService.class);
-				PendingIntent pendingIntent = PendingIntent.getService(MainActivity.this, 0, intent, 0);
-				try {
-					pendingIntent.send();
-				} catch (CanceledException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				WallpaperManager.with(MainActivity.this).toggleFavorite();
 			}
 		});
 
@@ -55,14 +43,7 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onClick(View arg0) {
-				Intent intent = new Intent(MainActivity.this, NextWallpaperService.class);
-				PendingIntent pendingIntent = PendingIntent.getService(MainActivity.this, 0, intent, 0);
-				try {
-					pendingIntent.send();
-				} catch (CanceledException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				WallpaperManager.with(MainActivity.this).nextWallpaper();
 
 //				MainActivity.this.startService(new Intent(MainActivity.this,
 //						WallpaperControlWidgetProvider.RefreshService.class).setAction("start"));
@@ -94,8 +75,7 @@ public class MainActivity extends Activity {
 							android.R.drawable.ic_media_play :
 							android.R.drawable.ic_media_pause
 				);
-				Intent intent = new Intent(MainActivity.this,
-						WallpaperControlWidgetProvider.RefreshService.class);
+				Intent intent = new Intent(MainActivity.this, RefreshService.class);
 				startService(intent.setAction(RefreshService.TOGGLE));
 			}
 		});
@@ -110,7 +90,7 @@ public class MainActivity extends Activity {
 //				
 //				Toast.makeText(MainActivity.this, "Cleared cache", Toast.LENGTH_SHORT).show();
 				
-				WallpaperManager.with(MainActivity.this).clearHistory();
+				WallpaperManager.with(MainActivity.this).resetQueueAndHistory();
 				return false;
 			}
 		});

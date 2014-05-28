@@ -20,8 +20,9 @@ public class SettingsActivity extends PreferenceActivity implements
     @Override
 	public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
     	// Set summary to be the user-description for the selected value
-    	if (key.equals(KEY_PREF_SUBREDDIT)) { 
+    	if (key.equals(KEY_PREF_SUBREDDIT)) {
 			findPreference(key).setSummary("r/" + sp.getString(key, ""));
+			WallpaperManager.with(this).resetQueue();
 		}
 	}
     
@@ -44,7 +45,7 @@ public class SettingsActivity extends PreferenceActivity implements
                 .registerOnSharedPreferenceChangeListener(this);
         
         // Hackily updates the summary
-        onSharedPreferenceChanged(with(this), KEY_PREF_SUBREDDIT);
+        findPreference(KEY_PREF_SUBREDDIT).setSummary("r/" + getSubreddit(this));
     }
 
     @Override
