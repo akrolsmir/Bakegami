@@ -112,11 +112,12 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 			alarmManager.cancel(pendingIntent); //Cancels any past refresh
 			
 			if (intent.getAction().equals(BOOT)) {
-				alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME,
-						SystemClock.elapsedRealtime() + period / 2, period, pendingIntent);
-				setCycling(true);
+				if (isCycling(this)) {
+					alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME,
+							SystemClock.elapsedRealtime() + period / 2, period, pendingIntent);
+				}
 			} else if (intent.getAction().equals(TOGGLE)) {
-				if(isCycling(this)) {
+				if (isCycling(this)) {
 					// stop by doing nothing
 				} else {
 					alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, 0, period, pendingIntent);
@@ -135,8 +136,7 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 	// Restart alarm on boot
 	public static class BootBroadcastReceiver extends BroadcastReceiver {
 		
-		public BootBroadcastReceiver() {
-		}
+		public BootBroadcastReceiver() {}
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
