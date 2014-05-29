@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -81,6 +82,9 @@ public class FrequencyPickerPreference extends DialogPreference {
     		values[0] = "1";
     	persistString(values[0] + " " + values[1]);
     	setSummary(freqString() + (RefreshService.isCycling(getContext()) ? "" : " (currently paused)"));
+    	// Update the refresh time
+		Intent intent = new Intent(getContext(), RefreshService.class);
+		getContext().startService(intent.setAction(RefreshService.UPDATE));
     }
     
     @Override

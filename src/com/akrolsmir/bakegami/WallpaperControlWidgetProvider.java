@@ -98,7 +98,7 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 		}
 		
 		public final static String TOGGLE = "com.akrolsmir.bakegami.TOGGLE",
-				BOOT = "com.akrolsmir.bakegami.BOOT";
+				BOOT = "com.akrolsmir.bakegami.BOOT", UPDATE = "com.akrolsmir.bakegami.UPDATE";
 
 		@Override
 		protected void onHandleIntent(Intent intent) {
@@ -111,8 +111,6 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 			long period = SettingsActivity.getRefreshSeconds(this) * 1000;
 			alarmManager.cancel(pendingIntent); //Cancels any past refresh
 			
-			
-			Log.d("REPEATING intent.getAction()", intent.getAction());
 			if (intent.getAction().equals(BOOT)) {
 				alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME,
 						SystemClock.elapsedRealtime() + period / 2, period, pendingIntent);
@@ -120,12 +118,15 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 			} else if (intent.getAction().equals(TOGGLE)) {
 				if(isCycling(this)) {
 					// stop by doing nothing
-					Log.d("REPEATING EVERY", "PAUSED");
 				} else {
 					alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, 0, period, pendingIntent);
-					Log.d("REPEATING EVERY", period + "ms");
 				}
 				setCycling(!isCycling(this));
+			} else if (intent.getAction().equals(UPDATE)) {
+				if(isCycling(this)) {
+					alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, 
+							SystemClock.elapsedRealtime() + period, period, pendingIntent);
+				}
 			}
 
 		}
