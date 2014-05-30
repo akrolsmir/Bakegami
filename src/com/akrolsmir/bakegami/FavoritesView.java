@@ -77,7 +77,7 @@ public class FavoritesView extends GridView {
 					}
 
 					intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
-					context.startActivity(intent);
+					context.startActivity(Intent.createChooser(intent, "Share via"));
 					mode.finish();
 					return true;
 				default:
