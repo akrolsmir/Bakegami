@@ -138,6 +138,8 @@ public class WallpaperManager {
 
 	// Push the head of the queue onto history, which marks it as current
 	private void advanceCurrent() {
+		getCurrentWallpaper().uncache();
+		
 		String queue = settings.getString(QUEUE, "");
 		settings.edit().putString(QUEUE, queue.substring(queue.indexOf(" ") + 1)).apply();
 		String history = settings.getString(HISTORY, "");
