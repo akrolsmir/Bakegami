@@ -1,6 +1,5 @@
 package com.akrolsmir.bakegami;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import android.content.Context;
@@ -23,7 +22,6 @@ public class FavoritesView extends GridView {
 	public FavoritesView(final Context context, AttributeSet attrs) {
 		super(context, attrs);
 
-		//		final GridView gv = (GridView) findViewById(R.id.favorites);
 		final GridViewAdapter gva = new GridViewAdapter(context);
 		this.setAdapter(gva);
 		this.setOnItemClickListener(new OnItemClickListener() {
@@ -33,7 +31,7 @@ public class FavoritesView extends GridView {
 				Intent intent = new Intent();
 				intent.setAction(Intent.ACTION_VIEW);
 				intent.setDataAndType(
-						Uri.parse("file://" + Wallpaper.getFavorites().get(position)),
+						Uri.fromFile(Wallpaper.getFavorites().get(position)),
 						"image/*");
 				context.startActivity(intent);
 			}
@@ -74,7 +72,7 @@ public class FavoritesView extends GridView {
 					ArrayList<Uri> files = new ArrayList<Uri>();
 					for (int i = 0; i < getAdapter().getCount(); i++) {
 						if (checked.get(i)) {
-							files.add(Uri.fromFile(new File(Wallpaper.getFavorites().get(i))));
+							files.add(Uri.fromFile(Wallpaper.getFavorites().get(i)));
 						}
 					}
 

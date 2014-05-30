@@ -17,7 +17,7 @@ import com.squareup.picasso.Picasso;
 
 final class GridViewAdapter extends BaseAdapter {
 	private final Context context;
-	private List<String> favorites;
+	private List<File> favorites;
 
 	public GridViewAdapter(Context context) {
 		this.context = context;
@@ -32,12 +32,9 @@ final class GridViewAdapter extends BaseAdapter {
 			view.setScaleType(CENTER_CROP);
 		}
 
-		// Get the image URL for the current position.
-		String uri = getItem(position);
-
 		// Trigger the download of the URL asynchronously into the image view.
 		Picasso.with(context) //
-		.load(new File(uri)) //
+		.load(getItem(position)) //
 		//.placeholder(R.drawable.placeholder) //
 		//.error(R.drawable.error) //
 		.fit().centerCrop().into(view);
@@ -59,7 +56,7 @@ final class GridViewAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public String getItem(int position) {
+	public File getItem(int position) {
 		return favorites.get(position);
 	}
 

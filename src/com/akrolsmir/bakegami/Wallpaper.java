@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -21,7 +20,6 @@ import android.util.Log;
 
 public class Wallpaper {
 
-	//	private Bitmap picture;
 	private Context context;
 	private String imageURL;
 	private String imageName;
@@ -39,8 +37,6 @@ public class Wallpaper {
 		CACHE_DIR.mkdirs();
 		PIC_DIR.mkdirs();
 	}
-
-	Runnable runnable;
 
 	public void cache() {
 		if (!imageInCache()) {
@@ -135,24 +131,22 @@ public class Wallpaper {
 		return new File(PIC_DIR, imageName);
 	}
 	
-	public static List<String> getFavorites() {
-		List<String> result = new ArrayList<String>();
+	public static List<File> getFavorites() {
 		File[] files = PIC_DIR.listFiles();
 		
-		if (files != null) {
-			Arrays.sort(files, new Comparator<File>() {
-				public int compare(File f1, File f2) {
-					return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
-				}
-			});
-			for (File file : files) {
-				result.add(file.getPath());
+		if (files == null)
+			files = new File[0];
+		
+		Arrays.sort(files, new Comparator<File>() {
+			public int compare(File f1, File f2) {
+				return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
 			}
-		}
-		return result;
+		});
+		
+		return Arrays.asList(files);
 	}
 	
 	public static void removeFavorite(int i) {
-		Log.d("DELETING...", ""+ new File(Wallpaper.getFavorites().get(i)).delete());
+		Log.d("DELETING...", ""+ Wallpaper.getFavorites().get(i).delete());
 	}
 }
