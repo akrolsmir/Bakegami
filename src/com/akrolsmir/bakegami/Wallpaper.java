@@ -59,7 +59,6 @@ public class Wallpaper {
 		if (imageInCache()) {
 			getCacheFile().delete();
 		}
-		Log.d("UNCACHE", Arrays.toString(CACHE_DIR.list()));
 	}
 
 	public void setAsBackground() {

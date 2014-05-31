@@ -1,5 +1,7 @@
 package com.akrolsmir.bakegami;
 
+import java.io.File;
+
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -30,8 +32,20 @@ public class WallpaperManager {
 	public static WallpaperManager with(Context context) {
 		return instance == null ? instance = new WallpaperManager(context) : instance; 
 	}
+	
+	public void setWallpaper(File file) {
+		getCurrentWallpaper().uncache();
+		String history = settings.getString(HISTORY, "");
+		settings.edit().putString(HISTORY, file.toURI() + " " + history).apply();
+		
+		getCurrentWallpaper().setAsBackground();
+		// Notify MainActivity and the widget to update their views
+		LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.NEXT));
+		WallpaperControlWidgetProvider.updateViews(context);
+	}
 
 	public void nextWallpaper() {
+		getCurrentWallpaper().uncache();
 		advanceCurrent();
 		getCurrentWallpaper().setAsBackground();
 		// Notify MainActivity and the widget to update their views
@@ -126,7 +140,6 @@ public class WallpaperManager {
 		} else {
 			new Wallpaper(context, imageURL).cache();
 		}
-
 	}
 	
 	// The current wallpaper is at the top of the history stack
@@ -138,8 +151,6 @@ public class WallpaperManager {
 
 	// Push the head of the queue onto history, which marks it as current
 	private void advanceCurrent() {
-		getCurrentWallpaper().uncache();
-		
 		String queue = settings.getString(QUEUE, "");
 		settings.edit().putString(QUEUE, queue.substring(queue.indexOf(" ") + 1)).apply();
 		String history = settings.getString(HISTORY, "");

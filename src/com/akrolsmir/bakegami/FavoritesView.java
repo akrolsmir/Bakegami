@@ -51,6 +51,15 @@ public class FavoritesView extends GridView {
 				SparseBooleanArray checked = getCheckedItemPositions();
 				// Respond to clicks on the actions in the CAB
 				switch (item.getItemId()) {
+				case R.id.menu_item_set:
+					for (int i = 0; i < getAdapter().getCount(); i++) {
+						if (checked.get(i)) {
+							WallpaperManager.with(context).setWallpaper(Wallpaper.getFavorites().get(i));
+							break;
+						}
+					}
+					mode.finish();
+					return true;
 				case R.id.menu_item_delete:
 					//TODO confirm discard
 					// Count backwards to ensure correct index is used
