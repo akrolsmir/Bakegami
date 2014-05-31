@@ -109,7 +109,8 @@ public class WallpaperManager {
 		JsonArray children = object.getAsJsonObject().get("data").getAsJsonObject().get("children").getAsJsonArray();
 		for (JsonElement child : children) {
 			String url = child.getAsJsonObject().get("data").getAsJsonObject().get("url").getAsString();
-			if (numToFetch > 0 && validImageUrl(url)) {
+			boolean nsfw = child.getAsJsonObject().get("data").getAsJsonObject().get("over_18").getAsBoolean();
+			if (numToFetch > 0 && validImageUrl(url) && (!nsfw || SettingsActivity.showNSFW(context))) {
 				enqueueURL(url);
 				numToFetch--;
 			}
