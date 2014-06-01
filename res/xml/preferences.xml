@@ -5,7 +5,7 @@
         android:defaultValue="2 days"
         android:key="pref_refresh_freq"
         android:summary="Every 2 days (currently paused)"
-        android:title="Refresh frequency" />
+        android:title="Cycle time" />
 
     <EditTextPreference
         android:defaultValue="wallpaper"
