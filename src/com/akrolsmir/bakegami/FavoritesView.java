@@ -2,7 +2,9 @@ package com.akrolsmir.bakegami;
 
 import java.util.ArrayList;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
@@ -15,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 public class FavoritesView extends GridView {
 	
@@ -47,8 +48,8 @@ public class FavoritesView extends GridView {
 			}
 
 			@Override
-			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-				SparseBooleanArray checked = getCheckedItemPositions();
+			public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
+				final SparseBooleanArray checked = getCheckedItemPositions();
 				// Respond to clicks on the actions in the CAB
 				switch (item.getItemId()) {
 				case R.id.menu_item_set:
@@ -61,17 +62,25 @@ public class FavoritesView extends GridView {
 					mode.finish();
 					return true;
 				case R.id.menu_item_delete:
-					//TODO confirm discard
-					// Count backwards to ensure correct index is used
-					for (int i = getAdapter().getCount() - 1; i >= 0; i--) {
-						if (checked.get(i)) {
-							Wallpaper.removeFavorite(i);
+					AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+					builder.setMessage("Unfavorite " + (getCheckedItemCount() == 1 ? 
+							"this image?" : "these " + getCheckedItemCount() + " images?"));
+					builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// Count backwards to ensure correct index is used
+							for (int i = getAdapter().getCount() - 1; i >= 0; i--) {
+								if (checked.get(i)) {
+									Wallpaper.removeFavorite(i);
+								}
+							}
+							LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.FAVORITE));
+							mode.finish();
 						}
-					}
-					Toast.makeText(context, getCheckedItemCount() + " unfavorited.",
-							Toast.LENGTH_LONG).show();
-					LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.FAVORITE));
-					mode.finish();
+					});
+					builder.setNegativeButton("Cancel", null);
+					builder.show();
+					
 					return true;
 				case R.id.menu_item_share:
 					Intent intent = new Intent();
