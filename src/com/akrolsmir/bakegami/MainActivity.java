@@ -9,9 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -40,34 +38,19 @@ public class MainActivity extends Activity {
 
 		ImageButton nextButton = (ImageButton) findViewById(R.id.nextButton);
 		nextButton.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View arg0) {
 				WallpaperManager.with(MainActivity.this).nextWallpaper();
-
-//				MainActivity.this.startService(new Intent(MainActivity.this,
-//						WallpaperControlWidgetProvider.RefreshService.class).setAction("start"));
-//
-//				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().putString("subreddit",
-//						subredditText.getText().toString()).commit();
-//
-//				getSharedPreferences("com.akrolsmir.bakegami", 0).edit().putLong("refreshTime",
-//						Long.parseLong(refreshTimeText.getText().toString())).commit();
-//
-//				Toast.makeText(MainActivity.this, "Cycling through r/" + subredditText.getText()
-//						+ " every " + refreshTimeText.getText() + " sec", Toast.LENGTH_LONG).show();
 			}
 		});
 
 		final ImageButton playPauseButton = (ImageButton) findViewById(R.id.pausePlayButton);
-		Log.d("REPEATING", "" + RefreshService.isCycling(this));
 		playPauseButton.setImageResource(
 				RefreshService.isCycling(this) ?
 					android.R.drawable.ic_media_pause :
 					android.R.drawable.ic_media_play
 		);
 		playPauseButton.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				playPauseButton.setImageResource(
@@ -84,17 +67,10 @@ public class MainActivity extends Activity {
 		playPauseButton.setOnLongClickListener(new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View arg0) {
-				// clears cache
-//				for(File file : getExternalCacheDir().listFiles())
-//					file.delete();
-//				
-//				Toast.makeText(MainActivity.this, "Cleared cache", Toast.LENGTH_SHORT).show();
-				
 				WallpaperManager.with(MainActivity.this).resetQueueAndHistory();
 				return false;
 			}
 		});
-		
 		
 		findViewById(R.id.currentBG).setOnClickListener(new OnClickListener() {
 			@Override
@@ -102,8 +78,8 @@ public class MainActivity extends Activity {
 				Intent intent = new Intent();
 				intent.setAction(Intent.ACTION_VIEW);
 				intent.setDataAndType(
-						Uri.fromFile(WallpaperManager.with(MainActivity.this).getCurrentWallpaper().getCacheFile()),
-						"image/*");
+						Uri.fromFile(WallpaperManager.with(MainActivity.this)
+								.getCurrentWallpaper().getCacheFile()), "image/*");
 				startActivity(intent);
 			}
 		});
@@ -151,7 +127,6 @@ public class MainActivity extends Activity {
 	};
 	
 	private void onNextBG() {
-		Log.d("TAG", "onNextBG");
 		ImageView currentBG = (ImageView) findViewById(R.id.currentBG);
 		Picasso.with(this).load(
 				WallpaperManager.with(this).getCurrentWallpaper().getCacheFile())
