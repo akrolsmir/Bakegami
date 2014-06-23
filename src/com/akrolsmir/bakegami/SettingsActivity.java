@@ -15,7 +15,8 @@ public class SettingsActivity extends PreferenceActivity implements
         addPreferencesFromResource(R.xml.preferences);
     }
     
-	public static String KEY_PREF_SUBREDDIT = "pref_subreddit";
+	public static String KEY_PREF_SUBREDDIT = "pref_subreddit", 
+			KEY_PREF_SHOW_NSFW = "pref_show_nsfw";
     
     @Override
 	public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
@@ -28,6 +29,10 @@ public class SettingsActivity extends PreferenceActivity implements
     
     public static String getSubreddit(Context context) {
     	return with(context).getString(KEY_PREF_SUBREDDIT, "");
+    }
+    
+    public static boolean showNSFW(Context context) {
+    	return with(context).getBoolean(KEY_PREF_SUBREDDIT, false);
     }
     
     public static long getRefreshSeconds(Context context) {
