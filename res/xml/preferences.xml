@@ -6,16 +6,70 @@
         android:key="pref_refresh_freq"
         android:summary="Every 2 days (currently paused)"
         android:title="Cycle time" />
-
-    <EditTextPreference
-        android:defaultValue="wallpaper"
-        android:key="pref_subreddit"
-        android:summary="r/wallpaper_"
-        android:title="Subreddit" />
     
     <CheckBoxPreference 
         android:defaultValue="false"
         android:key="pref_show_nsfw"
         android:title="Show NSFW content"/>
+
+    <EditTextPreference
+        android:defaultValue="wallpaper"
+        android:key="sr1"
+        android:summary="r/wallpaper"
+        android:title="Subreddit 1" />
+
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="sr2"
+        android:summary="r/"
+        android:title="Subreddit 2" />
+	
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="sr3"
+        android:summary="r/"
+        android:title="Subreddit 3" />
+	
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="sr4"
+        android:summary="r/"
+        android:title="Subreddit 4" />
+	
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="sr5"
+        android:summary="r/"
+        android:title="Subreddit 5" />
+	
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="sr6"
+        android:summary="r/"
+        android:title="Subreddit 6" />
+        
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="sr7"
+        android:summary="r/"
+        android:title="Subreddit 7" />
+	
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="sr8"
+        android:summary="r/"
+        android:title="Subreddit 8" />
+	
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="sr9"
+        android:summary="r/"
+        android:title="Subreddit 9" />
+	
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="sr0"
+        android:summary="r/"
+        android:title="Subreddit 10" />
 
 </PreferenceScreen>

@@ -93,35 +93,51 @@ public class WallpaperManager {
 			public void run() {
 				RestTemplate restTemplate = new RestTemplate();
 				restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
-				String rawJson = restTemplate.getForObject("http://www.reddit.com/r/"
-						+ getSubreddit() + "/top.json?t=week", String.class);
-				parseUrlFromReddit(rawJson, numToFetch);
+				String rawJson = "";
+				for(int i = 0; i < numToFetch; i++)
+				{
+					int sr = (int)(10*Math.random());
+					if(getSubreddit(sr).length() == 0)
+						i--;
+					else
+					{
+						rawJson = restTemplate.getForObject("http://www.reddit.com/r/"
+								+ getSubreddit(sr) + "/top.json?t=week&limit=100", 
+								String.class);
+					
+						if(!parseUrlFromReddit(rawJson))
+							i--;
+					}
+				}
 			}
 		}).start();
 	}
 
-	private String getSubreddit() {
-		return SettingsActivity.getSubreddit(context);
+	private String getSubreddit( int index ) {
+		return SettingsActivity.getSubreddit(context,index);
 	}
 
-	private void parseUrlFromReddit(String rawJson, int numToFetch) {
+	private boolean parseUrlFromReddit(String rawJson) {
 		JsonElement object = new JsonParser().parse(rawJson);
 		JsonArray children = object.getAsJsonObject().get("data").getAsJsonObject().get("children").getAsJsonArray();
 		for (JsonElement child : children) {
 			String url = child.getAsJsonObject().get("data").getAsJsonObject().get("url").getAsString();
 			boolean nsfw = child.getAsJsonObject().get("data").getAsJsonObject().get("over_18").getAsBoolean();
-			if (numToFetch > 0 && validImageUrl(url) && (!nsfw || SettingsActivity.showNSFW(context))) {
+			if(url.contains("imgur.com") && !url.contains("imgur.com/a/") && !url.contains("i.imgur.com"))
+				url+=".jpg";
+			if (validImageUrl(url) && (!nsfw || SettingsActivity.showNSFW(context))) {
 				enqueueURL(url);
-				numToFetch--;
+				return true;
 			}
 		}
+		return false;
 		// TODO handle case when out of images
 		//		return "http://i.imgur.com/iCQxSJZ.jpg";
 	}
 
 	// Returns true if URL has no spaces, ends in .jpg/.png and is not enqueued
 	private boolean validImageUrl(String imageURL) {
-		return !imageURL.contains(" ") && imageURL.matches("http://.*\\.(jpg|png)$")
+		return !imageURL.contains(" ") && imageURL.matches("https?://.*\\.(jpg|png)$")
 				&& isNew(imageURL);
 	}
 	
