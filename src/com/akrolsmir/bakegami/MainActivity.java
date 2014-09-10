@@ -1,13 +1,19 @@
 package com.akrolsmir.bakegami;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.View;
@@ -22,12 +28,14 @@ import com.squareup.picasso.Picasso;
 
 public class MainActivity extends Activity {
 
+	private Context context;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setContentView(R.layout.activity_main);
+		context = this;
 		
 		findViewById(R.id.favButton).setOnClickListener(new OnClickListener() {
 			@Override
@@ -63,6 +71,14 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		ImageButton cropButton = (ImageButton) findViewById(R.id.cropButton);
+		cropButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				WallpaperManager.with(MainActivity.this).cropWallpaper();
+			}
+		});
+
 		//TODO remove backdoor
 		playPauseButton.setOnLongClickListener(new OnLongClickListener() {
 			@Override
@@ -144,6 +160,27 @@ public class MainActivity extends Activity {
 		);
 	}
 	
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+		if(requestCode == Wallpaper.PIC_CROP)
+		{
+			android.app.WallpaperManager wpm = android.app.WallpaperManager.getInstance(context);
+			Uri selectedImage = data.getData();
+	        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+	        Cursor cursor = getContentResolver().query(
+	                           selectedImage, filePathColumn, null, null, null);
+	        cursor.moveToFirst();
+	        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+	        String filePath = cursor.getString(columnIndex);
+	        cursor.close();
+	        Bitmap thePic= BitmapFactory.decodeFile(filePath);
+			try {
+				wpm.setBitmap(thePic);
+			} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			}
+		}
+	}
 //	public void updateConnectedFlags() {
 //        ConnectivityManager connMgr = (ConnectivityManager) 
 //                getSystemService(Context.CONNECTIVITY_SERVICE);
