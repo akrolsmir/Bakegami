@@ -1,10 +1,13 @@
 package com.akrolsmir.bakegami;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -22,12 +25,14 @@ import com.squareup.picasso.Picasso;
 
 public class MainActivity extends Activity {
 
+	private Context context;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setContentView(R.layout.activity_main);
+		context = this;
 		
 		findViewById(R.id.favButton).setOnClickListener(new OnClickListener() {
 			@Override
@@ -63,6 +68,14 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		ImageButton cropButton = (ImageButton) findViewById(R.id.cropButton);
+		cropButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				WallpaperManager.with(MainActivity.this).cropWallpaper();
+			}
+		});
+
 		//TODO remove backdoor
 		playPauseButton.setOnLongClickListener(new OnLongClickListener() {
 			@Override
@@ -144,6 +157,20 @@ public class MainActivity extends Activity {
 		);
 	}
 	
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+		if(requestCode == Wallpaper.PIC_CROP)
+		{
+			android.app.WallpaperManager wpm = android.app.WallpaperManager.getInstance(context);
+			Bundle extras = data.getExtras();
+			Bitmap thePic = extras.getParcelable("data");
+			try {
+				wpm.setBitmap(thePic);
+			} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			}
+		}
+	}
 //	public void updateConnectedFlags() {
 //        ConnectivityManager connMgr = (ConnectivityManager) 
 //                getSystemService(Context.CONNECTIVITY_SERVICE);
