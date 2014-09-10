@@ -95,10 +95,10 @@ public class Wallpaper {
 		Intent cropIntent = new Intent("com.android.camera.action.CROP");
 		cropIntent.setDataAndType(Uri.fromFile(getCacheFile()),"image/*");
 		cropIntent.putExtra("crop","true");
-		cropIntent.putExtra("aspectX",1);
-		cropIntent.putExtra("aspectY",1);
-		cropIntent.putExtra("outputX",1024);
-		cropIntent.putExtra("outputY",1024);
+		cropIntent.putExtra("aspectX",960);
+		cropIntent.putExtra("aspectY",800);
+		cropIntent.putExtra("outputX",960);
+		cropIntent.putExtra("outputY",800);
 		cropIntent.putExtra("return-data",true);
 		((Activity)context).startActivityForResult(cropIntent,PIC_CROP);
 	}

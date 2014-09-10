@@ -7,10 +7,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.View;
@@ -161,8 +164,15 @@ public class MainActivity extends Activity {
 		if(requestCode == Wallpaper.PIC_CROP)
 		{
 			android.app.WallpaperManager wpm = android.app.WallpaperManager.getInstance(context);
-			Bundle extras = data.getExtras();
-			Bitmap thePic = extras.getParcelable("data");
+			Uri selectedImage = data.getData();
+	        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+	        Cursor cursor = getContentResolver().query(
+	                           selectedImage, filePathColumn, null, null, null);
+	        cursor.moveToFirst();
+	        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+	        String filePath = cursor.getString(columnIndex);
+	        cursor.close();
+	        Bitmap thePic= BitmapFactory.decodeFile(filePath);
 			try {
 				wpm.setBitmap(thePic);
 			} catch (IOException e) {
