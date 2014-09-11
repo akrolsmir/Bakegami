@@ -46,6 +46,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_media_next" />
+                
+            <ImageButton
+                android:id="@+id/cropButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_crop" />
 
             <TextView
                 android:layout_width="0dp"

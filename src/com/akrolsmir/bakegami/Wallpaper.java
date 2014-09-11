@@ -32,7 +32,6 @@ public class Wallpaper {
 		this.context = context;
 		this.imageURL = imageURL;
 		this.imageName = imageURL.substring(imageURL.lastIndexOf('/'));
-
 		CACHE_DIR = context.getExternalCacheDir();
 		CACHE_DIR.mkdirs();
 		PIC_DIR.mkdirs();
@@ -86,7 +85,7 @@ public class Wallpaper {
 			}
 		}).start();
 	}
-
+	
 	private boolean imageInCache() {
 		return getCacheFile().exists();
 	}
