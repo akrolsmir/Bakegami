@@ -53,9 +53,6 @@ public class WallpaperManager {
 		WallpaperControlWidgetProvider.updateViews(context);
 	}
 	
-	public void cropWallpaper() {
-		getCurrentWallpaper().cropAndSet();
-	}
 	public void toggleFavorite() {
 		getCurrentWallpaper().toggleFavorite();
 		// Notify MainActivity and the widget to update their views

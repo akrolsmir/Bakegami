@@ -13,11 +13,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
@@ -26,7 +23,6 @@ public class Wallpaper {
 	private Context context;
 	private String imageURL;
 	private String imageName;
-	public static final int PIC_CROP = 2;
 
 	private File CACHE_DIR;
 	private static File PIC_DIR = new File(Environment.getExternalStoragePublicDirectory(
@@ -88,19 +84,6 @@ public class Wallpaper {
 				}
 			}
 		}).start();
-	}
-
-	public void cropAndSet()
-	{
-		Intent cropIntent = new Intent("com.android.camera.action.CROP");
-		cropIntent.setDataAndType(Uri.fromFile(getCacheFile()),"image/*");
-		cropIntent.putExtra("crop","true");
-		cropIntent.putExtra("aspectX",960);
-		cropIntent.putExtra("aspectY",800);
-		cropIntent.putExtra("outputX",960);
-		cropIntent.putExtra("outputY",800);
-		cropIntent.putExtra("return-data",true);
-		((Activity)context).startActivityForResult(cropIntent,PIC_CROP);
 	}
 	
 	private boolean imageInCache() {
