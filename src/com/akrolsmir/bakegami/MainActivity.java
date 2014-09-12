@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Images.Media;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.View;
@@ -172,26 +173,18 @@ public class MainActivity extends Activity {
 	}
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
-		if(requestCode == 1 && resultCode == RESULT_OK)
-		{
+		if (requestCode == 1 && resultCode == RESULT_OK) {
 			android.app.WallpaperManager wpm = android.app.WallpaperManager.getInstance(MainActivity.this);
 			Uri selectedImage = data.getData();
-			Bitmap thePic = null;
 			try {
-				thePic = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+				Bitmap pic = Media.getBitmap(this.getContentResolver(), selectedImage);
+				wpm.setBitmap(pic);
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
-			try {
-				if( thePic != null)
-					wpm.setBitmap(thePic);
-			} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			}
 		}
 	}
