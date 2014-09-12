@@ -72,17 +72,21 @@ public class MainActivity extends Activity {
 		cropButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
+				// TODO http://stackoverflow.com/a/18307322/1222351
 				Intent cropIntent = new Intent("com.android.camera.action.CROP");
 				cropIntent.setDataAndType(
 						Uri.fromFile(WallpaperManager.with(MainActivity.this)
 								.getCurrentWallpaper().getCacheFile()), "image/*");
+				cropIntent.setClassName("com.google.android.apps.plus", 
+						"com.google.android.apps.photoeditor.fragments.PlusCropActivityAlias");
 				cropIntent.putExtra("crop","true");
-				cropIntent.putExtra("aspectX",960);
-				cropIntent.putExtra("aspectY",800);
-				cropIntent.putExtra("outputX",960);
-				cropIntent.putExtra("outputY",800);
-				cropIntent.putExtra("return-data",true);
-				startActivityForResult(cropIntent,1);
+				android.app.WallpaperManager wpm = android.app.WallpaperManager.getInstance(MainActivity.this);
+				cropIntent.putExtra("aspectX", wpm.getDesiredMinimumWidth());
+				cropIntent.putExtra("aspectY", wpm.getDesiredMinimumHeight());
+				cropIntent.putExtra("outputX", wpm.getDesiredMinimumWidth());
+				cropIntent.putExtra("outputY", wpm.getDesiredMinimumHeight());
+				cropIntent.putExtra("return-data", true);
+				startActivityForResult(cropIntent, 1);
 			}
 		});
 
