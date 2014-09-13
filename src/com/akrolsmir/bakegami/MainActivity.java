@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +13,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Media;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
@@ -22,6 +22,7 @@ import android.view.View.OnLongClickListener;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.RefreshService;
 import com.squareup.picasso.Picasso;
@@ -73,7 +74,7 @@ public class MainActivity extends Activity {
 		cropButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				// TODO http://stackoverflow.com/a/18307322/1222351
+				// TODO Try using WPM.getCropAndSetWallpaperIntent on sdk 19 and higher
 				Intent cropIntent = new Intent("com.android.camera.action.CROP");
 				cropIntent.setDataAndType(
 						Uri.fromFile(WallpaperManager.with(MainActivity.this)
@@ -87,7 +88,11 @@ public class MainActivity extends Activity {
 				cropIntent.putExtra("outputX", wpm.getDesiredMinimumWidth());
 				cropIntent.putExtra("outputY", wpm.getDesiredMinimumHeight());
 				cropIntent.putExtra("return-data", true);
-				startActivityForResult(cropIntent, 1);
+				try {
+					startActivityForResult(cropIntent, 1);
+				} catch (ActivityNotFoundException anfe) {
+				    Toast.makeText(MainActivity.this, "Cropping requires the latest Google+.", Toast.LENGTH_LONG).show();
+				}
 			}
 		});
 
