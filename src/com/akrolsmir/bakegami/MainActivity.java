@@ -91,7 +91,13 @@ public class MainActivity extends Activity {
 				try {
 					startActivityForResult(cropIntent, 1);
 				} catch (ActivityNotFoundException anfe) {
-				    Toast.makeText(MainActivity.this, "Cropping requires the latest Google+.", Toast.LENGTH_LONG).show();
+					try{
+						cropIntent.setClassName("com.google.android.apps.plus", 
+								"com.google.android.apps.photoeditor.fragments.PlusCropActivity");
+						startActivityForResult(cropIntent, 1);
+					} catch (ActivityNotFoundException anfe2) {
+						Toast.makeText(MainActivity.this, "Cropping requires the latest Google+.", Toast.LENGTH_LONG).show();
+					}
 				}
 			}
 		});
