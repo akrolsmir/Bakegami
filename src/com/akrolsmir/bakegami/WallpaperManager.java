@@ -36,8 +36,7 @@ public class WallpaperManager {
 	public void setWallpaper(File file) {
 		getCurrentWallpaper().uncache();
 		String history = settings.getString(HISTORY, "");
-		settings.edit().putString(HISTORY, file.toURI() + " " + history).apply();
-		
+		settings.edit().putString(HISTORY, file.toURI()+"|"+(file.toURI()+"").substring((file.toURI()+"").lastIndexOf('/')+1) + " " + history).apply();
 		getCurrentWallpaper().setAsBackground();
 		// Notify MainActivity and the widget to update their views
 		LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.NEXT));
@@ -126,7 +125,9 @@ public class WallpaperManager {
 			if(url.contains("imgur.com") && !url.contains("imgur.com/a/") && !url.contains("i.imgur.com"))
 				url+=".jpg";
 			if (validImageUrl(url) && (!nsfw || SettingsActivity.showNSFW(context))) {
-				enqueueURL(url);
+				String perma = child.getAsJsonObject().get("data").getAsJsonObject().get("permalink").getAsString();
+				perma = perma.substring(0,perma.lastIndexOf('/')-1);
+				enqueueURL(url,perma.substring(perma.lastIndexOf('/')+1)+url.substring(url.lastIndexOf('.')));
 				return true;
 			}
 		}
@@ -146,21 +147,20 @@ public class WallpaperManager {
 		return !((settings.getString(HISTORY, "") + settings.getString(QUEUE, "")).contains(imageURL));
 	}
 
-	private void enqueueURL(String imageURL) {
-		Log.d("enqueueURL", imageURL);
+	private void enqueueURL(String imageURL, String imageName) {
+		Log.d("enqueueURL", imageURL+"|"+imageName);
 		String queue = settings.getString(QUEUE, "");
-		settings.edit().putString(QUEUE, queue + imageURL + " ").apply();
-		
+		settings.edit().putString(QUEUE, queue + imageURL + "|" + imageName + " ").apply();
 		if (setNextWallpaperAsBG) { // || settings.getString(QUEUE, "").length == 0
 			nextWallpaper();
 			setNextWallpaperAsBG = false;
 		} else {
-			new Wallpaper(context, imageURL).cache();
+			new Wallpaper(context, imageURL+"|"+imageName).cache();
 		}
 	}
 	
 	// The current wallpaper is at the top of the history stack
-	private String DEFAULT_URL = "http://cdn.awwni.me/maav.jpg";
+	private String DEFAULT_URL = "http://cdn.awwni.me/maav.jpg|maav.jpg";
 	private String getCurrentWallpaperURL(){
 		String url = settings.getString(HISTORY, DEFAULT_URL + " ").split(" ")[0];
 		return url.contains("/") ? url : DEFAULT_URL;

@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import android.app.WallpaperManager;
 import android.content.Context;
@@ -27,11 +28,12 @@ public class Wallpaper {
 	private File CACHE_DIR;
 	private static File PIC_DIR = new File(Environment.getExternalStoragePublicDirectory(
 			Environment.DIRECTORY_PICTURES), "bakegami"); //TODO replace with name of app
-
-	public Wallpaper(Context context, String imageURL) {
+	
+	public Wallpaper( Context context, String imageURL)
+	{
 		this.context = context;
-		this.imageURL = imageURL;
-		this.imageName = imageURL.substring(imageURL.lastIndexOf('/'));
+		this.imageURL = imageURL.split(Pattern.quote("|"))[0];
+		this.imageName = imageURL.split(Pattern.quote("|"))[1];
 		CACHE_DIR = context.getExternalCacheDir();
 		CACHE_DIR.mkdirs();
 		PIC_DIR.mkdirs();
