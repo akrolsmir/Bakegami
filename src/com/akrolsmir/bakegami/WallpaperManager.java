@@ -126,7 +126,7 @@ public class WallpaperManager {
 				url+=".jpg";
 			if (validImageUrl(url) && (!nsfw || SettingsActivity.showNSFW(context))) {
 				String perma = child.getAsJsonObject().get("data").getAsJsonObject().get("permalink").getAsString();
-				perma = perma.substring(0,perma.lastIndexOf('/')-1);
+				perma = perma.substring(0,perma.lastIndexOf('/'));
 				enqueueURL(url,perma.substring(perma.lastIndexOf('/')+1)+url.substring(url.lastIndexOf('.')));
 				return true;
 			}
