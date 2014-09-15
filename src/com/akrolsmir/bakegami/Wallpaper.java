@@ -16,10 +16,7 @@ import java.util.regex.Pattern;
 
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 
 public class Wallpaper {
@@ -122,12 +119,10 @@ public class Wallpaper {
 
 	public void toggleFavorite() {
 		if (imageInFavorites()) {
-			removeFavorite(getFavoriteFile(),context);
+			getFavoriteFile().delete();
 		} else {
 			try {
 				copyFile(getCacheFile(), getFavoriteFile());
-				context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, 
-						Uri.fromFile(getFavoriteFile())));
 			} catch (IOException e) {
 				// TODO handle?
 				e.printStackTrace();
@@ -158,22 +153,7 @@ public class Wallpaper {
 		return Arrays.asList(files);
 	}
 	
-	public static void removeFavorite(File f, Context cont) {
-		String canonicalPath = "";
-		try {
-	        canonicalPath = f.getCanonicalPath();
-	    } catch (IOException e) {
-	        canonicalPath = f.getAbsolutePath();
-	    }
-	    final Uri uri = MediaStore.Files.getContentUri("external");
-	    final int result = cont.getContentResolver().delete(uri,
-	            MediaStore.Files.FileColumns.DATA + "=?", new String[] {canonicalPath});
-	    if (result == 0) {
-	        final String absolutePath = f.getAbsolutePath();
-	        if (!absolutePath.equals(canonicalPath)) {
-	            cont.getContentResolver().delete(uri,
-	                    MediaStore.Files.FileColumns.DATA + "=?", new String[]{absolutePath});
-	        }
-	    }
+	public static void removeFavorite(int i) {
+		Log.d("DELETING...", ""+ Wallpaper.getFavorites().get(i).delete());
 	}
 }
