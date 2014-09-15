@@ -72,7 +72,9 @@ public class WallpaperManager {
 	
 	public void resetQueue() {
 		settings.edit().putString(QUEUE, "").apply();
-		setNextWallpaperAsBG = true;
+		for( File file : context.getExternalCacheDir().listFiles())
+			if( !file.equals(getCurrentWallpaper().getCacheFile()))
+				file.delete();
 		fetchNextUrls();
 	}
 	
