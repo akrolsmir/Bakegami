@@ -126,7 +126,7 @@ public class WallpaperManager {
 		for (JsonElement child : children) {
 			String url = child.getAsJsonObject().get("data").getAsJsonObject().get("url").getAsString();
 			boolean nsfw = child.getAsJsonObject().get("data").getAsJsonObject().get("over_18").getAsBoolean();
-			if(url.contains("imgur.com") && !url.contains("imgur.com/a/") && !url.contains("i.imgur.com"))
+			if(url.contains("imgur.com") && !url.contains("i.imgur.com") && !url.contains("imgur.com/gallery/") && !url.contains("imgur.com/a/"))
 				url+=".jpg";
 			if (validImageUrl(url) && (!nsfw || SettingsActivity.showNSFW(context))) {
 				String perma = child.getAsJsonObject().get("data").getAsJsonObject().get("permalink").getAsString();
