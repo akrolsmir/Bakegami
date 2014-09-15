@@ -190,6 +190,7 @@ public class MainActivity extends Activity {
 			try {
 				Bitmap pic = Media.getBitmap(this.getContentResolver(), selectedImage);
 				wpm.setBitmap(pic);
+				getContentResolver().delete(selectedImage, null, null);
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

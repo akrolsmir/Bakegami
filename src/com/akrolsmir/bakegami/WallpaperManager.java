@@ -34,6 +34,7 @@ public class WallpaperManager {
 	}
 	
 	public void setWallpaper(File file) {
+		getCurrentWallpaper().getCacheFile().delete();
 		getCurrentWallpaper().uncache();
 		String history = settings.getString(HISTORY, "");
 		settings.edit().putString(HISTORY, file.toURI()+"|"+(file.toURI()+"").substring((file.toURI()+"").lastIndexOf('/')+1) + " " + history).apply();
@@ -44,6 +45,7 @@ public class WallpaperManager {
 	}
 
 	public void nextWallpaper() {
+		getCurrentWallpaper().getCacheFile().delete();
 		getCurrentWallpaper().uncache();
 		advanceCurrent();
 		getCurrentWallpaper().setAsBackground();
