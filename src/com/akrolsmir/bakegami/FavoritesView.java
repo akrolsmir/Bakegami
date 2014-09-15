@@ -71,7 +71,7 @@ public class FavoritesView extends GridView {
 							// Count backwards to ensure correct index is used
 							for (int i = getAdapter().getCount() - 1; i >= 0; i--) {
 								if (checked.get(i)) {
-									Wallpaper.removeFavorite(i);
+									Wallpaper.removeFavorite(Wallpaper.getFavorites().get(i),context);
 								}
 							}
 							LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.FAVORITE));
