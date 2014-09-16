@@ -17,6 +17,8 @@ import java.util.regex.Pattern;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -77,9 +79,7 @@ public class Wallpaper {
 					WallpaperManager wpm = WallpaperManager.getInstance(context);
 					FileInputStream fis = new FileInputStream(getCacheFile());
 					wpm.setStream(fis);
-
 					Log.d("Changed wallpaper", imageURL);
-
 				} catch (FileNotFoundException e) {
 					// TODO handle?
 					e.printStackTrace();
