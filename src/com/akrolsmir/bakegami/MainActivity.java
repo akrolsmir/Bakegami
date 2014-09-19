@@ -111,6 +111,14 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		ImageButton infoButton = (ImageButton) findViewById(R.id.infoButton);
+		infoButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				WallpaperManager.with(MainActivity.this).displayInfo();
+			}
+		});
+		
 		findViewById(R.id.currentBG).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

@@ -17,8 +17,6 @@ import java.util.regex.Pattern;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -165,6 +163,7 @@ public class Wallpaper {
 	    } catch (IOException e) {
 	        canonicalPath = f.getAbsolutePath();
 	    }
+		com.akrolsmir.bakegami.WallpaperManager.with(cont).removeInfo(canonicalPath.substring(canonicalPath.lastIndexOf("/")+1));
 	    final Uri uri = MediaStore.Files.getContentUri("external");
 	    final int result = cont.getContentResolver().delete(uri,
 	            MediaStore.Files.FileColumns.DATA + "=?", new String[] {canonicalPath});

@@ -98,6 +98,16 @@ public class FavoritesView extends GridView {
 					context.startActivity(Intent.createChooser(intent, "Share via"));
 					mode.finish();
 					return true;
+				case R.id.menu_item_info:
+					for (int i = 0; i < getAdapter().getCount(); i++) {
+						if (checked.get(i)) {
+							String path = Wallpaper.getFavorites().get(i).getAbsolutePath();
+							WallpaperManager.with(context).displayInfo(path.substring(path.lastIndexOf("/")+1));
+							break;
+						}
+					}
+					mode.finish();
+					return true;
 				default:
 					return false;
 				}
