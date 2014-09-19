@@ -47,7 +47,11 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
+        <receiver android:name=".ConnectReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
         <service android:name="WallpaperControlWidgetProvider$NextWallpaperService" />
         <service android:name="WallpaperControlWidgetProvider$RefreshService" />
         <service android:name="WallpaperControlWidgetProvider$FavoriteWallpaperService" />
