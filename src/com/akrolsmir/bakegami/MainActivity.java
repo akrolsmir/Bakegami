@@ -115,7 +115,7 @@ public class MainActivity extends Activity {
 		infoButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				WallpaperManager.with(MainActivity.this).displayInfo();
+				WallpaperManager.with(MainActivity.this).displayInfo( MainActivity.this );
 			}
 		});
 		

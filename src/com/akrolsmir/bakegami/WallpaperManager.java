@@ -231,10 +231,10 @@ public class WallpaperManager {
 		}
 	}
 
-	public void displayInfo(){
-		displayInfo(getCurrentWallpaperURL().split(Pattern.quote("|"))[1]);
+	public void displayInfo( Context context){
+		displayInfo(getCurrentWallpaperURL().split(Pattern.quote("|"))[1], context);
 	}
-	public void displayInfo( String name ) {
+	public void displayInfo( String name , final Context context) {
 		Log.d("DisplayInfo", name);
 		final String[] rawInfo = {settings.getString(name + "_sr", "N/A"),
 				settings.getString(name + "_postURL", "N/A"),

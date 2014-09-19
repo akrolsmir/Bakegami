@@ -102,7 +102,7 @@ public class FavoritesView extends GridView {
 					for (int i = 0; i < getAdapter().getCount(); i++) {
 						if (checked.get(i)) {
 							String path = Wallpaper.getFavorites().get(i).getAbsolutePath();
-							WallpaperManager.with(context).displayInfo(path.substring(path.lastIndexOf("/")+1));
+							WallpaperManager.with(context).displayInfo(path.substring(path.lastIndexOf("/")+1), context);
 							break;
 						}
 					}
