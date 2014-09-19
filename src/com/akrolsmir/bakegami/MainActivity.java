@@ -10,11 +10,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore.Images.Media;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -130,6 +134,9 @@ public class MainActivity extends Activity {
 				startActivity(intent);
 			}
 		});
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+		registerReceiver(connectReceiver, intentFilter);
 	}
 	
 	@Override
@@ -162,6 +169,12 @@ public class MainActivity extends Activity {
 		super.onPause();
 	}
 	
+	@Override
+	protected void onDestroy(){
+		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+		manager.unregisterReceiver(connectReceiver);
+		super.onDestroy();
+	}
 	private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -169,6 +182,20 @@ public class MainActivity extends Activity {
 				onNextBG();
 			} else if (intent.getAction().equals(FAVORITE)) {
 				onFavorite();
+			}
+		}
+	};
+	private BroadcastReceiver connectReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			final String action = intent.getAction();
+			if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+			    	ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+					NetworkInfo activeNetworkInfo = connectivityManager
+							.getActiveNetworkInfo();
+					while(activeNetworkInfo == null && !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false))
+						activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+			    	WallpaperManager.with(MainActivity.this).fetchNextUrls();
 			}
 		}
 	};

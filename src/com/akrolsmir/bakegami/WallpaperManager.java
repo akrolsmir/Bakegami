@@ -13,6 +13,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
@@ -26,6 +28,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -70,6 +73,19 @@ public class WallpaperManager {
 	}
 
 	public void nextWallpaper() {
+		if(!settings.getString(QUEUE, "").contains(" "))
+		{
+			ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo activeNetworkInfo = connectivityManager
+					.getActiveNetworkInfo();
+			if(activeNetworkInfo == null || !activeNetworkInfo.isConnected())
+				Toast.makeText(context, "Connect to the Internet and try again.", Toast.LENGTH_LONG).show();
+			else
+			{
+				Toast.makeText(context, "Out of unique images. Try adding more subreddits or increasing Cycle Time", Toast.LENGTH_LONG).show();
+			}
+			return;
+		}
 		removeInfo(getCurrentWallpaperURL().split(Pattern.quote("|"))[1]);
 		getCurrentWallpaper().uncache();
 		advanceCurrent();
@@ -111,7 +127,12 @@ public class WallpaperManager {
 
 	/* Private helper methods */
 
-	private void fetchNextUrls() {
+	public void fetchNextUrls() {
+		ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo activeNetworkInfo = connectivityManager
+				.getActiveNetworkInfo();
+		if(activeNetworkInfo == null || !activeNetworkInfo.isConnected())
+			return;
 		int index = settings.getInt("index", 0);
 		int total = StringUtils.countOccurrencesOf(
 				settings.getString(QUEUE, ""), " ");
@@ -287,6 +308,6 @@ public class WallpaperManager {
 		Log.d("HISTORY", settings.getString(HISTORY, ""));
 		Log.d("QUEUE", settings.getString(QUEUE, ""));
 
-		fetchNextUrls(1);
+		fetchNextUrls();
 	}
 }
