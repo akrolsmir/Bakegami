@@ -75,8 +75,11 @@ public class WallpaperManager {
 		if (!settings.getString(QUEUE, "").contains(" ")) {
 			ConnectivityManager connectivityManager = (ConnectivityManager) context
 					.getSystemService(Context.CONNECTIVITY_SERVICE);
-			NetworkInfo activeNetworkInfo = connectivityManager
-					.getActiveNetworkInfo();
+			NetworkInfo activeNetworkInfo;
+			if(SettingsActivity.allowData(context))
+				activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+			else
+				activeNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 			if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
 				Toast.makeText(context,
 						"Connect to the Internet and try again.",
@@ -132,8 +135,11 @@ public class WallpaperManager {
 	public void fetchNextUrls() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo activeNetworkInfo = connectivityManager
-				.getActiveNetworkInfo();
+		NetworkInfo activeNetworkInfo;
+		if(SettingsActivity.allowData(context))
+			activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+		else
+			activeNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 		if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
 			return;
 		int index = settings.getInt("index", 0);

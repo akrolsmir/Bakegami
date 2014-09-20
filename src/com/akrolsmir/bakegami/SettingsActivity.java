@@ -18,6 +18,7 @@ public class SettingsActivity extends PreferenceActivity implements
 	public static String[] KEY_PREF_SUBREDDITS = {"sr0","sr1","sr2","sr3","sr4","sr5","sr6",
 		"sr7","sr8","sr9"}; 
 	public static String KEY_PREF_SHOW_NSFW = "pref_show_nsfw";
+	public static String KEY_PREF_ALLOW_DATA = "pref_allow_data";
     
     @Override
 	public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
@@ -26,8 +27,10 @@ public class SettingsActivity extends PreferenceActivity implements
     			if (key.equals(k)) { 
     				findPreference(key).setSummary("r/" + sp.getString(key, ""));
 				WallpaperManager.with(this).resetQueue();
-				break;
+				return;
     			}
+    		if(key.equals(KEY_PREF_ALLOW_DATA) && sp.getBoolean(KEY_PREF_ALLOW_DATA, false) == true)
+    			WallpaperManager.with(this).fetchNextUrls();
 	}
     
     public static String getSubreddit(Context context, int index) {
@@ -36,6 +39,10 @@ public class SettingsActivity extends PreferenceActivity implements
     
     public static boolean showNSFW(Context context) {
     	return with(context).getBoolean(KEY_PREF_SHOW_NSFW, false);
+    }
+    
+    public static boolean allowData(Context context){
+    	return with(context).getBoolean(KEY_PREF_ALLOW_DATA, true);
     }
     
     public static long getRefreshSeconds(Context context) {

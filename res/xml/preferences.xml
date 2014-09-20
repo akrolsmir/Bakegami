@@ -8,6 +8,11 @@
         android:title="Cycle time" />
     
     <CheckBoxPreference 
+        android:defaultValue="true"
+        android:key="pref_allow_data"
+        android:title="Allow Data Usage"/>
+        
+    <CheckBoxPreference 
         android:defaultValue="false"
         android:key="pref_show_nsfw"
         android:title="Show NSFW content"/>
