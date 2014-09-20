@@ -12,10 +12,13 @@ public class ConnectReceiver extends BroadcastReceiver{
 	public void onReceive(Context context, Intent intent) {
 		if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 		    	ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-				NetworkInfo activeNetworkInfo = connectivityManager
-						.getActiveNetworkInfo();
+				NetworkInfo activeNetworkInfo;
+				if(SettingsActivity.allowData(context))
+					activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+				else
+					activeNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 				Log.d("nonet",""+intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false));
-				if(activeNetworkInfo != null)
+				if(activeNetworkInfo != null && activeNetworkInfo.isConnected())
 				{
 					if(firstConnect){
 						firstConnect = false;
