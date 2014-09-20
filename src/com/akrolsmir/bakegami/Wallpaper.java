@@ -29,11 +29,12 @@ public class Wallpaper {
 	private String imageName;
 
 	private File CACHE_DIR;
-	private static File PIC_DIR = new File(Environment.getExternalStoragePublicDirectory(
-			Environment.DIRECTORY_PICTURES), "bakegami"); //TODO replace with name of app
-	
-	public Wallpaper( Context context, String imageURL)
-	{
+	private static File PIC_DIR = new File(
+			Environment
+					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+			"bakegami"); // TODO replace with name of app
+
+	public Wallpaper(Context context, String imageURL) {
 		this.context = context;
 		this.imageURL = imageURL.split(Pattern.quote("|"))[0];
 		this.imageName = imageURL.split(Pattern.quote("|"))[1];
@@ -51,16 +52,19 @@ public class Wallpaper {
 						// Download stuff to cache folder
 						downloadFile(imageURL, getCacheFile());
 					} catch (Exception e) {
-						//TODO handle?
+						// TODO handle?
 						e.printStackTrace();
 					}
 				}
 			}).start();
 		}
 	}
-	
+
 	public void uncache() {
 		if (imageInCache()) {
+			if (!imageInFavorites())
+				com.akrolsmir.bakegami.WallpaperManager.with(context)
+						.removeInfo(imageName);
 			getCacheFile().delete();
 		}
 	}
@@ -74,7 +78,8 @@ public class Wallpaper {
 						downloadFile(imageURL, getCacheFile());
 
 					// Grab the picture from cache
-					WallpaperManager wpm = WallpaperManager.getInstance(context);
+					WallpaperManager wpm = WallpaperManager
+							.getInstance(context);
 					FileInputStream fis = new FileInputStream(getCacheFile());
 					wpm.setStream(fis);
 					Log.d("Changed wallpaper", imageURL);
@@ -88,23 +93,24 @@ public class Wallpaper {
 			}
 		}).start();
 	}
-	
+
 	private boolean imageInCache() {
 		return getCacheFile().exists();
 	}
-	
+
 	public boolean imageInFavorites() {
 		return getFavoriteFile().exists();
 	}
 
-	private void downloadFile(String url, File dst) throws MalformedURLException, IOException {
+	private void downloadFile(String url, File dst)
+			throws MalformedURLException, IOException {
 		transfer(new URL(url).openStream(), new FileOutputStream(dst));
 	}
 
 	private void copyFile(File src, File dst) throws IOException {
 		transfer(new FileInputStream(src), new FileOutputStream(dst));
 	}
-	
+
 	private void transfer(InputStream in, OutputStream out) throws IOException {
 		try {
 			byte[] buf = new byte[1024];
@@ -120,59 +126,71 @@ public class Wallpaper {
 
 	public void toggleFavorite() {
 		if (imageInFavorites()) {
-			removeFavorite(getFavoriteFile(),context);
+			removeFavorite(getFavoriteFile(), context);
 		} else {
 			try {
 				copyFile(getCacheFile(), getFavoriteFile());
-				context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, 
-						Uri.fromFile(getFavoriteFile())));
+				context.sendBroadcast(new Intent(
+						Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri
+								.fromFile(getFavoriteFile())));
 			} catch (IOException e) {
 				// TODO handle?
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	public File getCacheFile() {
 		return new File(CACHE_DIR, imageName);
 	}
-	
+
 	public File getFavoriteFile() {
 		return new File(PIC_DIR, imageName);
 	}
-	
+
 	public static List<File> getFavorites() {
 		File[] files = PIC_DIR.listFiles();
-		
+
 		if (files == null)
 			files = new File[0];
-		
+
 		Arrays.sort(files, new Comparator<File>() {
 			public int compare(File f1, File f2) {
-				return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+				return Long.valueOf(f2.lastModified()).compareTo(
+						f1.lastModified());
 			}
 		});
-		
+
 		return Arrays.asList(files);
 	}
-	
+
 	public static void removeFavorite(File f, Context cont) {
 		String canonicalPath = "";
 		try {
-	        canonicalPath = f.getCanonicalPath();
-	    } catch (IOException e) {
-	        canonicalPath = f.getAbsolutePath();
-	    }
-		com.akrolsmir.bakegami.WallpaperManager.with(cont).removeInfo(canonicalPath.substring(canonicalPath.lastIndexOf("/")+1));
-	    final Uri uri = MediaStore.Files.getContentUri("external");
-	    final int result = cont.getContentResolver().delete(uri,
-	            MediaStore.Files.FileColumns.DATA + "=?", new String[] {canonicalPath});
-	    if (result == 0) {
-	        final String absolutePath = f.getAbsolutePath();
-	        if (!absolutePath.equals(canonicalPath)) {
-	            cont.getContentResolver().delete(uri,
-	                    MediaStore.Files.FileColumns.DATA + "=?", new String[]{absolutePath});
-	        }
-	    }
+			canonicalPath = f.getCanonicalPath();
+		} catch (IOException e) {
+			canonicalPath = f.getAbsolutePath();
+		}
+		if (!com.akrolsmir.bakegami.WallpaperManager
+				.with(cont)
+				.getCurrentWallpaperURL()
+				.contains(
+						canonicalPath.substring(canonicalPath.lastIndexOf("/") + 1)))
+			com.akrolsmir.bakegami.WallpaperManager.with(cont)
+					.removeInfo(
+							canonicalPath.substring(canonicalPath
+									.lastIndexOf("/") + 1));
+		final Uri uri = MediaStore.Files.getContentUri("external");
+		final int result = cont.getContentResolver().delete(uri,
+				MediaStore.Files.FileColumns.DATA + "=?",
+				new String[] { canonicalPath });
+		if (result == 0) {
+			final String absolutePath = f.getAbsolutePath();
+			if (!absolutePath.equals(canonicalPath)) {
+				cont.getContentResolver().delete(uri,
+						MediaStore.Files.FileColumns.DATA + "=?",
+						new String[] { absolutePath });
+			}
+		}
 	}
 }

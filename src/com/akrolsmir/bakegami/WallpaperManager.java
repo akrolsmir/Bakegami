@@ -54,7 +54,6 @@ public class WallpaperManager {
 	}
 
 	public void setWallpaper(File file) {
-		removeInfo(getCurrentWallpaperURL().split(Pattern.quote("|"))[1]);
 		getCurrentWallpaper().uncache();
 		String history = settings.getString(HISTORY, "");
 		settings.edit()
@@ -73,20 +72,23 @@ public class WallpaperManager {
 	}
 
 	public void nextWallpaper() {
-		if(!settings.getString(QUEUE, "").contains(" "))
-		{
-			ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (!settings.getString(QUEUE, "").contains(" ")) {
+			ConnectivityManager connectivityManager = (ConnectivityManager) context
+					.getSystemService(Context.CONNECTIVITY_SERVICE);
 			NetworkInfo activeNetworkInfo = connectivityManager
 					.getActiveNetworkInfo();
-			if(activeNetworkInfo == null || !activeNetworkInfo.isConnected())
-				Toast.makeText(context, "Connect to the Internet and try again.", Toast.LENGTH_LONG).show();
-			else
-			{
-				Toast.makeText(context, "Out of unique images. Try adding more subreddits or increasing Cycle Time", Toast.LENGTH_LONG).show();
+			if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
+				Toast.makeText(context,
+						"Connect to the Internet and try again.",
+						Toast.LENGTH_LONG).show();
+			else {
+				Toast.makeText(
+						context,
+						"Out of unique images. Try adding more subreddits or increasing Cycle Time",
+						Toast.LENGTH_LONG).show();
 			}
 			return;
 		}
-		removeInfo(getCurrentWallpaperURL().split(Pattern.quote("|"))[1]);
 		getCurrentWallpaper().uncache();
 		advanceCurrent();
 		getCurrentWallpaper().setAsBackground();
@@ -128,10 +130,11 @@ public class WallpaperManager {
 	/* Private helper methods */
 
 	public void fetchNextUrls() {
-		ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		ConnectivityManager connectivityManager = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetworkInfo = connectivityManager
 				.getActiveNetworkInfo();
-		if(activeNetworkInfo == null || !activeNetworkInfo.isConnected())
+		if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
 			return;
 		int index = settings.getInt("index", 0);
 		int total = StringUtils.countOccurrencesOf(
@@ -243,41 +246,44 @@ public class WallpaperManager {
 	}
 
 	public void removeInfo(String name) {
-		if (!getCurrentWallpaperURL().contains(name)) {
-			Log.d("RemoveInfo", name);
-			settings.edit().remove(name + "_sr").commit();
-			settings.edit().remove(name + "_title").commit();
-			settings.edit().remove(name + "_postURL").commit();
-			settings.edit().remove(name + "_url").commit();
-		}
+		Log.d("RemoveInfo ", name);
+		settings.edit().remove(name + "_sr").commit();
+		settings.edit().remove(name + "_title").commit();
+		settings.edit().remove(name + "_postURL").commit();
+		settings.edit().remove(name + "_url").commit();
 	}
 
-	public void displayInfo( Context context){
-		displayInfo(getCurrentWallpaperURL().split(Pattern.quote("|"))[1], context);
+	public void displayInfo(Context context) {
+		displayInfo(getCurrentWallpaperURL().split(Pattern.quote("|"))[1],
+				context);
 	}
-	public void displayInfo( String name , final Context context) {
+
+	public void displayInfo(String name, final Context context) {
 		Log.d("DisplayInfo", name);
-		final String[] rawInfo = {settings.getString(name + "_sr", "N/A"),
+		final String[] rawInfo = { settings.getString(name + "_sr", "N/A"),
 				settings.getString(name + "_postURL", "N/A"),
 				settings.getString(name + "_url", "N/A"),
-				settings.getString(name + "_title", "N/A")};
-		Spanned[] info = {Html.fromHtml("<b>Subreddit:</b><br/>"+rawInfo[0]),
-				Html.fromHtml("<b>Post Title:</b><br/>"+rawInfo[3]),
-				Html.fromHtml("<b>Image URL:</b><br/>"+rawInfo[2])};
+				settings.getString(name + "_title", "N/A") };
+		Spanned[] info = {
+				Html.fromHtml("<b>Subreddit:</b><br/>" + rawInfo[0]),
+				Html.fromHtml("<b>Post Title:</b><br/>" + rawInfo[3]),
+				Html.fromHtml("<b>Image URL:</b><br/>" + rawInfo[2]) };
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setTitle("Info")
-				.setItems(info, new DialogInterface.OnClickListener(){
-					public void onClick(DialogInterface dialog, int which){
-						if(!rawInfo[which].equals("N/A"))
-						{
+				.setItems(info, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						if (!rawInfo[which].equals("N/A")) {
 							Intent browserIntent;
-							if( which == 0)
-								browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.reddit.com/r/"+rawInfo[which]));
+							if (which == 0)
+								browserIntent = new Intent(Intent.ACTION_VIEW,
+										Uri.parse("http://www.reddit.com/r/"
+												+ rawInfo[which]));
 							else
-								browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(rawInfo[which]));
+								browserIntent = new Intent(Intent.ACTION_VIEW,
+										Uri.parse(rawInfo[which]));
 							context.startActivity(browserIntent);
 						}
-							
+
 					}
 				})
 				.setPositiveButton("Done",
@@ -291,7 +297,7 @@ public class WallpaperManager {
 	// The current wallpaper is at the top of the history stack
 	private String DEFAULT_URL = "http://cdn.awwni.me/maav.jpg|maav.jpg";
 
-	private String getCurrentWallpaperURL() {
+	public String getCurrentWallpaperURL() {
 		String url = settings.getString(HISTORY, DEFAULT_URL + " ").split(" ")[0];
 		return url.contains("/") ? url : DEFAULT_URL;
 	}
