@@ -162,13 +162,6 @@ public class MainActivity extends Activity {
 		super.onPause();
 	}
 	
-	//@Override
-	/*protected void onDestroy(){
-		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
-		manager.unregisterReceiver(connectReceiver);
-		super.onDestroy();
-	}*/
-	
 	private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
