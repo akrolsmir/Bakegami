@@ -199,7 +199,7 @@ public class WallpaperManager {
 						.getAsJsonObject().get("subreddit").getAsString();
 				String title = child.getAsJsonObject().get("data")
 						.getAsJsonObject().get("title").getAsString();
-				String postURL = "http://www.reddit.com" + perma;
+				String postURL = "http://www.i.reddit.com" + perma;
 				perma = perma.substring(0, perma.lastIndexOf('/'));
 				perma = perma.substring(perma.lastIndexOf('/') + 1)
 						+ url.substring(url.lastIndexOf('.'));
@@ -282,7 +282,7 @@ public class WallpaperManager {
 							Intent browserIntent;
 							if (which == 0)
 								browserIntent = new Intent(Intent.ACTION_VIEW,
-										Uri.parse("http://www.reddit.com/r/"
+										Uri.parse("http://www.i.reddit.com/r/"
 												+ rawInfo[which]));
 							else
 								browserIntent = new Intent(Intent.ACTION_VIEW,
