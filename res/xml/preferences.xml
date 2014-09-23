@@ -4,7 +4,7 @@
 
 	<PreferenceScreen
 		android:title="Edit Subreddits"
-		android:summary="Blank subreddits will be ignored">
+		android:summary="Add up to 10 subreddits to get images from. Blank subreddits will be ignored.">
 		
 		<EditTextPreference
         	android:defaultValue="wallpaper"
