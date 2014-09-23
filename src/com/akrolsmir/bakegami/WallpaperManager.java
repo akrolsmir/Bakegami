@@ -163,9 +163,9 @@ public class WallpaperManager {
 					else {
 						rawJson = restTemplate.getForObject(
 								"http://www.reddit.com/r/" + getSubreddit(sr)
-										+ "/top.json?t=week&limit=100",
+										+ "/"+SortPreference.getValues(context)[0]+".json?"+
+										( SortPreference.getValues(context).length <= 1? "" : "t="+SortPreference.getValues(context)[1]+"&")+"limit=100",
 								String.class);
-
 						if (!parseUrlFromReddit(rawJson))
 							i--;
 					}

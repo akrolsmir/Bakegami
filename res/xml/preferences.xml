@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
+	<com.akrolsmir.bakegami.SortPreference
+		android:defaultValue="Hot"
+		android:key="pref_sort"
+		android:summary = "Hot"
+		android:title="Sort Type" />
+
     <com.akrolsmir.bakegami.FrequencyPickerPreference
         android:defaultValue="2 days"
         android:key="pref_refresh_freq"
