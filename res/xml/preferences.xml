@@ -3,7 +3,8 @@
 	android:title="Settings" >
 
 	<PreferenceScreen
-		android:title="Edit Subreddits">
+		android:title="Edit Subreddits"
+		android:summary="Blank subreddits will be ignored">
 		
 		<EditTextPreference
         	android:defaultValue="wallpaper"
