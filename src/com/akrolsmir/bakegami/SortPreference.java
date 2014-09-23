@@ -56,7 +56,7 @@ public class SortPreference extends DialogPreference implements OnItemSelectedLi
 		if( values.contains("from"))
 		{
 			sortSpinner.setSelection(SORT.indexOf(values.split(" ")[0]));
-			timeSpinner.setSelection(TIME.indexOf(values.substring(values.indexOf("from"))+5));
+			timeSpinner.setSelection(TIME.indexOf(values.substring(values.indexOf("from")+5)));
 			timeSpinner.setVisibility(View.VISIBLE);
 			text.setVisibility(View.VISIBLE);
 		}
@@ -75,7 +75,7 @@ public class SortPreference extends DialogPreference implements OnItemSelectedLi
         // When the user selects "OK", persist the new value
         if (positiveResult) {
         	if(text.getVisibility() == View.VISIBLE)
-        		setValue(""+sortSpinner.getSelectedItem()+text.getText()+timeSpinner.getSelectedItem());
+        		setValue(sortSpinner.getSelectedItem()+" "+text.getText()+" "+timeSpinner.getSelectedItem());
         	else
         		setValue(sortSpinner.getSelectedItem()+"");
         	WallpaperManager.with(getContext()).resetQueue();
@@ -109,9 +109,11 @@ public class SortPreference extends DialogPreference implements OnItemSelectedLi
 		String sort = sortSpinner.getSelectedItem()+"";
 		if( sort.equals("Top") || sort.equals("Controversial"))
 		{
-			timeSpinner.setSelection(TIME.indexOf("today"));
-			timeSpinner.setVisibility(View.VISIBLE);
-			text.setVisibility(View.VISIBLE);
+			if(text.getVisibility()==View.INVISIBLE){
+				timeSpinner.setSelection(TIME.indexOf("today"));
+				timeSpinner.setVisibility(View.VISIBLE);
+				text.setVisibility(View.VISIBLE);
+			}
 		}
 		else
 		{
