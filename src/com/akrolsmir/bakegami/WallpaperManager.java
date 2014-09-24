@@ -1,10 +1,12 @@
 package com.akrolsmir.bakegami;
 
 import java.io.File;
+import java.net.SocketException;
 import java.util.regex.Pattern;
 
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import android.app.Activity;
@@ -92,6 +94,11 @@ public class WallpaperManager {
 			}
 			return;
 		}
+		if(!getNextWallpaper().imageInCache())
+		{
+			resetQueue();
+			return;
+		}
 		getCurrentWallpaper().uncache();
 		advanceCurrent();
 		getCurrentWallpaper().setAsBackground();
@@ -111,6 +118,10 @@ public class WallpaperManager {
 
 	public Wallpaper getCurrentWallpaper() {
 		return new Wallpaper(context, getCurrentWallpaperURL());
+	}
+	
+	public Wallpaper getNextWallpaper() {
+		return new Wallpaper(context, getNextWallpaperURL());
 	}
 
 	public void resetQueueAndHistory() {
@@ -161,11 +172,17 @@ public class WallpaperManager {
 					if (getSubreddit(sr).length() == 0)
 						i--;
 					else {
+						try{
 						rawJson = restTemplate.getForObject(
 								"http://www.reddit.com/r/" + getSubreddit(sr)
 										+ "/"+SortPreference.getValues(context)[0]+".json?"+
 										( SortPreference.getValues(context).length <= 1? "" : "t="+SortPreference.getValues(context)[1]+"&")+"limit=100",
 								String.class);
+						}
+						catch(ResourceAccessException e)
+						{
+							break;
+						}
 						if (!parseUrlFromReddit(rawJson))
 							i--;
 					}
@@ -241,6 +258,7 @@ public class WallpaperManager {
 			new Wallpaper(context, imageURL + "|" + imageName).cache();
 		}
 	}
+	
 
 	private void addInfo(String name, String sr, String title, String postURL,
 			String url) {
@@ -305,6 +323,11 @@ public class WallpaperManager {
 
 	public String getCurrentWallpaperURL() {
 		String url = settings.getString(HISTORY, DEFAULT_URL + " ").split(" ")[0];
+		return url.contains("/") ? url : DEFAULT_URL;
+	}
+	
+	public String getNextWallpaperURL() {
+		String url = settings.getString(QUEUE, DEFAULT_URL + " ").split(" ")[0];
 		return url.contains("/") ? url : DEFAULT_URL;
 	}
 

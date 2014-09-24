@@ -52,6 +52,7 @@ public class Wallpaper {
 						// Download stuff to cache folder
 						downloadFile(imageURL, getCacheFile());
 					} catch (Exception e) {
+						com.akrolsmir.bakegami.WallpaperManager.with(context).resetQueue();
 						// TODO handle?
 						e.printStackTrace();
 					}
@@ -74,9 +75,7 @@ public class Wallpaper {
 			@Override
 			public void run() {
 				try {
-					if (!imageInCache())
-						downloadFile(imageURL, getCacheFile());
-
+					
 					// Grab the picture from cache
 					WallpaperManager wpm = WallpaperManager
 							.getInstance(context);
@@ -94,7 +93,7 @@ public class Wallpaper {
 		}).start();
 	}
 
-	private boolean imageInCache() {
+	public boolean imageInCache() {
 		return getCacheFile().exists();
 	}
 
