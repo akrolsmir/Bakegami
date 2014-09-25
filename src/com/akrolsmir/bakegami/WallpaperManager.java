@@ -1,6 +1,7 @@
 package com.akrolsmir.bakegami;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.SocketException;
 import java.util.regex.Pattern;
 
@@ -11,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -140,9 +142,72 @@ public class WallpaperManager {
 	public void tweakWallpaper() {
 		// TODO allow user to adjust wallpaper
 	}
+	
+	public void cropWallpaper() {
+		// TODO Try using WPM.getCropAndSetWallpaperIntent on sdk 19 and
+		// higher
+		android.app.WallpaperManager wpm = android.app.WallpaperManager
+				.getInstance(context);
+		if (android.os.Build.VERSION.SDK_INT >= 19) {
+			try {
+				Uri contUri = Uri.parse(android.provider.MediaStore.Images.Media
+						.insertImage(context.getContentResolver(),
+								getCurrentWallpaper()
+										.getCacheFile()
+										.getAbsolutePath(), null, null));
+				Intent cropSetIntent = wpm
+						.getCropAndSetWallpaperIntent(contUri);
+				cropSetIntent.setDataAndType(contUri,"image/*");
+				context.startActivity(cropSetIntent);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				backupCrop(wpm);
+				e.printStackTrace();
+			} catch (IllegalArgumentException iae){
+				backupCrop(wpm);
+				iae.printStackTrace();
+			}
+		} else {
+			backupCrop(wpm);
+		}
+	}
 
 	/* Private helper methods */
 
+	private void backupCrop( android.app.WallpaperManager wpm)
+	{
+		Intent cropIntent = new Intent(
+				"com.android.camera.action.CROP");
+		cropIntent.setDataAndType(
+				Uri.fromFile(getCurrentWallpaper().getCacheFile()),
+				"image/*");
+		cropIntent
+				.setClassName("com.google.android.apps.plus",
+						"com.google.android.apps.photoeditor.fragments.PlusCropActivityAlias");
+		cropIntent.putExtra("crop", "true");
+		cropIntent.putExtra("aspectX", wpm.getDesiredMinimumWidth());
+		cropIntent.putExtra("aspectY",
+				wpm.getDesiredMinimumHeight());
+		cropIntent.putExtra("outputX", wpm.getDesiredMinimumWidth());
+		cropIntent.putExtra("outputY",
+				wpm.getDesiredMinimumHeight());
+		cropIntent.putExtra("return-data", true);
+		try {
+			((Activity)context).startActivityForResult(cropIntent, 1);
+		} catch (ActivityNotFoundException anfe) {
+			try {
+				cropIntent
+						.setClassName(
+								"com.google.android.apps.plus",
+								"com.google.android.apps.photoeditor.fragments.PlusCropActivity");
+				((Activity)context).startActivityForResult(cropIntent, 1);
+			} catch (ActivityNotFoundException anfe2) {
+				Toast.makeText(context,
+						"Cropping requires the latest Google+.",
+						Toast.LENGTH_LONG).show();
+			}
+		}
+	}
 	public void fetchNextUrls() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);

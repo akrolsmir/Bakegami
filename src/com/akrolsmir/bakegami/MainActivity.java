@@ -72,63 +72,7 @@ public class MainActivity extends Activity {
 		cropButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				// TODO Try using WPM.getCropAndSetWallpaperIntent on sdk 19 and
-				// higher
-				android.app.WallpaperManager wpm = android.app.WallpaperManager
-						.getInstance(MainActivity.this);
-				if (android.os.Build.VERSION.SDK_INT >= 19) {
-					try {
-						Uri contUri = Uri.parse(android.provider.MediaStore.Images.Media
-								.insertImage(getContentResolver(),
-										WallpaperManager
-												.with(MainActivity.this)
-												.getCurrentWallpaper()
-												.getCacheFile()
-												.getAbsolutePath(), null, null));
-						Intent cropSetIntent = wpm
-								.getCropAndSetWallpaperIntent(contUri);
-						cropSetIntent.setType("image/*");
-						startActivity(cropSetIntent);
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-				} else {
-					Intent cropIntent = new Intent(
-							"com.android.camera.action.CROP");
-					cropIntent.setDataAndType(
-							Uri.fromFile(WallpaperManager
-									.with(MainActivity.this)
-									.getCurrentWallpaper().getCacheFile()),
-							"image/*");
-					cropIntent
-							.setClassName("com.google.android.apps.plus",
-									"com.google.android.apps.photoeditor.fragments.PlusCropActivityAlias");
-					cropIntent.putExtra("crop", "true");
-					cropIntent.putExtra("aspectX", wpm.getDesiredMinimumWidth());
-					cropIntent.putExtra("aspectY",
-							wpm.getDesiredMinimumHeight());
-					cropIntent.putExtra("outputX", wpm.getDesiredMinimumWidth());
-					cropIntent.putExtra("outputY",
-							wpm.getDesiredMinimumHeight());
-					cropIntent.putExtra("return-data", true);
-					try {
-						startActivityForResult(cropIntent, 1);
-					} catch (ActivityNotFoundException anfe) {
-						try {
-							cropIntent
-									.setClassName(
-											"com.google.android.apps.plus",
-											"com.google.android.apps.photoeditor.fragments.PlusCropActivity");
-							startActivityForResult(cropIntent, 1);
-						} catch (ActivityNotFoundException anfe2) {
-							Toast.makeText(MainActivity.this,
-									"Cropping requires the latest Google+.",
-									Toast.LENGTH_LONG).show();
-						}
-					}
-				}
+				WallpaperManager.with(MainActivity.this).cropWallpaper();
 			}
 		});
 
