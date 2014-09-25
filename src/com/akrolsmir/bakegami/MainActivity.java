@@ -152,9 +152,15 @@ public class MainActivity extends Activity {
 
 	private void onNextBG() {
 		ImageView currentBG = (ImageView) findViewById(R.id.currentBG);
-		Picasso.with(this)
+		Wallpaper wp = WallpaperManager.with(this).getCurrentWallpaper();
+		if(wp.imageInFavorites())
+			Picasso.with(this)
 				.load(WallpaperManager.with(this).getCurrentWallpaper()
-						.getCacheFile()).fit().centerInside().into(currentBG);
+						.getFavoriteFile()).fit().centerInside().into(currentBG);
+		else
+			Picasso.with(this)
+			.load(WallpaperManager.with(this).getCurrentWallpaper()
+					.getCacheFile()).fit().centerInside().into(currentBG);
 		onFavorite();
 	}
 

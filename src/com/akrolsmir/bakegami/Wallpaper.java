@@ -79,6 +79,8 @@ public class Wallpaper {
 					// Grab the picture from cache
 					WallpaperManager wpm = WallpaperManager
 							.getInstance(context);
+					if (!imageInCache() && imageInFavorites())
+			            copyFile(getFavoriteFile(), getCacheFile());
 					FileInputStream fis = new FileInputStream(getCacheFile());
 					wpm.setStream(fis);
 					Log.d("Changed wallpaper", imageURL);
