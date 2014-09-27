@@ -99,6 +99,10 @@ public class WallpaperManager {
 		if(!getNextWallpaper().imageInCache())
 		{
 			resetQueue();
+			Toast.makeText(
+					context,
+					"Finding more images. Wait a few seconds and try again.",
+					Toast.LENGTH_LONG).show();
 			return;
 		}
 		getCurrentWallpaper().uncache();
@@ -143,38 +147,38 @@ public class WallpaperManager {
 		// TODO allow user to adjust wallpaper
 	}
 	
-	public void cropWallpaper() {
+	public void cropWallpaper( Context cont ) {
 		// TODO Try using WPM.getCropAndSetWallpaperIntent on sdk 19 and
 		// higher
 		android.app.WallpaperManager wpm = android.app.WallpaperManager
-				.getInstance(context);
+				.getInstance(cont);
 		if (android.os.Build.VERSION.SDK_INT >= 19) {
 			try {
 				Uri contUri = Uri.parse(android.provider.MediaStore.Images.Media
-						.insertImage(context.getContentResolver(),
+						.insertImage(cont.getContentResolver(),
 								getCurrentWallpaper()
 										.getCacheFile()
 										.getAbsolutePath(), null, null));
 				Intent cropSetIntent = wpm
 						.getCropAndSetWallpaperIntent(contUri);
 				cropSetIntent.setDataAndType(contUri,"image/*");
-				context.startActivity(cropSetIntent);
+				cont.startActivity(cropSetIntent);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
-				backupCrop(wpm);
+				backupCrop(wpm, cont);
 				e.printStackTrace();
 			} catch (IllegalArgumentException iae){
-				backupCrop(wpm);
+				backupCrop(wpm, cont);
 				iae.printStackTrace();
 			}
 		} else {
-			backupCrop(wpm);
+			backupCrop(wpm, cont);
 		}
 	}
 
 	/* Private helper methods */
 
-	private void backupCrop( android.app.WallpaperManager wpm)
+	private void backupCrop( android.app.WallpaperManager wpm, Context cont)
 	{
 		Intent cropIntent = new Intent(
 				"com.android.camera.action.CROP");
@@ -193,14 +197,14 @@ public class WallpaperManager {
 				wpm.getDesiredMinimumHeight());
 		cropIntent.putExtra("return-data", true);
 		try {
-			((Activity)context).startActivityForResult(cropIntent, 1);
+			((Activity)cont).startActivityForResult(cropIntent, 1);
 		} catch (ActivityNotFoundException anfe) {
 			try {
 				cropIntent
 						.setClassName(
 								"com.google.android.apps.plus",
 								"com.google.android.apps.photoeditor.fragments.PlusCropActivity");
-				((Activity)context).startActivityForResult(cropIntent, 1);
+				((Activity)cont).startActivityForResult(cropIntent, 1);
 			} catch (ActivityNotFoundException anfe2) {
 				Toast.makeText(context,
 						"Cropping requires the latest Google+.",
@@ -277,7 +281,7 @@ public class WallpaperManager {
 					&& (!nsfw || SettingsActivity.showNSFW(context))) {
 				String perma = child.getAsJsonObject().get("data")
 						.getAsJsonObject().get("permalink").getAsString();
-				String subreddit = child.getAsJsonObject().get("data")
+				String subreddit = child.getAsJsonObject().get("data") 
 						.getAsJsonObject().get("subreddit").getAsString();
 				String title = child.getAsJsonObject().get("data")
 						.getAsJsonObject().get("title").getAsString();
