@@ -248,7 +248,7 @@ public class WallpaperManager {
 										( SortPreference.getValues(context).length <= 1? "" : "t="+SortPreference.getValues(context)[1]+"&")+"limit=100",
 								String.class);
 						}
-						catch(ResourceAccessException e)
+						catch(Exception e)
 						{
 							break;
 						}
@@ -265,34 +265,38 @@ public class WallpaperManager {
 	}
 
 	private boolean parseUrlFromReddit(String rawJson) {
-		JsonElement object = new JsonParser().parse(rawJson);
-		JsonArray children = object.getAsJsonObject().get("data")
-				.getAsJsonObject().get("children").getAsJsonArray();
-		for (JsonElement child : children) {
-			String url = child.getAsJsonObject().get("data").getAsJsonObject()
-					.get("url").getAsString();
-			boolean nsfw = child.getAsJsonObject().get("data")
-					.getAsJsonObject().get("over_18").getAsBoolean();
-			if (url.contains("imgur.com") && !url.contains("i.imgur.com")
-					&& !url.contains("imgur.com/gallery/")
-					&& !url.contains("imgur.com/a/"))
-				url += ".jpg";
-			if (validImageUrl(url)
-					&& (!nsfw || SettingsActivity.showNSFW(context))) {
-				String perma = child.getAsJsonObject().get("data")
-						.getAsJsonObject().get("permalink").getAsString();
-				String subreddit = child.getAsJsonObject().get("data") 
-						.getAsJsonObject().get("subreddit").getAsString();
-				String title = child.getAsJsonObject().get("data")
-						.getAsJsonObject().get("title").getAsString();
-				String postURL = "http://www.i.reddit.com" + perma;
-				perma = perma.substring(0, perma.lastIndexOf('/'));
-				perma = perma.substring(perma.lastIndexOf('/') + 1)
-						+ url.substring(url.lastIndexOf('.'));
-				enqueueURL(url, perma);
-				addInfo(perma, subreddit, title, postURL, url);
-				return true;
+		try {
+			JsonElement object = new JsonParser().parse(rawJson);
+			JsonArray children = object.getAsJsonObject().get("data")
+					.getAsJsonObject().get("children").getAsJsonArray();
+			for (JsonElement child : children) {
+				String url = child.getAsJsonObject().get("data")
+						.getAsJsonObject().get("url").getAsString();
+				boolean nsfw = child.getAsJsonObject().get("data")
+						.getAsJsonObject().get("over_18").getAsBoolean();
+				if (url.contains("imgur.com") && !url.contains("i.imgur.com")
+						&& !url.contains("imgur.com/gallery/")
+						&& !url.contains("imgur.com/a/"))
+					url += ".jpg";
+				if (validImageUrl(url)
+						&& (!nsfw || SettingsActivity.showNSFW(context))) {
+					String perma = child.getAsJsonObject().get("data")
+							.getAsJsonObject().get("permalink").getAsString();
+					String subreddit = child.getAsJsonObject().get("data")
+							.getAsJsonObject().get("subreddit").getAsString();
+					String title = child.getAsJsonObject().get("data")
+							.getAsJsonObject().get("title").getAsString();
+					String postURL = "http://www.i.reddit.com" + perma;
+					perma = perma.substring(0, perma.lastIndexOf('/'));
+					perma = perma.substring(perma.lastIndexOf('/') + 1)
+							+ url.substring(url.lastIndexOf('.'));
+					enqueueURL(url, perma);
+					addInfo(perma, subreddit, title, postURL, url);
+					return true;
+				}
 			}
+		} catch (Exception e) {
+			return false;
 		}
 		return false;
 		// TODO handle case when out of images
