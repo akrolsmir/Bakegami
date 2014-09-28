@@ -163,14 +163,11 @@ public class WallpaperManager {
 						.getCropAndSetWallpaperIntent(contUri);
 				cropSetIntent.setDataAndType(contUri,"image/*");
 				cont.startActivity(cropSetIntent);
-			} catch (FileNotFoundException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				backupCrop(wpm, cont);
 				e.printStackTrace();
-			} catch (IllegalArgumentException iae){
-				backupCrop(wpm, cont);
-				iae.printStackTrace();
-			}
+			} 
 		} else {
 			backupCrop(wpm, cont);
 		}
