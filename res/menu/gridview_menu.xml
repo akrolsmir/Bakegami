@@ -3,7 +3,7 @@
     
     <item
         android:icon="@drawable/ic_action_picture"
-        android:id="@+id/menu_item_set"
+        android:id="@+id/menu_item_view"
         android:showAsAction="always"
         android:title="Set as background" />
 

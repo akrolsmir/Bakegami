@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -28,13 +29,18 @@ public class FavoritesView extends GridView {
 		this.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-				Intent intent = new Intent();
-				intent.setAction(Intent.ACTION_VIEW);
-				intent.setDataAndType(
-						Uri.fromFile(Wallpaper.getFavorites().get(position)),
-						"image/*");
-				context.startActivity(intent);
+			public void onItemClick(AdapterView<?> parent, View v, final int position, long id) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+				builder.setMessage("Set this image as wallpaper?");
+				builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// Count backwards to ensure correct index is used
+						WallpaperManager.with(context).setWallpaper(Wallpaper.getFavorites().get(position));
+					}
+				});
+				builder.setNegativeButton("Cancel", null);
+				builder.show();
 			}
 		});
 		this.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -45,20 +51,30 @@ public class FavoritesView extends GridView {
 					boolean checked) {
 				// Here you can do something when items are selected/de-selected,
 				// such as update the title in the CAB
+				if(getCheckedItemCount() > 1)
+				{
+					mode.getMenu().findItem(R.id.menu_item_view).setVisible(false);
+					mode.getMenu().findItem(R.id.menu_item_info).setVisible(false);
+				}
+				else if(getCheckedItemCount() == 1)
+				{
+					mode.getMenu().findItem(R.id.menu_item_view).setVisible(true);
+					mode.getMenu().findItem(R.id.menu_item_info).setVisible(true);
+				}
 			}
 
 			@Override
 			public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
 				final SparseBooleanArray checked = getCheckedItemPositions();
+				Intent intent = new Intent();
 				// Respond to clicks on the actions in the CAB
 				switch (item.getItemId()) {
-				case R.id.menu_item_set:
-					for (int i = 0; i < getAdapter().getCount(); i++) {
-						if (checked.get(i)) {
-							WallpaperManager.with(context).setWallpaper(Wallpaper.getFavorites().get(i));
-							break;
-						}
-					}
+				case R.id.menu_item_view:
+					intent.setAction(Intent.ACTION_VIEW);
+					intent.setDataAndType(
+							Uri.fromFile(Wallpaper.getFavorites().get(
+									checked.keyAt(0))), "image/*");
+					context.startActivity(intent);
 					mode.finish();
 					return true;
 				case R.id.menu_item_delete:
@@ -83,7 +99,6 @@ public class FavoritesView extends GridView {
 					
 					return true;
 				case R.id.menu_item_share:
-					Intent intent = new Intent();
 					intent.setAction(Intent.ACTION_SEND_MULTIPLE);
 					intent.setType("image/*");
 
@@ -99,13 +114,8 @@ public class FavoritesView extends GridView {
 					mode.finish();
 					return true;
 				case R.id.menu_item_info:
-					for (int i = 0; i < getAdapter().getCount(); i++) {
-						if (checked.get(i)) {
-							String path = Wallpaper.getFavorites().get(i).getAbsolutePath();
-							WallpaperManager.with(context).displayInfo(path.substring(path.lastIndexOf("/")+1), context);
-							break;
-						}
-					}
+					String path = Wallpaper.getFavorites().get(checked.keyAt(0)).getAbsolutePath();
+					WallpaperManager.with(context).displayInfo(path.substring(path.lastIndexOf("/")+1), context);
 					mode.finish();
 					return true;
 				default:
@@ -118,6 +128,16 @@ public class FavoritesView extends GridView {
 				// Inflate the menu for the CAB
 				MenuInflater inflater = mode.getMenuInflater();
 				inflater.inflate(R.menu.gridview_menu, menu);
+				if(getCheckedItemCount() > 1)
+				{
+					menu.findItem(R.id.menu_item_view).setVisible(false);
+					menu.findItem(R.id.menu_item_info).setVisible(false);
+				}
+				else if(getCheckedItemCount() == 1)
+				{
+					menu.findItem(R.id.menu_item_view).setVisible(true);
+					menu.findItem(R.id.menu_item_info).setVisible(true);
+				}
 				return true;
 			}
 
