@@ -47,16 +47,15 @@ public class Tutorial {
 	}
 	public static void partTwo(Context context) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle("Tutorial")
+		builder.setTitle("Managing Settings")
 				.setMessage(
-						"Now that an image should be set as your wallpaper, other options should appear. The star button will allow you to save an image to favorites, the skip button will allow you to move to the next image, the crop button will allow you to re-crop your wallpaper, and the info button will give information about the image. Once you have an image favorited, you can set it as wallpaper by clicking it or hold your finger on it to open a menu of options.")
+						"You can change subreddits and other settings using your phone's settings button or the button on the right of the header.")
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 
 					}
-				})
-				.setCancelable(false);
+				});
 		builder.show();
 	}
 }

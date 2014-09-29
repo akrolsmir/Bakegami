@@ -40,13 +40,11 @@ public class MainActivity extends Activity {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setContentView(R.layout.activity_main);
 		prefs = getSharedPreferences("com.akrolsmir.bakegami.main",0);
-		if(prefs.getBoolean(NEED_TUTORIAL, true)){
+		if(prefs.getBoolean(CONTINUE_TUTORIAL, true)){
 			findViewById(R.id.favButton).setVisibility(View.GONE);
 			findViewById(R.id.nextButton).setVisibility(View.GONE);
 			findViewById(R.id.cropButton).setVisibility(View.GONE);
 			findViewById(R.id.infoButton).setVisibility(View.GONE);
-			prefs.edit().putBoolean(NEED_TUTORIAL, false).apply();
-			Tutorial.onFirst(this, prefs);
 		}
 		findViewById(R.id.favButton).setOnClickListener(new OnClickListener() {
 			@Override
