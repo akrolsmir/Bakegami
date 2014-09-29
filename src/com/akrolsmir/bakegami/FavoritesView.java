@@ -35,7 +35,6 @@ public class FavoritesView extends GridView {
 				builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						// Count backwards to ensure correct index is used
 						WallpaperManager.with(context).setWallpaper(Wallpaper.getFavorites().get(position));
 					}
 				});

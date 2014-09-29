@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,13 +31,23 @@ import com.squareup.picasso.Picasso;
 
 public class MainActivity extends Activity {
 
+	private SharedPreferences prefs;
+	public static final String NEED_TUTORIAL = "need tutorial",  CONTINUE_TUTORIAL = "continue tutorial";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setContentView(R.layout.activity_main);
-
+		prefs = getSharedPreferences("com.akrolsmir.bakegami.main",0);
+		if(prefs.getBoolean(NEED_TUTORIAL, true)){
+			findViewById(R.id.favButton).setVisibility(View.GONE);
+			findViewById(R.id.nextButton).setVisibility(View.GONE);
+			findViewById(R.id.cropButton).setVisibility(View.GONE);
+			findViewById(R.id.infoButton).setVisibility(View.GONE);
+			prefs.edit().putBoolean(NEED_TUTORIAL, false).apply();
+			Tutorial.onFirst(this, prefs);
+		}
 		findViewById(R.id.favButton).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -59,6 +70,15 @@ public class MainActivity extends Activity {
 		playPauseButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if(prefs.getBoolean(CONTINUE_TUTORIAL, true))
+				{
+					Tutorial.partTwo(MainActivity.this);
+					prefs.edit().putBoolean(CONTINUE_TUTORIAL,false).apply();
+				}
+				findViewById(R.id.favButton).setVisibility(View.VISIBLE);
+				findViewById(R.id.nextButton).setVisibility(View.VISIBLE);
+				findViewById(R.id.cropButton).setVisibility(View.VISIBLE);
+				findViewById(R.id.infoButton).setVisibility(View.VISIBLE);
 				playPauseButton.setImageResource(RefreshService
 						.isCycling(MainActivity.this) ? android.R.drawable.ic_media_play
 						: android.R.drawable.ic_media_pause);
@@ -77,13 +97,13 @@ public class MainActivity extends Activity {
 		});
 
 		// TODO remove backdoor
-		playPauseButton.setOnLongClickListener(new OnLongClickListener() {
+		/*playPauseButton.setOnLongClickListener(new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View arg0) {
 				WallpaperManager.with(MainActivity.this).resetQueueAndHistory();
 				return false;
 			}
-		});
+		});*/
 
 		ImageButton infoButton = (ImageButton) findViewById(R.id.infoButton);
 		infoButton.setOnClickListener(new OnClickListener() {

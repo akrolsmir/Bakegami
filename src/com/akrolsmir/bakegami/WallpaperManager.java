@@ -91,7 +91,7 @@ public class WallpaperManager {
 			else {
 				Toast.makeText(
 						context,
-						"Out of unique images. Try adding more subreddits or increasing Cycle Time",
+						"Out of unique images. Try changing settings to avoid this issue.",
 						Toast.LENGTH_LONG).show();
 			}
 			return;
@@ -306,7 +306,7 @@ public class WallpaperManager {
 				&& imageURL.matches("https?://.*\\.(jpg|png)$")
 				&& isNew(imageURL);
 	}
-
+	
 	private String HISTORY = "history", QUEUE = "queue";
 
 	private boolean isNew(String imageURL) {
@@ -385,7 +385,7 @@ public class WallpaperManager {
 							public void onClick(DialogInterface dialog, int id) {
 							}
 						});
-		builder.create().show();
+		builder.show();
 	}
 
 	// The current wallpaper is at the top of the history stack

@@ -3,8 +3,8 @@
 	android:title="Settings" >
 
 	<PreferenceScreen
-		android:title="Edit Subreddits"
-		android:summary="Add up to 10 subreddits to get images from. Blank subreddits will be ignored.">
+		android:title="Manage Subreddits"
+		android:summary="Add up to 10 subreddits to retrieve images from. Leave subreddit fields blank if you want to use less than 10.">
 		
 		<EditTextPreference
         	android:defaultValue="wallpaper"
@@ -78,7 +78,7 @@
         android:defaultValue="2 days"
         android:key="pref_refresh_freq"
         android:summary="Every 2 days (currently paused)"
-        android:title="Cycle time" />
+        android:title="Wallpaper Change Frequency" />
     
     <CheckBoxPreference 
         android:defaultValue="true"

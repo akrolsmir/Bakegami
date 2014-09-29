@@ -26,8 +26,8 @@ public class SettingsActivity extends PreferenceActivity implements
     		for( String k : KEY_PREF_SUBREDDITS)
     			if (key.equals(k)) { 
     				findPreference(key).setSummary("r/" + sp.getString(key, ""));
-				WallpaperManager.with(this).resetQueue();
-				return;
+    				WallpaperManager.with(this).resetQueue();
+    				return;
     			}
     		if(key.equals(KEY_PREF_ALLOW_DATA) && sp.getBoolean(KEY_PREF_ALLOW_DATA, false) == true)
     			WallpaperManager.with(this).fetchNextUrls();
