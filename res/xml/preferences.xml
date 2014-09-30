@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" 
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+	android:key="preferenceKey" 
 	android:title="Settings" >
 
 	<PreferenceScreen
+		android:key="nestedKey"
 		android:title="Manage Subreddits"
 		android:summary="Add up to 10 subreddits to retrieve images from. Leave subreddit fields blank if you want to use less than 10.">
 		
