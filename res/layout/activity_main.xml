@@ -58,7 +58,7 @@
                 android:id="@+id/infoButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_dialog_info" />
+                android:src="@drawable/ic_action_about" />
 
             <TextView
                 android:layout_width="0dp"

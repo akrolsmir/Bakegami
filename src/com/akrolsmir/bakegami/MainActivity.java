@@ -32,7 +32,7 @@ import com.squareup.picasso.Picasso;
 public class MainActivity extends Activity {
 
 	private SharedPreferences prefs;
-	public static final String NEED_TUTORIAL = "need tutorial",  CONTINUE_TUTORIAL = "continue tutorial";
+	public static final String FIRST_TIME = "need tutorial";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setContentView(R.layout.activity_main);
 		prefs = getSharedPreferences("com.akrolsmir.bakegami.main",0);
-		if(prefs.getBoolean(CONTINUE_TUTORIAL, true)){
+		if(prefs.getBoolean(FIRST_TIME, true)){
 			findViewById(R.id.favButton).setVisibility(View.GONE);
 			findViewById(R.id.nextButton).setVisibility(View.GONE);
 			findViewById(R.id.cropButton).setVisibility(View.GONE);
@@ -68,15 +68,14 @@ public class MainActivity extends Activity {
 		playPauseButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(prefs.getBoolean(CONTINUE_TUTORIAL, true))
+				if(prefs.getBoolean(FIRST_TIME, true))
 				{
-					Tutorial.partTwo(MainActivity.this);
-					prefs.edit().putBoolean(CONTINUE_TUTORIAL,false).apply();
+					prefs.edit().putBoolean(FIRST_TIME,false).apply();
+					findViewById(R.id.favButton).setVisibility(View.VISIBLE);
+					findViewById(R.id.nextButton).setVisibility(View.VISIBLE);
+					findViewById(R.id.cropButton).setVisibility(View.VISIBLE);
+					findViewById(R.id.infoButton).setVisibility(View.VISIBLE);
 				}
-				findViewById(R.id.favButton).setVisibility(View.VISIBLE);
-				findViewById(R.id.nextButton).setVisibility(View.VISIBLE);
-				findViewById(R.id.cropButton).setVisibility(View.VISIBLE);
-				findViewById(R.id.infoButton).setVisibility(View.VISIBLE);
 				playPauseButton.setImageResource(RefreshService
 						.isCycling(MainActivity.this) ? android.R.drawable.ic_media_play
 						: android.R.drawable.ic_media_pause);
@@ -132,6 +131,8 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		menu.findItem(R.id.action_settings).setIntent(
 				new Intent(this, SettingsActivity.class));
+		menu.findItem(R.id.action_help).setIntent(
+				new Intent(this, ItemListActivity.class));
 		return true;
 	}
 
