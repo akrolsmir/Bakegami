@@ -4,9 +4,9 @@
 	android:title="Settings" >
 
 	<PreferenceScreen
-		android:key="nestedKey"
-		android:title="Manage Subreddits"
-		android:summary="Add up to 10 subreddits to retrieve images from. Leave subreddit fields blank if you want to use less than 10.">
+		android:key="pref_subreddits"
+		android:title="Subreddits"
+		android:summary="r/wallpaper">
 		
 		<EditTextPreference
         	android:defaultValue="wallpaper"
@@ -74,18 +74,18 @@
 		android:defaultValue="Hot"
 		android:key="pref_sort"
 		android:summary = "Hot"
-		android:title="Sort Type" />
+		android:title="Sort by" />
 
     <com.akrolsmir.bakegami.FrequencyPickerPreference
         android:defaultValue="2 days"
         android:key="pref_refresh_freq"
         android:summary="Every 2 days (currently paused)"
-        android:title="Wallpaper Change Frequency" />
+        android:title="Change wallpapers" />
     
     <CheckBoxPreference 
         android:defaultValue="true"
         android:key="pref_allow_data"
-        android:title="Allow Data Usage"/>
+        android:title="Allow data usage"/>
         
     <CheckBoxPreference 
         android:defaultValue="false"

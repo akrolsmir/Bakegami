@@ -56,6 +56,7 @@ public class SettingsActivity extends PreferenceActivity implements
 		"sr7","sr8","sr9"}; 
 	public static String KEY_PREF_SHOW_NSFW = "pref_show_nsfw";
 	public static String KEY_PREF_ALLOW_DATA = "pref_allow_data";
+	public static String KEY_PREF_SUBREDDITS_MAIN = "pref_subreddits";
     
 	private void addBack(PreferenceScreen preferenceScreen){
 		final Dialog dialog = preferenceScreen.getDialog();
@@ -104,15 +105,26 @@ public class SettingsActivity extends PreferenceActivity implements
     @Override
 	public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
     	// Set summary to be the user-description for the selected value
-    		for( String k : KEY_PREF_SUBREDDITS)
-    			if (key.equals(k)) { 
-    				findPreference(key).setSummary("r/" + sp.getString(key, ""));
-    				WallpaperManager.with(this).resetQueue();
-    				return;
-    			}
-    		if(key.equals(KEY_PREF_ALLOW_DATA) && sp.getBoolean(KEY_PREF_ALLOW_DATA, false) == true)
-    			WallpaperManager.with(this).fetchNextUrls();
+		for( String k : KEY_PREF_SUBREDDITS)
+			if (key.equals(k)) { 
+				findPreference(key).setSummary("r/" + sp.getString(key, ""));
+				findPreference(KEY_PREF_SUBREDDITS_MAIN).setSummary(subredditsString(sp));
+				WallpaperManager.with(this).resetQueue();
+				return;
+			}
+		if(key.equals(KEY_PREF_ALLOW_DATA) && sp.getBoolean(KEY_PREF_ALLOW_DATA, false) == true)
+			WallpaperManager.with(this).fetchNextUrls();
 	}
+    
+    private String subredditsString(SharedPreferences sp) {
+    	String result = "";
+    	for (String subredditKey : KEY_PREF_SUBREDDITS) {
+    		if (sp.getString(subredditKey, "").length() > 0) {
+    			result += ", r/" + sp.getString(subredditKey, "");
+    		}
+    	}
+    	return result.length() > 0 ? result.substring(2) : "No subreddits selected";
+    }
     
     public static String getSubreddit(Context context, int index) {
     	return with(context).getString(KEY_PREF_SUBREDDITS[index], "");
@@ -134,19 +146,21 @@ public class SettingsActivity extends PreferenceActivity implements
     	return PreferenceManager.getDefaultSharedPreferences(context);
     }
     
-    @Override
-    protected void onResume() {
-        super.onResume();
-        getPreferenceScreen().getSharedPreferences()
-                .registerOnSharedPreferenceChangeListener(this);
-        if(findPreference("nestedKey") != null && findPreference("nestedKey") instanceof PreferenceScreen){
-        	addBack((PreferenceScreen)findPreference("nestedKey"));
-        }
-        
-        // Hackily updates the summary
-	for( int i = 0; i < 10; i++ )
-        	findPreference(KEY_PREF_SUBREDDITS[i]).setSummary("r/" + getSubreddit(this,i));
-    }
+	@Override
+	protected void onResume() {
+		super.onResume();
+		getPreferenceScreen().getSharedPreferences()
+				.registerOnSharedPreferenceChangeListener(this);
+		if (findPreference(KEY_PREF_SUBREDDITS_MAIN) != null
+				&& findPreference(KEY_PREF_SUBREDDITS_MAIN) instanceof PreferenceScreen) {
+			addBack((PreferenceScreen) findPreference(KEY_PREF_SUBREDDITS_MAIN));
+		}
+
+		// Hackily updates the summary
+		for (int i = 0; i < 10; i++)
+			findPreference(KEY_PREF_SUBREDDITS[i]).setSummary("r/" + getSubreddit(this, i));
+		findPreference(KEY_PREF_SUBREDDITS_MAIN).setSummary(subredditsString(with(this)));
+	}
 
     @Override
     protected void onPause() {
