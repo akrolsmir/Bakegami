@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -50,13 +49,11 @@ public class FavoritesView extends GridView {
 					boolean checked) {
 				// Here you can do something when items are selected/de-selected,
 				// such as update the title in the CAB
-				if(getCheckedItemCount() > 1)
-				{
+				if (getCheckedItemCount() > 1) {
 					mode.getMenu().findItem(R.id.menu_item_view).setVisible(false);
 					mode.getMenu().findItem(R.id.menu_item_info).setVisible(false);
 				}
-				else if(getCheckedItemCount() == 1)
-				{
+				else if (getCheckedItemCount() == 1) {
 					mode.getMenu().findItem(R.id.menu_item_view).setVisible(true);
 					mode.getMenu().findItem(R.id.menu_item_info).setVisible(true);
 				}
@@ -98,7 +95,7 @@ public class FavoritesView extends GridView {
 					
 					return true;
 				case R.id.menu_item_share:
-					intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+					intent.setAction(getCheckedItemCount() == 1 ? Intent.ACTION_SEND : Intent.ACTION_SEND_MULTIPLE);
 					intent.setType("image/*");
 
 					ArrayList<Uri> files = new ArrayList<Uri>();
