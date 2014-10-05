@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    
-    <item
-        android:icon="@drawable/ic_action_picture"
-        android:id="@+id/menu_item_view"
-        android:showAsAction="always"
-        android:title="Set as background" />
 
     <item
         android:id="@+id/menu_item_share"
         android:icon="@drawable/ic_action_share"
-        android:showAsAction="ifRoom"
-        android:title="Share"/>
-    <item
-        android:id="@+id/menu_item_delete"
-        android:icon="@drawable/ic_action_discard"
-        android:orderInCategory="100"
         android:showAsAction="always"
-        android:title="Delete"/>
+        android:title="Share"/>
     <item
         android:id="@+id/menu_item_info"
         android:icon="@drawable/ic_action_about"
         android:showAsAction="ifRoom"
         android:title="Info"/>
+    <item
+        android:id="@+id/menu_item_view"
+        android:icon="@drawable/ic_action_picture"
+        android:showAsAction="ifRoom"
+        android:title="View"/>
+    <item
+        android:id="@+id/menu_item_delete"
+        android:icon="@drawable/ic_action_discard"
+        android:showAsAction="ifRoom"
+        android:title="Delete"/>
 
 </menu>

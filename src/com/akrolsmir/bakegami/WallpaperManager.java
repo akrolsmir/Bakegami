@@ -4,12 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.SocketException;
 import java.util.regex.Pattern;
-
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -33,7 +32,6 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -147,6 +145,7 @@ public class WallpaperManager {
 		// TODO allow user to adjust wallpaper
 	}
 	
+	@SuppressLint("NewApi")
 	public void cropWallpaper( Context cont ) {
 		// TODO Try using WPM.getCropAndSetWallpaperIntent on sdk 19 and
 		// higher
@@ -363,7 +362,7 @@ public class WallpaperManager {
 				Html.fromHtml("<b>Post Title:</b><br/>" + rawInfo[3]),
 				Html.fromHtml("<b>Image URL:</b><br/>" + rawInfo[2]) };
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle("Info")
+		builder.setTitle("Details")
 				.setItems(info, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						if (!rawInfo[which].equals("N/A")) {

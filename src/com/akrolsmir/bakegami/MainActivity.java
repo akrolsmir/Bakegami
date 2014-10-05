@@ -18,6 +18,7 @@ import android.provider.MediaStore.Images.Media;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -40,11 +41,10 @@ public class MainActivity extends Activity {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setContentView(R.layout.activity_main);
 		prefs = getSharedPreferences("com.akrolsmir.bakegami.main",0);
-		if(prefs.getBoolean(FIRST_TIME, true)){
+		if (prefs.getBoolean(FIRST_TIME, true)) {
 			findViewById(R.id.favButton).setVisibility(View.GONE);
 			findViewById(R.id.nextButton).setVisibility(View.GONE);
 			findViewById(R.id.cropButton).setVisibility(View.GONE);
-			findViewById(R.id.infoButton).setVisibility(View.GONE);
 		}
 		findViewById(R.id.favButton).setOnClickListener(new OnClickListener() {
 			@Override
@@ -68,13 +68,11 @@ public class MainActivity extends Activity {
 		playPauseButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(prefs.getBoolean(FIRST_TIME, true))
-				{
+				if(prefs.getBoolean(FIRST_TIME, true)) {
 					prefs.edit().putBoolean(FIRST_TIME,false).apply();
 					findViewById(R.id.favButton).setVisibility(View.VISIBLE);
 					findViewById(R.id.nextButton).setVisibility(View.VISIBLE);
 					findViewById(R.id.cropButton).setVisibility(View.VISIBLE);
-					findViewById(R.id.infoButton).setVisibility(View.VISIBLE);
 				}
 				playPauseButton.setImageResource(RefreshService
 						.isCycling(MainActivity.this) ? android.R.drawable.ic_media_play
@@ -90,24 +88,6 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				WallpaperManager.with(MainActivity.this).cropWallpaper(MainActivity.this);
-			}
-		});
-
-		// TODO remove backdoor
-		/*playPauseButton.setOnLongClickListener(new OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View arg0) {
-				WallpaperManager.with(MainActivity.this).resetQueueAndHistory();
-				return false;
-			}
-		});*/
-
-		ImageButton infoButton = (ImageButton) findViewById(R.id.infoButton);
-		infoButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				WallpaperManager.with(MainActivity.this).displayInfo(
-						MainActivity.this);
 			}
 		});
 
@@ -132,6 +112,17 @@ public class MainActivity extends Activity {
 		menu.findItem(R.id.action_settings).setIntent(
 				new Intent(this, SettingsActivity.class));
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_info:
+			WallpaperManager.with(this).displayInfo(this);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	/* Listen for changes made by services/the widget */
