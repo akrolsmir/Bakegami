@@ -23,6 +23,10 @@ final class GridViewAdapter extends BaseAdapter {
 		this.context = context;
 		this.favorites = Wallpaper.getFavorites();
 	}
+	public GridViewAdapter(Context context, List<File> favorites) {
+		this.context = context;
+		this.favorites = favorites;
+	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {

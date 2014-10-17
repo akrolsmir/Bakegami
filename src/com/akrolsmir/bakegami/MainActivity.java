@@ -4,9 +4,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -16,6 +18,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore.Images.Media;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +26,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -33,10 +39,13 @@ import com.squareup.picasso.Picasso;
 public class MainActivity extends Activity {
 
 	private SharedPreferences prefs;
+	private boolean filtered;
+	private Menu menu;
 	public static final String FIRST_TIME = "need tutorial";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		filtered = false;
 		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setContentView(R.layout.activity_main);
@@ -111,14 +120,56 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		menu.findItem(R.id.action_settings).setIntent(
 				new Intent(this, SettingsActivity.class));
+		this.menu = menu;
 		return true;
 	}
 	
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(final MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_info:
 			WallpaperManager.with(this).displayInfo(this);
+			return true;
+		case R.id.action_filter:
+			if(filtered)
+			{
+				((FavoritesView)findViewById(R.id.favorites)).unfilter();
+				filtered = false;
+				item.setTitle("Filter");
+			}
+			else
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				final EditText input = new EditText(this);
+				input.setInputType(InputType.TYPE_CLASS_TEXT);
+				builder.setTitle("Filter Favorites by Keyword")
+						.setView(input)
+						.setPositiveButton("OK",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										InputMethodManager inputMethodManager = (InputMethodManager)  getSystemService(INPUT_METHOD_SERVICE);
+									    inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
+										((FavoritesView) findViewById(R.id.favorites)).filter(input.getText().toString());
+										filtered = true;
+										item.setTitle("Unfilter");
+									}
+								})
+						.setNegativeButton("Cancel",
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										InputMethodManager inputMethodManager = (InputMethodManager)  getSystemService(INPUT_METHOD_SERVICE);
+									    inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
+										dialog.cancel();
+									}
+								});
+				AlertDialog ad = builder.create();
+				ad.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+				ad.show();
+			}
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -133,7 +184,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume() {
 		onNextBG();
-
+		filtered = false;
 		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
 		manager.registerReceiver(updateReceiver, new IntentFilter(NEXT));
 		manager.registerReceiver(updateReceiver, new IntentFilter(FAVORITE));
@@ -163,12 +214,11 @@ public class MainActivity extends Activity {
 		Wallpaper wp = WallpaperManager.with(this).getCurrentWallpaper();
 		if(wp.imageInFavorites())
 			Picasso.with(this)
-				.load(WallpaperManager.with(this).getCurrentWallpaper()
-						.getFavoriteFile()).fit().centerInside().into(currentBG);
+				.load(wp.getFavoriteFile()).fit().centerInside().into(currentBG);
 		else
 			Picasso.with(this)
-			.load(WallpaperManager.with(this).getCurrentWallpaper()
-					.getCacheFile()).fit().centerInside().into(currentBG);
+			.load(wp.getCacheFile()).fit().centerInside().into(currentBG);
+		
 		onFavorite();
 	}
 
