@@ -46,6 +46,8 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		filtered = false;
+		if(menu != null)
+			menu.findItem(R.id.action_filter).setTitle("Filter");
 		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setContentView(R.layout.activity_main);
@@ -185,6 +187,8 @@ public class MainActivity extends Activity {
 	protected void onResume() {
 		onNextBG();
 		filtered = false;
+		if(menu != null)
+			menu.findItem(R.id.action_filter).setTitle("Filter");
 		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
 		manager.registerReceiver(updateReceiver, new IntentFilter(NEXT));
 		manager.registerReceiver(updateReceiver, new IntentFilter(FAVORITE));
