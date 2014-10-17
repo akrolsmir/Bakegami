@@ -169,6 +169,9 @@ public class FavoritesView extends GridView {
 	}
 	
 	public void onFavorite() {
+		gva = new GridViewAdapter(context);
+		setAdapter(gva);
+		files = Wallpaper.getFavorites();
 		((GridViewAdapter)this.getAdapter()).notifyDataSetChanged();
 	}
 	
