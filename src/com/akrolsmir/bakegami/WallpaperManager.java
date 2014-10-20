@@ -61,7 +61,8 @@ public class WallpaperManager {
 		settings.edit()
 				.putString(
 						HISTORY,
-						file.toURI()
+						settings.getString((file.toURI() + "").substring((file.toURI() + "")
+								.lastIndexOf('/') + 1)+"_url",file.toURI()+"")
 								+ "|"
 								+ (file.toURI() + "").substring((file.toURI() + "")
 										.lastIndexOf('/') + 1) + " " + history)

@@ -2,6 +2,7 @@ package com.akrolsmir.bakegami;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,6 +13,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -28,6 +31,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.RefreshService;
 import com.squareup.picasso.Picasso;
@@ -169,6 +173,44 @@ public class MainActivity extends Activity {
 				ad.show();
 			}
 			return true;
+		case R.id.action_reload:
+			ConnectivityManager connectivityManager = (ConnectivityManager) this
+			.getSystemService(Context.CONNECTIVITY_SERVICE);
+	NetworkInfo activeNetworkInfo;
+	if(SettingsActivity.allowData(this))
+		activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	else
+		activeNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+	if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
+		Toast.makeText(this,
+				"Connect to the Internet and try again.",
+				Toast.LENGTH_LONG).show();
+	else {
+		final WallpaperManager wpm = WallpaperManager.with(MainActivity.this);
+		Thread t =new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					
+					// Download stuff to cache folder
+					wpm.getCurrentWallpaper().downloadFile(wpm.getCurrentWallpaperURL(), wpm.getCurrentWallpaper().getCacheFile());
+				} catch (Exception e) {
+					// TODO handle?
+					e.printStackTrace();
+				}
+			}
+		});
+		t.start();
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		wpm.getCurrentWallpaper().setAsBackground();
+		Picasso.with(this)
+		.load(wpm.getCurrentWallpaper().getCacheFile()).fit().centerInside().into((ImageView) findViewById(R.id.currentBG));
+	}
 		default:
 			return super.onOptionsItemSelected(item);
 		}

@@ -103,7 +103,7 @@ public class Wallpaper {
 		return getFavoriteFile().exists();
 	}
 
-	private void downloadFile(String url, File dst)
+	public void downloadFile(String url, File dst)
 			throws MalformedURLException, IOException {
 		transfer(new URL(url).openStream(), new FileOutputStream(dst));
 	}
