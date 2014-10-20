@@ -210,6 +210,14 @@ public class MainActivity extends Activity {
 		wpm.getCurrentWallpaper().setAsBackground();
 		Picasso.with(this)
 		.load(wpm.getCurrentWallpaper().getCacheFile()).fit().centerInside().into((ImageView) findViewById(R.id.currentBG));
+		if(wpm.getCurrentWallpaper().imageInFavorites())
+			try {
+				wpm.getCurrentWallpaper().copyFile(wpm.getCurrentWallpaper().getCacheFile(), wpm.getCurrentWallpaper().getFavoriteFile());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return true;
 	}
 		default:
 			return super.onOptionsItemSelected(item);

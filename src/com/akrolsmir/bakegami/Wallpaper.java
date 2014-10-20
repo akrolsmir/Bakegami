@@ -108,7 +108,7 @@ public class Wallpaper {
 		transfer(new URL(url).openStream(), new FileOutputStream(dst));
 	}
 
-	private void copyFile(File src, File dst) throws IOException {
+	public void copyFile(File src, File dst) throws IOException {
 		transfer(new FileInputStream(src), new FileOutputStream(dst));
 	}
 
