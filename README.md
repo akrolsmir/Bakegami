@@ -1,14 +1,14 @@
-Background Refresh
-------------------
+Wallpaper Route
+---------------
 
-Tired of stock wallpapers? Background Refresh pulls popular images onto your device and automatically sets them as your background! 
+Tired of stock wallpapers? Wallpaper Route delivers popular images to your device and automatically sets them as your background! 
 
 * Discover great wallpapers in any category of your choice!
 * Refresh on a weekly, daily, or even hourly basis!
 * Download and save your favorites with one click!
 * Power user? Access shortcuts from the handy widget!
 
-Free and open source, Background Refresh aims to improve your Android experience by delivering quality content straight to your background.
+Free and open source, Wallpaper Route aims to improve your Android experience by delivering quality content straight to your background.
 
 Fix:
 * Resize gigantic images - http://stackoverflow.com/questions/10271020/bitmap-too-large-to-be-uploaded-into-a-texture

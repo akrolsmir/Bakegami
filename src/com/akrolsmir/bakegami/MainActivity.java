@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,19 +18,16 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore.Images.Media;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.RefreshService;
 import com.squareup.picasso.Picasso;
@@ -185,6 +181,7 @@ public class MainActivity extends Activity {
 
 	@Override
 	protected void onResume() {
+		getActionBar().setTitle("");  
 		onNextBG();
 		filtered = false;
 		if(menu != null)
