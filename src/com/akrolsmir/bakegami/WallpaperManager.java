@@ -1,13 +1,13 @@
 package com.akrolsmir.bakegami;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.net.SocketException;
+import java.io.IOException;
 import java.util.regex.Pattern;
+
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -19,19 +19,13 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -57,16 +51,11 @@ public class WallpaperManager {
 
 	public void setWallpaper(File file) {
 		getCurrentWallpaper().uncache();
-		String history = settings.getString(HISTORY, "");
-		settings.edit()
-				.putString(
-						HISTORY,
-						settings.getString((file.toURI() + "").substring((file.toURI() + "")
-								.lastIndexOf('/') + 1)+"_url",file.toURI()+"")
-								+ "|"
-								+ (file.toURI() + "").substring((file.toURI() + "")
-										.lastIndexOf('/') + 1) + " " + history)
-				.apply();
+		String last = settings.getString((file.toURI() + "").substring((file.toURI() + "")
+				.lastIndexOf('/') + 1) + "_url", file.toURI() + "")
+				+ "|"
+				+ (file.toURI() + "").substring((file.toURI() + "").lastIndexOf('/') + 1) + " ";
+		setHistory(last + getHistory());
 		getCurrentWallpaper().setAsBackground();
 		// Notify MainActivity and the widget to update their views
 		LocalBroadcastManager.getInstance(context).sendBroadcast(
@@ -75,7 +64,7 @@ public class WallpaperManager {
 	}
 
 	public void nextWallpaper() {
-		if (!settings.getString(QUEUE, "").contains(" ")) {
+		if (!getQueue().contains(" ")) {
 			ConnectivityManager connectivityManager = (ConnectivityManager) context
 					.getSystemService(Context.CONNECTIVITY_SERVICE);
 			NetworkInfo activeNetworkInfo;
@@ -95,8 +84,7 @@ public class WallpaperManager {
 			}
 			return;
 		}
-		if(!getNextWallpaper().imageInCache())
-		{
+		if (!getNextWallpaper().imageInCache()) {
 			resetQueue();
 			Toast.makeText(
 					context,
@@ -129,21 +117,12 @@ public class WallpaperManager {
 		return new Wallpaper(context, getNextWallpaperURL());
 	}
 
-	public void resetQueueAndHistory() {
-		settings.edit().clear().apply();
-		fetchNextUrls();
-	}
-
 	public void resetQueue() {
-		settings.edit().putString(QUEUE, "").apply();
+		setQueue("");
 		for (File file : context.getExternalCacheDir().listFiles())
 			if (!file.equals(getCurrentWallpaper().getCacheFile()))
 				file.delete();
 		fetchNextUrls();
-	}
-
-	public void tweakWallpaper() {
-		// TODO allow user to adjust wallpaper
 	}
 	
 	@SuppressLint("NewApi")
@@ -170,6 +149,29 @@ public class WallpaperManager {
 			} 
 		} else {
 			backupCrop(wpm, cont);
+		}
+	}
+	
+	public void removeFavorite(File f) {
+		String canonicalPath = "";
+		try {
+			canonicalPath = f.getCanonicalPath();
+		} catch (IOException e) {
+			canonicalPath = f.getAbsolutePath();
+		}
+		if (!getCurrentWallpaperURL().contains(canonicalPath.substring(canonicalPath.lastIndexOf("/") + 1)))
+			removeInfo(canonicalPath.substring(canonicalPath.lastIndexOf("/") + 1));
+		final Uri uri = MediaStore.Files.getContentUri("external");
+		final int result = context.getContentResolver().delete(uri,
+				MediaStore.Files.FileColumns.DATA + "=?",
+				new String[] { canonicalPath });
+		if (result == 0) {
+			final String absolutePath = f.getAbsolutePath();
+			if (!absolutePath.equals(canonicalPath)) {
+				context.getContentResolver().delete(uri,
+						MediaStore.Files.FileColumns.DATA + "=?",
+						new String[] { absolutePath });
+			}
 		}
 	}
 
@@ -220,8 +222,7 @@ public class WallpaperManager {
 		if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
 			return;
 		int index = settings.getInt("index", 0);
-		int total = StringUtils.countOccurrencesOf(
-				settings.getString(QUEUE, ""), " ");
+		int total = StringUtils.countOccurrencesOf(getQueue(), " ");
 		fetchNextUrls(3 + index - total);
 	}
 
@@ -306,20 +307,14 @@ public class WallpaperManager {
 				&& imageURL.matches("https?://.*\\.(jpg|png)$")
 				&& isNew(imageURL);
 	}
-	
-	private String HISTORY = "history", QUEUE = "queue";
 
 	private boolean isNew(String imageURL) {
-		return !((settings.getString(HISTORY, "") + settings.getString(QUEUE,
-				"")).contains(imageURL));
+		return !(getHistory() + getQueue()).contains(imageURL);
 	}
 
 	private void enqueueURL(String imageURL, String imageName) {
 		Log.d("enqueueURL", imageURL + "|" + imageName);
-		String queue = settings.getString(QUEUE, "");
-		settings.edit()
-				.putString(QUEUE, queue + imageURL + "|" + imageName + " ")
-				.apply();
+		setQueue(getQueue() + imageURL + "|" + imageName + " ");
 		if (setNextWallpaperAsBG) { // || settings.getString(QUEUE, "").length
 									// == 0
 			nextWallpaper();
@@ -389,30 +384,43 @@ public class WallpaperManager {
 	}
 
 	// The current wallpaper is at the top of the history stack
-	private String DEFAULT_URL = "http://cdn.awwni.me/maav.jpg|maav.jpg";
+	private String DEFAULT_URL = "http://cdn.awwni.me/maav.jpg|default0.jpg";
 
 	public String getCurrentWallpaperURL() {
-		String url = settings.getString(HISTORY, DEFAULT_URL + " ").split(" ")[0];
+		String url = getHistory().split(" ")[0];
 		return url.contains("/") ? url : DEFAULT_URL;
 	}
 	
 	public String getNextWallpaperURL() {
-		String url = settings.getString(QUEUE, DEFAULT_URL + " ").split(" ")[0];
+		String url = getQueue().split(" ")[0];
 		return url.contains("/") ? url : DEFAULT_URL;
 	}
 
 	// Push the head of the queue onto history, which marks it as current
 	private void advanceCurrent() {
-		String queue = settings.getString(QUEUE, "");
-		settings.edit()
-				.putString(QUEUE, queue.substring(queue.indexOf(" ") + 1))
-				.apply();
-		String history = settings.getString(HISTORY, "");
-		settings.edit().putString(HISTORY, queue.split(" ")[0] + " " + history)
-				.apply();
-		Log.d("HISTORY", settings.getString(HISTORY, ""));
-		Log.d("QUEUE", settings.getString(QUEUE, ""));
+		setQueue(getQueue().substring(getQueue().indexOf(" ") + 1));
+		setHistory(getQueue().split(" ")[0] + " " + getHistory());
+		Log.d("HISTORY", getHistory());
+		Log.d("QUEUE", getQueue());
 
 		fetchNextUrls();
+	}
+	
+	private String HISTORY = "history", QUEUE = "queue";
+	
+	private String getHistory() {
+		return settings.getString(HISTORY, DEFAULT_URL + " ");
+	}
+	
+	private String getQueue() {
+		return settings.getString(QUEUE, DEFAULT_URL + " ");
+	}
+	
+	private void setHistory(String history) {
+		settings.edit().putString(HISTORY, history).apply();
+	}
+	
+	private void setQueue(String queue) {
+		settings.edit().putString(QUEUE, queue).apply();
 	}
 }

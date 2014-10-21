@@ -30,9 +30,8 @@ public class Wallpaper {
 
 	private File CACHE_DIR;
 	private static File PIC_DIR = new File(
-			Environment
-					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-			"bakegami"); // TODO replace with name of app
+			Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+			"reddit-starred"); // TODO replace with name of app
 
 	public Wallpaper(Context context, String imageURL) {
 		this.context = context;
@@ -42,6 +41,23 @@ public class Wallpaper {
 		CACHE_DIR.mkdirs();
 		PIC_DIR.mkdirs();
 	}
+	
+	public Wallpaper(Context context) {
+		this.context = context;
+		this.imageURL = "http://cdn.awwni.me/default0.jpg";
+		this.imageName = "default0.jpg";
+		CACHE_DIR = context.getExternalCacheDir();
+		CACHE_DIR.mkdirs();
+		PIC_DIR.mkdirs();
+		try {
+			InputStream in = context.getResources().openRawResource(R.raw.default0);
+			transfer(in, new FileOutputStream(getCacheFile()));
+			toggleFavorite();
+		} catch (Exception e) {
+			// TODO handle?
+			e.printStackTrace();
+		}
+	}
 
 	public void cache() {
 		if (!imageInCache()) {
@@ -50,7 +66,10 @@ public class Wallpaper {
 				public void run() {
 					try {
 						// Download stuff to cache folder
-						downloadFile(imageURL, getCacheFile());
+						if (imageInFavorites())
+							copyFile(getFavoriteFile(), getCacheFile());
+						else
+							downloadFile(imageURL, getCacheFile());
 					} catch (Exception e) {
 						com.akrolsmir.bakegami.WallpaperManager.with(context).resetQueue();
 						// TODO handle?
@@ -77,8 +96,7 @@ public class Wallpaper {
 				try {
 					
 					// Grab the picture from cache
-					WallpaperManager wpm = WallpaperManager
-							.getInstance(context);
+					WallpaperManager wpm = WallpaperManager.getInstance(context);
 					if (!imageInCache() && imageInFavorites())
 			            copyFile(getFavoriteFile(), getCacheFile());
 					FileInputStream fis = new FileInputStream(getCacheFile());
@@ -127,7 +145,7 @@ public class Wallpaper {
 
 	public void toggleFavorite() {
 		if (imageInFavorites()) {
-			removeFavorite(getFavoriteFile(), context);
+			com.akrolsmir.bakegami.WallpaperManager.with(context).removeFavorite(getFavoriteFile());
 		} else {
 			try {
 				copyFile(getCacheFile(), getFavoriteFile());
@@ -163,35 +181,5 @@ public class Wallpaper {
 		});
 
 		return Arrays.asList(files);
-	}
-
-	public static void removeFavorite(File f, Context cont) {
-		String canonicalPath = "";
-		try {
-			canonicalPath = f.getCanonicalPath();
-		} catch (IOException e) {
-			canonicalPath = f.getAbsolutePath();
-		}
-		if (!com.akrolsmir.bakegami.WallpaperManager
-				.with(cont)
-				.getCurrentWallpaperURL()
-				.contains(
-						canonicalPath.substring(canonicalPath.lastIndexOf("/") + 1)))
-			com.akrolsmir.bakegami.WallpaperManager.with(cont)
-					.removeInfo(
-							canonicalPath.substring(canonicalPath
-									.lastIndexOf("/") + 1));
-		final Uri uri = MediaStore.Files.getContentUri("external");
-		final int result = cont.getContentResolver().delete(uri,
-				MediaStore.Files.FileColumns.DATA + "=?",
-				new String[] { canonicalPath });
-		if (result == 0) {
-			final String absolutePath = f.getAbsolutePath();
-			if (!absolutePath.equals(canonicalPath)) {
-				cont.getContentResolver().delete(uri,
-						MediaStore.Files.FileColumns.DATA + "=?",
-						new String[] { absolutePath });
-			}
-		}
 	}
 }
