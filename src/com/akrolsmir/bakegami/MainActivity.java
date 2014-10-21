@@ -18,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore.Images.Media;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,12 +48,7 @@ public class MainActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		setContentView(R.layout.activity_main);
-		prefs = getSharedPreferences("com.akrolsmir.bakegami.main",0);
-		if (prefs.getBoolean(FIRST_TIME, true)) {
-			findViewById(R.id.favButton).setVisibility(View.GONE);
-			findViewById(R.id.nextButton).setVisibility(View.GONE);
-			findViewById(R.id.cropButton).setVisibility(View.GONE);
-		}
+
 		findViewById(R.id.favButton).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -75,12 +71,6 @@ public class MainActivity extends Activity {
 		playPauseButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(prefs.getBoolean(FIRST_TIME, true)) {
-					prefs.edit().putBoolean(FIRST_TIME,false).apply();
-					findViewById(R.id.favButton).setVisibility(View.VISIBLE);
-					findViewById(R.id.nextButton).setVisibility(View.VISIBLE);
-					findViewById(R.id.cropButton).setVisibility(View.VISIBLE);
-				}
 				playPauseButton.setImageResource(RefreshService
 						.isCycling(MainActivity.this) ? android.R.drawable.ic_media_play
 						: android.R.drawable.ic_media_pause);
@@ -110,6 +100,15 @@ public class MainActivity extends Activity {
 				startActivity(intent);
 			}
 		});
+		
+		// First time stuff
+		prefs = getSharedPreferences("com.akrolsmir.bakegami.main",0);
+		if (prefs.getBoolean(FIRST_TIME, true)) {
+			// PRETTY UGLY HACKS ALL DAY
+			prefs.edit().putBoolean(FIRST_TIME, false).apply();
+			new Wallpaper(this); // Creates the default wallpaper
+			playPauseButton.performClick();
+		}
 	}
 
 	@Override
