@@ -3,6 +3,7 @@ package com.akrolsmir.bakegami;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.regex.Pattern;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -187,13 +188,14 @@ public class MainActivity extends Activity {
 				Toast.LENGTH_LONG).show();
 	else {
 		final WallpaperManager wpm = WallpaperManager.with(MainActivity.this);
+		final Wallpaper wp = wpm.getCurrentWallpaper();
 		Thread t =new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					
 					// Download stuff to cache folder
-					wpm.getCurrentWallpaper().downloadFile(wpm.getCurrentWallpaperURL(), wpm.getCurrentWallpaper().getCacheFile());
+					wp.downloadFile(wpm.getCurrentWallpaperURL().split(Pattern.quote("|"))[0], wp.getCacheFile());
 				} catch (Exception e) {
 					// TODO handle?
 					e.printStackTrace();
@@ -207,12 +209,12 @@ public class MainActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		wpm.getCurrentWallpaper().setAsBackground();
+		wp.setAsBackground();
 		Picasso.with(this)
-		.load(wpm.getCurrentWallpaper().getCacheFile()).fit().centerInside().into((ImageView) findViewById(R.id.currentBG));
-		if(wpm.getCurrentWallpaper().imageInFavorites())
+		.load(wp.getCacheFile()).fit().centerInside().into((ImageView) findViewById(R.id.currentBG));
+		if(wp.imageInFavorites())
 			try {
-				wpm.getCurrentWallpaper().copyFile(wpm.getCurrentWallpaper().getCacheFile(), wpm.getCurrentWallpaper().getFavoriteFile());
+				wp.copyFile(wp.getCacheFile(), wp.getFavoriteFile());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
