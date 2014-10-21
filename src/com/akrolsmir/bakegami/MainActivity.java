@@ -1,5 +1,6 @@
 package com.akrolsmir.bakegami;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -175,51 +176,28 @@ public class MainActivity extends Activity {
 			return true;
 		case R.id.action_reload:
 			ConnectivityManager connectivityManager = (ConnectivityManager) this
-			.getSystemService(Context.CONNECTIVITY_SERVICE);
-	NetworkInfo activeNetworkInfo;
-	if(SettingsActivity.allowData(this))
-		activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-	else
-		activeNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-	if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
-		Toast.makeText(this,
-				"Connect to the Internet and try again.",
-				Toast.LENGTH_LONG).show();
-	else {
-		final WallpaperManager wpm = WallpaperManager.with(MainActivity.this);
-		final Wallpaper wp = wpm.getCurrentWallpaper();
-		Thread t =new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					
-					// Download stuff to cache folder
-					wp.downloadFile(wpm.getCurrentWallpaperURL().split(Pattern.quote("|"))[0], wp.getCacheFile());
-				} catch (Exception e) {
-					// TODO handle?
-					e.printStackTrace();
+					.getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo activeNetworkInfo;
+			if (SettingsActivity.allowData(this))
+				activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+			else
+				activeNetworkInfo = connectivityManager
+						.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+			if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
+				Toast.makeText(this, "Connect to the Internet and try again.",
+						Toast.LENGTH_LONG).show();
+			else {
+				final WallpaperManager wpm = WallpaperManager
+						.with(MainActivity.this);
+				final Wallpaper wp = wpm.getCurrentWallpaper();
+				wp.setAsBackground(); // Should cache at this step
+				if (wp.imageInFavorites()) { // Refresh favorite by toggling twice
+					wp.toggleFavorite();
+					wp.toggleFavorite();
 				}
+				onNextBG(); // Signal app to refresh views
+				return true;
 			}
-		});
-		t.start();
-		try {
-			t.join();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		wp.setAsBackground();
-		Picasso.with(this)
-		.load(wp.getCacheFile()).fit().centerInside().into((ImageView) findViewById(R.id.currentBG));
-		if(wp.imageInFavorites())
-			try {
-				wp.copyFile(wp.getCacheFile(), wp.getFavoriteFile());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		return true;
-	}
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -264,13 +242,8 @@ public class MainActivity extends Activity {
 	private void onNextBG() {
 		ImageView currentBG = (ImageView) findViewById(R.id.currentBG);
 		Wallpaper wp = WallpaperManager.with(this).getCurrentWallpaper();
-		if(wp.imageInFavorites())
-			Picasso.with(this)
-				.load(wp.getFavoriteFile()).fit().centerInside().into(currentBG);
-		else
-			Picasso.with(this)
-			.load(wp.getCacheFile()).fit().centerInside().into(currentBG);
-		
+		File file = wp.imageInFavorites() ? wp.getFavoriteFile() : wp.getCacheFile();
+		Picasso.with(this).load(file).fit().centerInside().into(currentBG);
 		onFavorite();
 	}
 

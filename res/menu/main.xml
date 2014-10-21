@@ -12,8 +12,12 @@
         android:title="Details"/>
     
     <item
+        android:id="@+id/action_reload"
+        android:showAsAction="never"
+        android:title="Reload"/>
+    
+    <item
         android:id="@+id/action_filter"
         android:showAsAction="never"
         android:title="Filter"/>
-
 </menu>

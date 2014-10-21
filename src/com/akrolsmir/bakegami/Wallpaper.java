@@ -94,11 +94,14 @@ public class Wallpaper {
 			@Override
 			public void run() {
 				try {
-					
 					// Grab the picture from cache
 					WallpaperManager wpm = WallpaperManager.getInstance(context);
-					if (!imageInCache() && imageInFavorites())
-			            copyFile(getFavoriteFile(), getCacheFile());
+					if (!imageInCache()) {
+						if (imageInFavorites()) // TODO this is duplicating cache...
+							copyFile(getFavoriteFile(), getCacheFile());
+						else
+							downloadFile(imageURL, getCacheFile());
+					}   
 					FileInputStream fis = new FileInputStream(getCacheFile());
 					wpm.setStream(fis);
 					Log.d("Changed wallpaper", imageURL);
@@ -121,12 +124,12 @@ public class Wallpaper {
 		return getFavoriteFile().exists();
 	}
 
-	public void downloadFile(String url, File dst)
+	private void downloadFile(String url, File dst)
 			throws MalformedURLException, IOException {
 		transfer(new URL(url).openStream(), new FileOutputStream(dst));
 	}
 
-	public void copyFile(File src, File dst) throws IOException {
+	private void copyFile(File src, File dst) throws IOException {
 		transfer(new FileInputStream(src), new FileOutputStream(dst));
 	}
 
