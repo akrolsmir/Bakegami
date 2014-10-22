@@ -187,15 +187,15 @@ public class MainActivity extends Activity {
 				Toast.makeText(this, "Connect to the Internet and try again.",
 						Toast.LENGTH_LONG).show();
 			else {
-				final WallpaperManager wpm = WallpaperManager
-						.with(MainActivity.this);
+				final WallpaperManager wpm = WallpaperManager.with(MainActivity.this);
 				final Wallpaper wp = wpm.getCurrentWallpaper();
-				wp.setAsBackground(); // Should cache at this step
-				if (wp.imageInFavorites()) { // Refresh favorite by toggling twice
-					wp.toggleFavorite();
-					wp.toggleFavorite();
-				}
-				onNextBG(); // Signal app to refresh views
+				wp.reload(new Wallpaper.ReloadCallback() {
+					
+					@Override
+					public void onFinish() {
+						onNextBG(); // Signal app to refresh views
+					}
+				});
 				return true;
 			}
 		default:

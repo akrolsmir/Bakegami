@@ -18,6 +18,7 @@ import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -114,6 +115,37 @@ public class Wallpaper {
 				}
 			}
 		}).start();
+	}
+	
+	interface ReloadCallback {
+		void onFinish();
+	}
+	
+	public void reload(final ReloadCallback callback) {
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				try {
+					downloadFile(imageURL, getCacheFile());
+					FileInputStream fis = new FileInputStream(getCacheFile());
+					WallpaperManager.getInstance(context).setStream(fis);
+					if (imageInFavorites()) { // Refresh favorite by toggling twice
+						toggleFavorite();
+						toggleFavorite();
+					}
+				} catch (Exception e) {
+					// TODO handle?
+					e.printStackTrace();
+				}
+				return null;
+			}
+			
+			protected void onPostExecute(Void result) {
+				callback.onFinish();
+			}
+			
+		}.execute();
 	}
 
 	public boolean imageInCache() {
