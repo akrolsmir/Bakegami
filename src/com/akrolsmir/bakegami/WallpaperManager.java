@@ -230,6 +230,7 @@ public class WallpaperManager {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
+				String offs[]= {"","","","","","","","","",""};
 				RestTemplate restTemplate = new RestTemplate();
 				restTemplate.getMessageConverters().add(
 						new StringHttpMessageConverter());
@@ -243,15 +244,20 @@ public class WallpaperManager {
 						rawJson = restTemplate.getForObject(
 								"http://www.reddit.com/r/" + getSubreddit(sr)
 										+ "/"+SortPreference.getValues(context)[0]+".json?"+
-										( SortPreference.getValues(context).length <= 1? "" : "t="+SortPreference.getValues(context)[1]+"&")+"limit=100",
+										( SortPreference.getValues(context).length <= 1? "" : "t="+SortPreference.getValues(context)[1]+"&")+"limit=100&after="+offs[sr],
 								String.class);
 						}
 						catch(Exception e)
 						{
 							break;
 						}
-						if (!parseUrlFromReddit(rawJson))
+						if (!parseUrlFromReddit(rawJson)){
 							i--;
+							try{
+								offs[sr] = new JsonParser().parse(rawJson).getAsJsonObject().get("data").getAsJsonObject().get("after").getAsString();
+							}
+							catch(Exception e){}
+						}
 					}
 				}
 			}
