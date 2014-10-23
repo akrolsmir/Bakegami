@@ -3,9 +3,12 @@ package com.akrolsmir.bakegami;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -21,12 +24,18 @@ public class QueryAdapter extends ArrayAdapter<String> {
   }
 
   @Override
-  public View getView(int position, View convertView, ViewGroup parent) {
+  public View getView(final int position, View convertView, ViewGroup parent) {
     LayoutInflater inflater = (LayoutInflater) context
         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     View rowView = inflater.inflate(R.layout.query, parent, false);
     TextView textView = (TextView) rowView.findViewById(R.id.firstLine);
     ImageButton imageBtn = (ImageButton) rowView.findViewById(R.id.icon);
+    imageBtn.setOnClickListener(new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			QueryActivity.closeItem(values, position, context);
+		}
+	});
     TextView textView2 = (TextView) rowView.findViewById(R.id.secondLine);
     // Change the icon for Windows and iPhone
     String s = values.get(position);
@@ -40,8 +49,19 @@ public class QueryAdapter extends ArrayAdapter<String> {
       imageBtn.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
     } else{
     	textView.setText(values.get(position));
+    	textView.setPadding(textView.getPaddingLeft(), 0, textView.getPaddingRight(), 0);
+    	textView.setTextSize(18);
     	textView2.setVisibility(View.GONE);
-    	imageBtn.setImageResource(android.R.drawable.ic_menu_add);
+    	imageBtn.setVisibility(View.GONE);
+    	LayoutParams params = rowView.getLayoutParams();
+    	if (params == null) { 
+    	    params = new LayoutParams(LayoutParams.MATCH_PARENT, 50); 
+    	} else {
+    	    params.height = 50;
+    	}
+
+    	rowView.setPadding(rowView.getPaddingLeft(), 0, rowView.getPaddingRight(), 0);
+    	rowView.setLayoutParams(params);
     }
 
     return rowView;

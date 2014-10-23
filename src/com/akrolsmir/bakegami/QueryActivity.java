@@ -16,10 +16,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -29,7 +31,7 @@ public class QueryActivity extends Activity {
 	private final ArrayList<String> vals = new ArrayList<String>();
 	private SharedPreferences prefs;
 	private int numEntries;
-	ListView listview;
+	private static ListView listview;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +41,6 @@ public class QueryActivity extends Activity {
         listview = (ListView)findViewById(R.id.list);
         vals.add("+ Add a Subreddit");
         vals.add("+ Add a Tag");
-        if(!prefs.contains("rq0")){
-        	prefs.edit().putString("rq0","rwallpaper").apply();
-        	prefs.edit().putString("rq1","qscenery").apply();
-        }
         numEntries = 0;
         while(!(prefs.getString("rq"+numEntries, "").equals("")))
         {
@@ -56,6 +54,7 @@ public class QueryActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					final int position, long id) {
+				numEntries = prefs.getInt("numEntries", numEntries);
 				Log.d("LOG",""+position);
 			    final TextView textView = (TextView) view.findViewById(R.id.firstLine);
 			    final TextView textView2 = (TextView) view.findViewById(R.id.secondLine);
@@ -84,15 +83,13 @@ public class QueryActivity extends Activity {
 		if(textView.getText().toString().startsWith("+"))
 		{
 			title = "Add "+type;
-			vals.add("");
-			for(int i = numEntries; i > position-2;i--){
-				prefs.edit().putString("rq"+i, prefs.getString("rq"+(i-1),"")).apply();
-			}
-			numEntries++;
 		}
 		else{
 			title = "Edit "+type;
-			input.setText(textView.getText());
+			if(type.startsWith("S"))
+				input.setText(textView.getText().toString().substring(2));
+			else
+				input.setText(textView.getText());
 		}
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
 		builder.setTitle(title)
@@ -106,6 +103,14 @@ public class QueryActivity extends Activity {
 							    inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
 								if(type.startsWith("S")){
 									String value = input.getText().toString().substring(1+input.getText().toString().lastIndexOf("/"));
+									if(textView.getText().toString().startsWith("+"))
+									{
+										vals.add(position,value);
+										for(int i = numEntries; i > position-2;i--){
+											prefs.edit().putString("rq"+i, prefs.getString("rq"+(i-1),"")).apply();
+										}
+										numEntries++;
+									}
 									if(value.equals("")){
 										vals.remove(position);
 										for(int i = position-2; i < numEntries-1;i++){
@@ -121,6 +126,11 @@ public class QueryActivity extends Activity {
 								}
 								else{
 									String value = input.getText().toString();
+									if(textView.getText().toString().startsWith("+"))
+									{
+										vals.add(position,value);
+										numEntries++;
+									}
 									if(value.equals("")){
 										vals.remove(position);
 										for(int i = position-2; i < numEntries-1;i++){
@@ -134,6 +144,7 @@ public class QueryActivity extends Activity {
 									prefs.edit().putString("rq"+(position-2), "q"+value).apply();
 									}
 								}
+								prefs.edit().putInt("numEntries", numEntries).apply();
 								WallpaperManager.with(QueryActivity.this).resetQueue();
 								listview.setAdapter(new QueryAdapter(QueryActivity.this, vals));
 							}
@@ -154,11 +165,32 @@ public class QueryActivity extends Activity {
 	}
 	
 	public static int numQueries(Context context){
-    	return context.getSharedPreferences("com.akrolsmir.bakegami.Query",0).getInt("numEntries",0);
+		SharedPreferences prefs = context.getSharedPreferences("com.akrolsmir.bakegami.Query",0);
+		if(!prefs.contains("rq0")){
+        	prefs.edit().putString("rq0","rwallpaper").apply();
+        	prefs.edit().putString("rq1","qscenery").apply();
+        	prefs.edit().putInt("numEntries", 2).apply();
+        }
+		Log.d("LOG",""+prefs.getInt("numEntries",0));
+    	return prefs.getInt("numEntries",0);
     }
 	public static String getSubreddit(Context context, int index) {
     	return context.getSharedPreferences("com.akrolsmir.bakegami.Query",0).getString("rq"+index, "");
     }
+	
+	public static void closeItem(ArrayList<String> vals, int position, Context context){
+		vals.remove(position);
+		SharedPreferences prefs = context.getSharedPreferences("com.akrolsmir.bakegami.Query",0);
+		int numEntries = prefs.getInt("numEntries",0);
+		for(int i = position-2; i < numEntries-1;i++){
+			prefs.edit().putString("rq"+i, prefs.getString("rq"+(i+1), "")).apply();
+		}
+		prefs.edit().remove("rq"+(numEntries-1)).apply();
+		numEntries--;
+		prefs.edit().putInt("numEntries", numEntries).apply();
+		WallpaperManager.with(context).resetQueue();
+		listview.setAdapter(new QueryAdapter(context, vals));
+	}
     
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

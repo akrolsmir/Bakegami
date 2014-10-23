@@ -34,9 +34,6 @@ import android.widget.TextView;
 
 public class SettingsActivity extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
-	private final ArrayList<String> vals = new ArrayList<String>();
-	private SharedPreferences prefs;
-	private int numEntries;
 	ListView listview;
     @Override
     public void onCreate(Bundle savedInstanceState) {
