@@ -230,26 +230,36 @@ public class WallpaperManager {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				String offs[]= {"","","","","","","","","",""};
+				String offs[]= new String[QueryActivity.numQueries(context)];
+				for(int i = 0; i <QueryActivity.numQueries(context);i++){
+					offs[i] = "";
+				}
 				RestTemplate restTemplate = new RestTemplate();
 				restTemplate.getMessageConverters().add(
 						new StringHttpMessageConverter());
 				String rawJson = "";
 				for (int i = 0; i < numToFetch; i++) {
-					int sr = (int) (10 * Math.random());
+					int sr = (int) (QueryActivity.numQueries(context) * Math.random());
 					if (getSubreddit(sr).length() == 0)
 						i--;
 					else {
 						try{
+							if(getSubreddit(sr).startsWith("r"))
 						rawJson = restTemplate.getForObject(
-								"http://www.reddit.com/r/" + getSubreddit(sr)
+								"http://www.reddit.com/r/" + getSubreddit(sr).substring(1)
 										+ "/"+SortPreference.getValues(context)[0]+".json?"+
 										( SortPreference.getValues(context).length <= 1? "" : "t="+SortPreference.getValues(context)[1]+"&")+"limit=100&after="+offs[sr],
 								String.class);
+							else
+								rawJson = restTemplate.getForObject(
+										"http://www.reddit.com/search.json?q=/" + getSubreddit(sr).substring(1)
+												+ "&sort="+SortPreference.getValues(context)[0]+"&"+
+												( SortPreference.getValues(context).length <= 1? "" : "t="+SortPreference.getValues(context)[1]+"&")+"limit=100&after="+offs[sr],
+										String.class);
 						}
 						catch(Exception e)
 						{
-							break;
+							continue;
 						}
 						if (!parseUrlFromReddit(rawJson)){
 							i--;
@@ -265,7 +275,7 @@ public class WallpaperManager {
 	}
 
 	private String getSubreddit(int index) {
-		return SettingsActivity.getSubreddit(context, index);
+		return QueryActivity.getSubreddit(context, index);
 	}
 
 	private boolean parseUrlFromReddit(String rawJson) {

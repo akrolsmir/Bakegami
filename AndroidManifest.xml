@@ -21,7 +21,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.akrolsmir.bakegami.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden" >
@@ -31,9 +31,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.akrolsmir.bakegami.SettingsActivity" />
+        <activity android:name=".SettingsActivity" />
 
-        <receiver android:name="WallpaperControlWidgetProvider" >
+        <receiver android:name=".WallpaperControlWidgetProvider" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -42,7 +42,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/wallpaper_control_widget_info" />
         </receiver>
-        <receiver android:name="WallpaperControlWidgetProvider$BootBroadcastReceiver" >
+        <receiver android:name=".WallpaperControlWidgetProvider$BootBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -52,9 +52,19 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-        <service android:name="WallpaperControlWidgetProvider$NextWallpaperService" />
-        <service android:name="WallpaperControlWidgetProvider$RefreshService" />
-        <service android:name="WallpaperControlWidgetProvider$FavoriteWallpaperService" />
+
+        <service android:name=".WallpaperControlWidgetProvider$NextWallpaperService" />
+        <service android:name=".WallpaperControlWidgetProvider$RefreshService" />
+        <service android:name=".WallpaperControlWidgetProvider$FavoriteWallpaperService" />
+
+        <activity
+            android:name=".QueryActivity"
+            android:label="@string/title_activity_query"
+            android:parentActivityName=".SettingsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.akrolsmir.bakegami.SettingsActivity" />
+        </activity>
     </application>
 
 </manifest>
