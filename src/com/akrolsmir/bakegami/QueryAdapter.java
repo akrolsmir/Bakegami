@@ -53,15 +53,6 @@ public class QueryAdapter extends ArrayAdapter<String> {
     	textView.setTextSize(18);
     	textView2.setVisibility(View.GONE);
     	imageBtn.setVisibility(View.GONE);
-    	LayoutParams params = rowView.getLayoutParams();
-    	if (params == null) { 
-    	    params = new LayoutParams(LayoutParams.MATCH_PARENT, 50); 
-    	} else {
-    	    params.height = 50;
-    	}
-
-    	rowView.setPadding(rowView.getPaddingLeft(), 0, rowView.getPaddingRight(), 0);
-    	rowView.setLayoutParams(params);
     }
 
     return rowView;

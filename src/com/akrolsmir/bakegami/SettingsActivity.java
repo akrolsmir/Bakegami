@@ -40,7 +40,8 @@ public class SettingsActivity extends PreferenceActivity implements
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        Preference button = (Preference)findPreference("pref_subreddits");
+        Preference button = findPreference("pref_subreddits");
+        button.setSummary(getSources(this));
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference arg0) { 
@@ -82,50 +83,6 @@ public class SettingsActivity extends PreferenceActivity implements
 	public static String KEY_PREF_SUBREDDITS_MAIN = "pref_subreddits";
     
 	
-	private void addBack(PreferenceScreen preferenceScreen){
-		final Dialog dialog = preferenceScreen.getDialog();
-		if (dialog != null) {
-			dialog.getActionBar().setDisplayHomeAsUpEnabled(true);
-			View homeBtn = dialog.findViewById(android.R.id.home);
-			if (homeBtn != null) {
-				OnClickListener dismissClickListener = new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						dialog.dismiss();
-					}
-				};
-				ViewParent homeBtnContainer = homeBtn.getParent();
-
-				// The home button is an ImageView inside a FrameLayout
-				if (homeBtnContainer instanceof FrameLayout) {
-					ViewGroup containerParent = (ViewGroup) homeBtnContainer
-							.getParent();
-
-					if (containerParent instanceof LinearLayout) {
-						// This view also contains the title text, set the whole
-						// view as clickable
-						((LinearLayout) containerParent)
-								.setOnClickListener(dismissClickListener);
-					} else {
-						// Just set it on the home button
-						((FrameLayout) homeBtnContainer)
-								.setOnClickListener(dismissClickListener);
-					}
-				} else {
-					// The 'If all else fails' default case
-					homeBtn.setOnClickListener(dismissClickListener);
-				}
-			}
-		}
-	}
-	@Override
-	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference){
-		if(preference instanceof PreferenceScreen)
-		{
-			addBack((PreferenceScreen)preference);
-		}
-		return true;
-	}
     @Override
 	public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
     	// Set summary to be the user-description for the selected value
@@ -146,7 +103,29 @@ public class SettingsActivity extends PreferenceActivity implements
     	return FrequencyPickerPreference.getRefreshSeconds(context);
     }
     
-    
+    private static String getSources(Context context){
+    	SharedPreferences prefs = context.getSharedPreferences("com.akrolsmir.bakegami.Query",0);
+    	int i = 0;
+    	String sources="Subreddits:";
+    	while(prefs.getString("rq"+i, "").startsWith("r")){
+    		sources+=(" r/" + prefs.getString("rq"+i, "").substring(1) + ",");
+    		i++;
+    	}
+    	sources = sources.substring(0,sources.length()-1);
+    	if(sources.length()>63){
+    		sources = sources.substring(0,60)+"...";
+    	}
+    	String sources2="Tags:";
+    	while(prefs.getString("rq"+i, "").startsWith("q")){
+    		sources2+=(" " + prefs.getString("rq"+i, "").substring(1) + ",");
+    		i++;
+    	}
+    	sources2 = sources2.substring(0,sources2.length()-1);
+    	if(sources2.length()>63){
+    		sources2 = sources2.substring(0,60)+"...";
+    	}
+    	return sources+"\n"+sources2;
+    }
     private static SharedPreferences with(Context context) {
     	return PreferenceManager.getDefaultSharedPreferences(context);
     }
@@ -156,11 +135,7 @@ public class SettingsActivity extends PreferenceActivity implements
 		super.onResume();
 		getPreferenceScreen().getSharedPreferences()
 				.registerOnSharedPreferenceChangeListener(this);
-		if (findPreference(KEY_PREF_SUBREDDITS_MAIN) != null
-				&& findPreference(KEY_PREF_SUBREDDITS_MAIN) instanceof PreferenceScreen) {
-			addBack((PreferenceScreen) findPreference(KEY_PREF_SUBREDDITS_MAIN));
-		}
-
+		findPreference("pref_subreddits").setSummary(getSources(this));
 	}
 
     @Override

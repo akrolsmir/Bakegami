@@ -1,47 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="6dip"
-    android:descendantFocusability="blocksDescendants" >
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="horizontal"
+    android:padding="2dip" >
 
-    <ImageButton
-        android:id="@+id/icon"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:contentDescription="TODO"
-        android:src="@drawable/ic_launcher"
-        android:background="@android:color/transparent"
-        android:focusable="false" />
+    
 
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:orientation="vertical" >
     <TextView
+        android:id="@+id/firstLine"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:focusable="false"
+        android:gravity="center_vertical"
+        android:singleLine="true"
+        android:text="r/wallpaper"
+        android:textSize="22sp" />
+        <TextView
         android:id="@+id/secondLine"
         android:layout_width="fill_parent"
         android:layout_height="22dip"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_toLeftOf="@id/icon"
         android:ellipsize="marquee"
         android:singleLine="true"
         android:text="Subreddit"
         android:textSize="10sp"
         android:focusable="false" />
-
-    <TextView
-        android:id="@+id/firstLine"
-        android:layout_width="fill_parent"
+    
+</LinearLayout>
+<ImageButton
+        android:id="@+id/icon"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/secondLine"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_toLeftOf="@id/icon"
-        android:gravity="center_vertical"
-        android:text="r/wallpaper"
-        android:textSize="22sp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_launcher"
+        android:background="?android:selectableItemBackground"
         android:focusable="false" />
-
-</RelativeLayout> 
+</LinearLayout> 

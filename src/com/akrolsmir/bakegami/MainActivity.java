@@ -112,6 +112,12 @@ public class MainActivity extends Activity {
 		if (prefs.getBoolean(FIRST_TIME, true)) {
 			// PRETTY UGLY HACKS ALL DAY
 			prefs.edit().putBoolean(FIRST_TIME, false).apply();
+			SharedPreferences prefs = getSharedPreferences("com.akrolsmir.bakegami.Query",0);
+			if(!prefs.contains("rq0")){
+	        	prefs.edit().putString("rq0","rwallpaper").apply();
+	        	prefs.edit().putString("rq1","qscenery").apply();
+	        	prefs.edit().putInt("numEntries", 2).apply();
+	        }
 			new Wallpaper(this); // Creates the default wallpaper
 			playPauseButton.performClick();
 		}

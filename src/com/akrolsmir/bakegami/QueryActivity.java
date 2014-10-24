@@ -37,6 +37,7 @@ public class QueryActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_query);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		prefs = getSharedPreferences("com.akrolsmir.bakegami.Query",0);
         listview = (ListView)findViewById(R.id.list);
         vals.add("+ Add a Subreddit");
@@ -102,7 +103,7 @@ public class QueryActivity extends Activity {
 								InputMethodManager inputMethodManager = (InputMethodManager)  getSystemService(INPUT_METHOD_SERVICE);
 							    inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
 								if(type.startsWith("S")){
-									String value = input.getText().toString().substring(1+input.getText().toString().lastIndexOf("/"));
+									String value = input.getText().toString().substring(1+input.getText().toString().lastIndexOf("/")).replace(" ", "");
 									if(textView.getText().toString().startsWith("+"))
 									{
 										vals.add(position,value);
@@ -131,7 +132,7 @@ public class QueryActivity extends Activity {
 										vals.add(position,value);
 										numEntries++;
 									}
-									if(value.equals("")){
+									if(value.replace(" ", "").equals("")){
 										vals.remove(position);
 										for(int i = position-2; i < numEntries-1;i++){
 											prefs.edit().putString("rq"+i, prefs.getString("rq"+(i+1), "")).apply();
@@ -166,11 +167,6 @@ public class QueryActivity extends Activity {
 	
 	public static int numQueries(Context context){
 		SharedPreferences prefs = context.getSharedPreferences("com.akrolsmir.bakegami.Query",0);
-		if(!prefs.contains("rq0")){
-        	prefs.edit().putString("rq0","rwallpaper").apply();
-        	prefs.edit().putString("rq1","qscenery").apply();
-        	prefs.edit().putInt("numEntries", 2).apply();
-        }
 		Log.d("LOG",""+prefs.getInt("numEntries",0));
     	return prefs.getInt("numEntries",0);
     }
@@ -205,7 +201,8 @@ public class QueryActivity extends Activity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		if (id == android.R.id.home) {
+			finish();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
