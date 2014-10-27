@@ -131,7 +131,7 @@ public class Wallpaper {
 					FileInputStream fis = new FileInputStream(getCacheFile());
 					WallpaperManager.getInstance(context).setStream(fis);
 					if (imageInFavorites()) { // Refresh favorite by toggling twice
-						toggleFavorite();
+						getFavoriteFile().delete();
 						toggleFavorite();
 					}
 				} catch (Exception e) {
