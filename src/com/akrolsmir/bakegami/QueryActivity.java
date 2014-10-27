@@ -1,5 +1,7 @@
 package com.akrolsmir.bakegami;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -103,7 +105,7 @@ public class QueryActivity extends Activity {
 								InputMethodManager inputMethodManager = (InputMethodManager)  getSystemService(INPUT_METHOD_SERVICE);
 							    inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
 								if(type.startsWith("s")){
-									String value = input.getText().toString().substring(1+input.getText().toString().lastIndexOf("/")).replace(" ", "");
+									String value = input.getText().toString().substring(1+input.getText().toString().lastIndexOf("/")).replaceAll("[^A-Za-z0-9_]", "");;
 									if(textView.getText().toString().startsWith("+"))
 									{
 										vals.add(position,value);

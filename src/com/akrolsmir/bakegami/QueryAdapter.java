@@ -49,8 +49,8 @@ public class QueryAdapter extends ArrayAdapter<String> {
       imageBtn.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
     } else{
     	textView.setText(values.get(position));
-    	textView.setPadding(textView.getPaddingLeft(), 0, textView.getPaddingRight(), 0);
-    	textView.setTextSize(18);
+    	textView.setTextSize(20);
+    	rowView.setPadding(rowView.getPaddingLeft(), rowView.getPaddingTop()*7, rowView.getPaddingRight(), rowView.getPaddingBottom()*7);
     	textView2.setVisibility(View.GONE);
     	imageBtn.setVisibility(View.GONE);
     }

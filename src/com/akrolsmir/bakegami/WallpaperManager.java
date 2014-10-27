@@ -2,6 +2,7 @@ package com.akrolsmir.bakegami;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.regex.Pattern;
 
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -252,7 +253,7 @@ public class WallpaperManager {
 								String.class);
 							else
 								rawJson = restTemplate.getForObject(
-										"http://www.reddit.com/search.json?q=/" + getSubreddit(sr).substring(1)
+										"http://www.reddit.com/search.json?q=/" + URLEncoder.encode(getSubreddit(sr).substring(1),"UTF-8")
 												+ "&sort="+SortPreference.getValues(context)[0]+"&"+
 												( SortPreference.getValues(context).length <= 1? "" : "t="+SortPreference.getValues(context)[1]+"&")+"limit=100&after="+offs[sr],
 										String.class);
