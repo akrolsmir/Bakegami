@@ -401,7 +401,7 @@ public class WallpaperManager {
 	}
 
 	// The current wallpaper is at the top of the history stack
-	private String DEFAULT_URL = "http://cdn.awwni.me/maav.jpg|default0.jpg";
+	private String DEFAULT_URL = "http://pixabay.com/get/9a1e9044203f49270547/1414394710/spring-179584_1280.jpg|default0.jpg";
 
 	public String getCurrentWallpaperURL() {
 		String url = getHistory().split(" ")[0];

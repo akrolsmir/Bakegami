@@ -10,6 +10,8 @@ Tired of stock wallpapers? Wallpaper Route delivers popular images to your devic
 
 Free and open source, Wallpaper Route aims to improve your Android experience by delivering quality content straight to your background.
 
+Default wallpaper courtesy of liuksena, from http://pixabay.com/en/spring-bloom-nature-leaves-natur-179584/
+
 Fix:
 * Resize gigantic images - http://stackoverflow.com/questions/10271020/bitmap-too-large-to-be-uploaded-into-a-texture
 * Improve landscape layout
