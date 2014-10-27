@@ -45,7 +45,7 @@ public class QueryAdapter extends ArrayAdapter<String> {
       imageBtn.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
     } else if(s.startsWith("q")){
     	textView.setText(values.get(position).substring(1));
-    	textView2.setText("Tag");
+    	textView2.setText("Keyword");
       imageBtn.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
     } else{
     	textView.setText(values.get(position));

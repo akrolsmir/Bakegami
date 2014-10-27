@@ -2,6 +2,7 @@ package com.akrolsmir.bakegami;
 
 import java.util.ArrayList;
 
+import android.R.integer;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -103,29 +105,40 @@ public class SettingsActivity extends PreferenceActivity implements
     	return FrequencyPickerPreference.getRefreshSeconds(context);
     }
     
-    private static String getSources(Context context){
-    	SharedPreferences prefs = context.getSharedPreferences("com.akrolsmir.bakegami.Query",0);
-    	int i = 0;
-    	String sources="Subreddits:";
-    	while(prefs.getString("rq"+i, "").startsWith("r")){
-    		sources+=(" r/" + prefs.getString("rq"+i, "").substring(1) + ",");
-    		i++;
-    	}
-    	sources = sources.substring(0,sources.length()-1);
-    	if(sources.length()>63){
-    		sources = sources.substring(0,60)+"...";
-    	}
-    	String sources2="Tags:";
-    	while(prefs.getString("rq"+i, "").startsWith("q")){
-    		sources2+=(" " + prefs.getString("rq"+i, "").substring(1) + ",");
-    		i++;
-    	}
-    	sources2 = sources2.substring(0,sources2.length()-1);
-    	if(sources2.length()>63){
-    		sources2 = sources2.substring(0,60)+"...";
-    	}
-    	return sources+"\n"+sources2;
+    private static String getSources(Context context) {
+		SharedPreferences prefs = context.getSharedPreferences("com.akrolsmir.bakegami.Query", 0);
+		int i = 0;
+		String subreddits = "";
+		while (prefs.getString("rq" + i, "").startsWith("r")) {
+			subreddits += (subreddits.isEmpty() ? "" : ",");
+			subreddits += " r/" + prefs.getString("rq" + i, "").substring(1);
+			i++;
+		}
+		subreddits = truncate(subreddits, 60);
+		
+		String keywords = "";
+		while (prefs.getString("rq" + i, "").startsWith("q")) {
+			keywords += (keywords.isEmpty() ? "" : ",");
+			keywords += " " + prefs.getString("rq" + i, "").substring(1);
+			i++;
+		}
+		keywords = truncate(keywords, 60);
+
+		if (subreddits.isEmpty()) {
+			return "Keywords: " + keywords;
+		}
+		else if (keywords.isEmpty()) {
+			return "Subreddits: " + subreddits;
+		}
+		else {
+			return "Subreddits: " + subreddits + "\n" + "Keywords: " + keywords;
+		}
     }
+    
+    private static String truncate(String string, int length) {
+    	return string.length() > length ? string.substring(0, length - 3) + "..." : string;
+    }
+    
     private static SharedPreferences with(Context context) {
     	return PreferenceManager.getDefaultSharedPreferences(context);
     }

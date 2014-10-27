@@ -3,7 +3,7 @@
 
     <string name="app_name">Wallpaper Route</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_query">Subreddits</string>
+    <string name="title_activity_query">Sources</string>
     <string name="hello_world">Hello world!</string>
 
 </resources>

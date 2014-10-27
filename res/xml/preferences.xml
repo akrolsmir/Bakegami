@@ -5,7 +5,7 @@
 
 	<Preference
 		android:key="pref_subreddits"
-		android:title="Subreddits"
+		android:title="@string/title_activity_query"
 		android:summary="r/wallpaper">
 		      
 	</Preference>

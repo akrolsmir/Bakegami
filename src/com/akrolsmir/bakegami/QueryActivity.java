@@ -40,8 +40,8 @@ public class QueryActivity extends Activity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		prefs = getSharedPreferences("com.akrolsmir.bakegami.Query",0);
         listview = (ListView)findViewById(R.id.list);
-        vals.add("+ Add a Subreddit");
-        vals.add("+ Add a Tag");
+        vals.add("+ Add subreddit");
+        vals.add("+ Add keyword");
         numEntries = 0;
         while(!(prefs.getString("rq"+numEntries, "").equals("")))
         {
@@ -65,13 +65,13 @@ public class QueryActivity extends Activity {
 						if(prefs.getString("rq"+i, "").startsWith("q"))
 							break;
 					}
-					editDialog(textView,"Subreddit",i+2);
+					editDialog(textView,"subreddit",i+2);
 				}
 				else if(position ==1){
-					editDialog(textView,"Tag",numEntries+2);
+					editDialog(textView,"keyword",numEntries+2);
 				}
 				else{
-					editDialog(textView,textView2.getText().toString(),position);
+					editDialog(textView,textView2.getText().toString().toLowerCase(),position);
 				}
 			}
         	
@@ -87,7 +87,7 @@ public class QueryActivity extends Activity {
 		}
 		else{
 			title = "Edit "+type;
-			if(type.startsWith("S"))
+			if(type.startsWith("s"))
 				input.setText(textView.getText().toString().substring(2));
 			else
 				input.setText(textView.getText());
@@ -102,7 +102,7 @@ public class QueryActivity extends Activity {
 									int which) {
 								InputMethodManager inputMethodManager = (InputMethodManager)  getSystemService(INPUT_METHOD_SERVICE);
 							    inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
-								if(type.startsWith("S")){
+								if(type.startsWith("s")){
 									String value = input.getText().toString().substring(1+input.getText().toString().lastIndexOf("/")).replace(" ", "");
 									if(textView.getText().toString().startsWith("+"))
 									{
@@ -126,7 +126,7 @@ public class QueryActivity extends Activity {
 									}
 								}
 								else{
-									String value = input.getText().toString();
+									String value = input.getText().toString().trim();
 									if(textView.getText().toString().startsWith("+"))
 									{
 										vals.add(position,value);
