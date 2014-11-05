@@ -118,10 +118,15 @@ public class FavoritesView extends GridView {
 					for (int i = 0; i < getAdapter().getCount(); i++) {
 						if (checked.get(i)) {
 							fils.add(Uri.fromFile(files.get(i)));
+							if(fils.size() == getCheckedItemCount())
+								break;
 						}
 					}
-
-					intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, fils);
+					intent.setType("image/*");
+					if(getCheckedItemCount() > 1)
+						intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, fils);
+					else
+						intent.putExtra(Intent.EXTRA_STREAM, fils.get(0));
 					context.startActivity(Intent.createChooser(intent, "Share via"));
 					mode.finish();
 					return true;
