@@ -16,12 +16,17 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import android.app.WallpaperManager;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 public class Wallpaper {
@@ -46,7 +51,7 @@ public class Wallpaper {
 	
 	public Wallpaper(Context context) {
 		this.context = context;
-		this.imageURL = "http://cdn.awwni.me/default0.jpg";
+		this.imageURL = "http://pixabay.com/get/9a1e9044203f49270547/1414394710/spring-179584_1280.jpg";
 		this.imageName = "default0.jpg";
 		CACHE_DIR = context.getExternalCacheDir();
 		CACHE_DIR.mkdirs();
@@ -70,9 +75,11 @@ public class Wallpaper {
 						// Download stuff to cache folder
 						if (imageInFavorites())
 							copyFile(getFavoriteFile(), getCacheFile());
-						else
+						else{
 							downloadFile(imageURL, getCacheFile());
-					} catch (Exception e) {
+							resize();
+						}
+					} catch (IOException e) {
 						com.akrolsmir.bakegami.WallpaperManager.with(context).resetQueue();
 						// TODO handle?
 						e.printStackTrace();
@@ -130,6 +137,7 @@ public class Wallpaper {
 				try {
 					downloadFile(imageURL, getCacheFile());
 					FileInputStream fis = new FileInputStream(getCacheFile());
+					resize();
 					WallpaperManager.getInstance(context).setStream(fis);
 					if (imageInFavorites()) { // Refresh favorite by toggling twice
 						getFavoriteFile().delete();
@@ -205,6 +213,82 @@ public class Wallpaper {
 		return new File(PIC_DIR, imageName);
 	}
 
+	private void resize(){
+		WallpaperManager wpm = WallpaperManager.getInstance(context);
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+
+		//Returns null, sizes are in the options variable
+		BitmapFactory.decodeFile(getCacheFile().getAbsolutePath(), options);
+		int width = options.outWidth;
+		int height = options.outHeight;
+		DisplayMetrics dm = new DisplayMetrics();
+		((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(dm);
+		int screenWidth = wpm.getDesiredMinimumWidth();
+		int screenHeight = wpm.getDesiredMinimumHeight();
+		if(screenWidth < 0 || screenHeight < 0)
+		{
+			screenWidth = dm.widthPixels;
+			screenHeight = dm.heightPixels;
+		}
+		double screenWidthInInches = (double)screenWidth/(double)dm.densityDpi;
+		double screenHeightInInches = (double)screenHeight/(double)dm.densityDpi;
+		int maxDim = Math.max(screenWidth,screenHeight);
+		screenWidth /= (double)dm.densityDpi;
+		screenHeight /= (double)dm.densityDpi;
+		if((Math.pow(width, 2)+Math.pow(height, 2))/(Math.pow(screenWidthInInches, 2)+Math.pow(screenHeightInInches,2)) < 10000){
+			com.akrolsmir.bakegami.WallpaperManager.with(context).dequeue(imageURL+"|"+imageName);
+			Log.d("Physical Dimensions",screenWidthInInches+" x "+screenHeightInInches);
+			Log.d("Deleted Dimensions",width+" x "+height);
+		}
+		else if( width > maxDim && height > maxDim){
+			Bitmap bmp, scaledBitmap;
+			try{
+			options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = false;
+			options.inDither = false;
+			options.inSampleSize = Math.min(width/maxDim, height/maxDim);
+			options.inScaled=false;
+			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+			bmp = BitmapFactory.decodeFile(getCacheFile().getAbsolutePath(), options);
+			width = bmp.getWidth();
+			height = bmp.getHeight();
+			Log.d("Old Size",width+" x "+height);
+			Matrix matrix = new Matrix();
+			matrix.postScale((float)maxDim/(float)Math.min(width,height), (float)maxDim/(float)Math.min(width,height));
+			scaledBitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
+			bmp = null;
+			/*if(width > height){
+				bmp = Bitmap.createScaledBitmap(bmp, width*maxDim/height, maxDim, false);
+				Log.d("New Size",(width*maxDim/height)+" x "+maxDim);
+			}
+			else{
+				bmp = Bitmap.createScaledBitmap(bmp, maxDim, height*maxDim/width, false);
+				Log.d("New Size",maxDim+" x "+(height*maxDim/width));
+			}*/	
+			}
+			catch(Exception e){
+				return;
+			}
+			FileOutputStream out = null;
+			try {
+				String filename = getCacheFile().getAbsolutePath();
+				getCacheFile().delete();
+			    out = new FileOutputStream(filename);
+			    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+			} catch (Exception e) {
+			    e.printStackTrace();
+			} finally {
+			    try {
+			        if (out != null) {
+			            out.close();
+			        }
+			    } catch (IOException e) {
+			        e.printStackTrace();
+			    }
+			}
+		}
+	}
 	public static List<File> getFavorites() {
 		File[] files = PIC_DIR.listFiles();
 

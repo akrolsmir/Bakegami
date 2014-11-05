@@ -212,6 +212,7 @@ public class WallpaperManager {
 			}
 		}
 	}
+
 	public void fetchNextUrls() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -222,12 +223,6 @@ public class WallpaperManager {
 			activeNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 		if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
 			return;
-		int index = settings.getInt("index", 0);
-		int total = StringUtils.countOccurrencesOf(getQueue(), " ");
-		fetchNextUrls(3 + index - total);
-	}
-
-	private void fetchNextUrls(final int numToFetch) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -239,11 +234,8 @@ public class WallpaperManager {
 				restTemplate.getMessageConverters().add(
 						new StringHttpMessageConverter());
 				String rawJson = "";
-				for (int i = 0; i < numToFetch; i++) {
+				while((context.getExternalCacheDir() == null) || (context.getExternalCacheDir().listFiles().length <= 3)) {
 					int sr = (int) (QueryActivity.numQueries(context) * Math.random());
-					if (getSubreddit(sr).length() == 0)
-						i--;
-					else {
 						try{
 							if(getSubreddit(sr).startsWith("r"))
 						rawJson = restTemplate.getForObject(
@@ -260,17 +252,24 @@ public class WallpaperManager {
 						}
 						catch(Exception e)
 						{
+							ConnectivityManager connectivityManager = (ConnectivityManager) context
+									.getSystemService(Context.CONNECTIVITY_SERVICE);
+							NetworkInfo activeNetworkInfo;
+							if(SettingsActivity.allowData(context))
+								activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+							else
+								activeNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+							if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
+								break;
 							continue;
 						}
 						if (!parseUrlFromReddit(rawJson)){
-							i--;
 							try{
 								offs[sr] = new JsonParser().parse(rawJson).getAsJsonObject().get("data").getAsJsonObject().get("after").getAsString();
 							}
 							catch(Exception e){}
 						}
 					}
-				}
 			}
 		}).start();
 	}
@@ -400,6 +399,13 @@ public class WallpaperManager {
 		builder.show();
 	}
 
+	public void dequeue(String imageURL){
+		setQueue(getQueue().replace(imageURL+" ", ""));
+		setHistory(getHistory()+imageURL+" ");
+		new Wallpaper(context,imageURL).uncache();
+		fetchNextUrls();
+		Log.d("AFTER DEQUEUE",getQueue());
+	}
 	// The current wallpaper is at the top of the history stack
 	private String DEFAULT_URL = "http://pixabay.com/get/9a1e9044203f49270547/1414394710/spring-179584_1280.jpg|default0.jpg";
 
