@@ -136,8 +136,8 @@ public class Wallpaper {
 			protected Void doInBackground(Void... params) {
 				try {
 					downloadFile(imageURL, getCacheFile());
-					FileInputStream fis = new FileInputStream(getCacheFile());
 					resize();
+					FileInputStream fis = new FileInputStream(getCacheFile());
 					WallpaperManager.getInstance(context).setStream(fis);
 					if (imageInFavorites()) { // Refresh favorite by toggling twice
 						getFavoriteFile().delete();
