@@ -169,10 +169,13 @@ public class WallpaperManager {
 		if (result == 0) {
 			final String absolutePath = f.getAbsolutePath();
 			if (!absolutePath.equals(canonicalPath)) {
-				context.getContentResolver().delete(uri,
+				if(context.getContentResolver().delete(uri,
 						MediaStore.Files.FileColumns.DATA + "=?",
-						new String[] { absolutePath });
+						new String[] { absolutePath }) == 0)
+					f.delete();
 			}
+			else
+				f.delete();
 		}
 	}
 
