@@ -332,7 +332,7 @@ public class WallpaperManager {
 	}
 
 	private void enqueueURL(String imageURL, String imageName) {
-		Log.d("enqueueURL", imageURL + "|" + imageName);
+		// Log.d("enqueueURL", imageURL + "|" + imageName);
 		setQueue(getQueue() + imageURL + "|" + imageName + " ");
 		if (setNextWallpaperAsBG) { // || settings.getString(QUEUE, "").length
 									// == 0
@@ -346,7 +346,7 @@ public class WallpaperManager {
 
 	private void addInfo(String name, String sr, String title, String postURL,
 			String url) {
-		Log.d("AddInfo", name);
+		// Log.d("AddInfo", name);
 		settings.edit().putString(name + "_sr", sr).apply();
 		settings.edit().putString(name + "_title", title).apply();
 		settings.edit().putString(name + "_postURL", postURL).apply();
@@ -354,7 +354,7 @@ public class WallpaperManager {
 	}
 
 	public void removeInfo(String name) {
-		Log.d("RemoveInfo ", name);
+		// Log.d("RemoveInfo ", name);
 		settings.edit().remove(name + "_sr").commit();
 		settings.edit().remove(name + "_title").commit();
 		settings.edit().remove(name + "_postURL").commit();
@@ -367,7 +367,7 @@ public class WallpaperManager {
 	}
 
 	public void displayInfo(String name, final Context context) {
-		Log.d("DisplayInfo", name);
+		// Log.d("DisplayInfo", name);
 		final String[] rawInfo = { settings.getString(name + "_sr", "N/A"),
 				settings.getString(name + "_postURL", "N/A"),
 				settings.getString(name + "_url", "N/A"),
@@ -407,7 +407,7 @@ public class WallpaperManager {
 		setHistory(getHistory()+imageURL+" ");
 		new Wallpaper(context,imageURL).uncache();
 		fetchNextUrls();
-		Log.d("AFTER DEQUEUE",getQueue());
+		// Log.d("AFTER DEQUEUE",getQueue());
 	}
 	// The current wallpaper is at the top of the history stack
 	private String DEFAULT_URL = "http://pixabay.com/get/9a1e9044203f49270547/1414394710/spring-179584_1280.jpg|default0.jpg";
@@ -424,10 +424,10 @@ public class WallpaperManager {
 
 	// Push the head of the queue onto history, which marks it as current
 	private void advanceCurrent() {
-		setQueue(getQueue().substring(getQueue().indexOf(" ") + 1));
 		setHistory(getQueue().split(" ")[0] + " " + getHistory());
-		Log.d("HISTORY", getHistory());
-		Log.d("QUEUE", getQueue());
+		setQueue(getQueue().substring(getQueue().indexOf(" ") + 1));
+		// Log.d("HISTORY", getHistory());
+		// Log.d("QUEUE", getQueue());
 
 		fetchNextUrls();
 	}

@@ -17,7 +17,7 @@ public class ConnectReceiver extends BroadcastReceiver{
 					activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 				else
 					activeNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-				Log.d("nonet",""+intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false));
+				// Log.d("nonet",""+intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false));
 				if(activeNetworkInfo != null && activeNetworkInfo.isConnected())
 				{
 					if(firstConnect){

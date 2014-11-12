@@ -187,7 +187,7 @@ public class FavoritesView extends GridView {
 		Iterator<File> iterator = Wallpaper.getFavorites().iterator();
 		while(iterator.hasNext())
 		{
-			Log.d("LOG","-");
+			// Log.d("LOG","-");
 			n=iterator.next();
 			name = n.getName();
 			if(settings.getString(name+"_sr", "").toLowerCase(Locale.getDefault()).contains(query.toLowerCase(Locale.getDefault()))

@@ -58,7 +58,7 @@ public class QueryActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					final int position, long id) {
 				numEntries = prefs.getInt("numEntries", numEntries);
-				Log.d("LOG",""+position);
+				// Log.d("LOG",""+position);
 			    final TextView textView = (TextView) view.findViewById(R.id.firstLine);
 			    final TextView textView2 = (TextView) view.findViewById(R.id.secondLine);
 			    int i = 0;
@@ -169,7 +169,7 @@ public class QueryActivity extends Activity {
 	
 	public static int numQueries(Context context){
 		SharedPreferences prefs = context.getSharedPreferences("com.akrolsmir.bakegami.Query",0);
-		Log.d("LOG",""+prefs.getInt("numEntries",0));
+		// Log.d("LOG",""+prefs.getInt("numEntries",0));
     	return prefs.getInt("numEntries",0);
     }
 	public static String getSubreddit(Context context, int index) {

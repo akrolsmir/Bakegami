@@ -16,7 +16,7 @@ import android.widget.RemoteViews;
 public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		Log.d("TAG", "onUpdate");
+		// Log.d("TAG", "onUpdate");
 
 		// Perform this loop procedure for each App Widget that belongs to this provider
 		for (int appWidgetId : appWidgetIds) {
@@ -76,7 +76,7 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
 		@Override
 		protected void onHandleIntent(Intent intent) {
-			Log.d("Changing wallpaper", "...");
+			// Log.d("Changing wallpaper", "...");
 			WallpaperManager.with(this).nextWallpaper();
 		}
 	}
