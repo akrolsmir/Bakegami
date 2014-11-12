@@ -1,6 +1,10 @@
-package com.akrolsmir.bakegami;
+package com.akrolsmir.bakegami.settings;
 
 import java.util.ArrayList;
+
+import com.akrolsmir.bakegami.R;
+import com.akrolsmir.bakegami.WallpaperManager;
+import com.akrolsmir.bakegami.R.xml;
 
 import android.R.integer;
 import android.app.AlertDialog;

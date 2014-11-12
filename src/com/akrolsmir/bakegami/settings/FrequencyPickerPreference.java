@@ -1,4 +1,4 @@
-package com.akrolsmir.bakegami;
+package com.akrolsmir.bakegami.settings;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +17,10 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.akrolsmir.bakegami.R;
+import com.akrolsmir.bakegami.WallpaperControlWidgetProvider;
+import com.akrolsmir.bakegami.R.id;
+import com.akrolsmir.bakegami.R.layout;
 import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.RefreshService;
 
 public class FrequencyPickerPreference extends DialogPreference {

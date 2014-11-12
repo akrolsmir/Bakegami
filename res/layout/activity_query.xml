@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    tools:context="com.akrolsmir.bakegami.QueryActivity" >
+    tools:context="com.akrolsmir.bakegami.settings.QueryActivity" >
 
 	    <ListView
               android:id="@+id/list"

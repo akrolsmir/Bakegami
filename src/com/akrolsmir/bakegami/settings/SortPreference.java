@@ -1,8 +1,13 @@
-package com.akrolsmir.bakegami;
+package com.akrolsmir.bakegami.settings;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
+import com.akrolsmir.bakegami.R;
+import com.akrolsmir.bakegami.WallpaperManager;
+import com.akrolsmir.bakegami.R.id;
+import com.akrolsmir.bakegami.R.layout;
 
 import android.content.Context;
 import android.content.res.TypedArray;

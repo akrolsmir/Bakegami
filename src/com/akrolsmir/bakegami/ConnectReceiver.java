@@ -1,5 +1,7 @@
 package com.akrolsmir.bakegami;
 
+import com.akrolsmir.bakegami.settings.SettingsActivity;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

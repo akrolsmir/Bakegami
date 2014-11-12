@@ -1,8 +1,14 @@
-package com.akrolsmir.bakegami;
+package com.akrolsmir.bakegami.settings;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+
+import com.akrolsmir.bakegami.R;
+import com.akrolsmir.bakegami.WallpaperManager;
+import com.akrolsmir.bakegami.R.id;
+import com.akrolsmir.bakegami.R.layout;
+import com.akrolsmir.bakegami.R.menu;
 
 import android.app.Activity;
 import android.app.AlertDialog;

@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.RefreshService;
+import com.akrolsmir.bakegami.settings.SettingsActivity;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends Activity {

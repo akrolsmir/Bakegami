@@ -31,7 +31,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettingsActivity" />
+        <activity android:name=".settings.SettingsActivity" />
 
         <receiver android:name=".WallpaperControlWidgetProvider" >
             <intent-filter>
@@ -58,9 +58,9 @@
         <service android:name=".WallpaperControlWidgetProvider$FavoriteWallpaperService" />
 
         <activity
-            android:name=".QueryActivity"
+            android:name=".settings.QueryActivity"
             android:label="@string/title_activity_query"
-            android:parentActivityName=".SettingsActivity" >
+      		android:parentActivityName=".settings.SettingsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.akrolsmir.bakegami.SettingsActivity" />

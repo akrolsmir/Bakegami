@@ -27,6 +27,9 @@ import android.text.Spanned;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.akrolsmir.bakegami.settings.QueryActivity;
+import com.akrolsmir.bakegami.settings.SettingsActivity;
+import com.akrolsmir.bakegami.settings.SortPreference;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;

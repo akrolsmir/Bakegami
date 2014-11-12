@@ -1,5 +1,7 @@
 package com.akrolsmir.bakegami;
 
+import com.akrolsmir.bakegami.settings.SettingsActivity;
+
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;

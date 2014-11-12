@@ -10,13 +10,13 @@
 		      
 	</Preference>
 	
-	<com.akrolsmir.bakegami.SortPreference
+	<com.akrolsmir.bakegami.settings.SortPreference
 		android:defaultValue="Hot"
 		android:key="pref_sort"
 		android:summary = "Hot"
 		android:title="Sort by" />
 
-    <com.akrolsmir.bakegami.FrequencyPickerPreference
+    <com.akrolsmir.bakegami.settings.FrequencyPickerPreference
         android:defaultValue="2 days"
         android:key="pref_refresh_freq"
         android:summary="Every 2 days (currently paused)"

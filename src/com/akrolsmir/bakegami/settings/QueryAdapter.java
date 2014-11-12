@@ -1,6 +1,10 @@
-package com.akrolsmir.bakegami;
+package com.akrolsmir.bakegami.settings;
 
 import java.util.ArrayList;
+
+import com.akrolsmir.bakegami.R;
+import com.akrolsmir.bakegami.R.id;
+import com.akrolsmir.bakegami.R.layout;
 
 import android.content.Context;
 import android.content.SharedPreferences;
