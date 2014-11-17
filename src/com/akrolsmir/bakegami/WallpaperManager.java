@@ -219,7 +219,7 @@ public class WallpaperManager {
 		}
 	}
 
-	public void fetchNextUrls() {
+	public void fetchNextUrls( ) {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetworkInfo;
@@ -240,7 +240,7 @@ public class WallpaperManager {
 				restTemplate.getMessageConverters().add(
 						new StringHttpMessageConverter());
 				String rawJson = "";
-				while((context.getExternalCacheDir() == null) || (context.getExternalCacheDir().listFiles().length <= 3)) {
+				while(StringUtils.countOccurrencesOf(getQueue(), " ") < 3) {
 					int sr = (int) (QueryActivity.numQueries(context) * Math.random());
 						try{
 							if(getSubreddit(sr).startsWith("r"))

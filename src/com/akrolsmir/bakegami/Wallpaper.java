@@ -77,7 +77,7 @@ public class Wallpaper {
 							copyFile(getFavoriteFile(), getCacheFile());
 						else{
 							downloadFile(imageURL, getCacheFile());
-							resize();
+							//resize();
 						}
 					} catch (IOException e) {
 						com.akrolsmir.bakegami.WallpaperManager.with(context).resetQueue();
@@ -136,7 +136,7 @@ public class Wallpaper {
 			protected Void doInBackground(Void... params) {
 				try {
 					downloadFile(imageURL, getCacheFile());
-					resize();
+					//resize();
 					FileInputStream fis = new FileInputStream(getCacheFile());
 					WallpaperManager.getInstance(context).setStream(fis);
 					if (imageInFavorites()) { // Refresh favorite by toggling twice
@@ -213,7 +213,7 @@ public class Wallpaper {
 		return new File(PIC_DIR, imageName);
 	}
 
-	private void resize(){
+	/*private void resize(){
 		WallpaperManager wpm = WallpaperManager.getInstance(context);
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;
@@ -238,8 +238,6 @@ public class Wallpaper {
 		screenHeight /= (double)dm.densityDpi;
 		if((Math.pow(width, 2)+Math.pow(height, 2))/(Math.pow(screenWidthInInches, 2)+Math.pow(screenHeightInInches,2)) < 10000){
 			com.akrolsmir.bakegami.WallpaperManager.with(context).dequeue(imageURL+"|"+imageName);
-			// Log.d("Physical Dimensions",screenWidthInInches+" x "+screenHeightInInches);
-			// Log.d("Deleted Dimensions",width+" x "+height);
 		}
 		else if( width > maxDim && height > maxDim){
 			Bitmap bmp, scaledBitmap;
@@ -253,19 +251,10 @@ public class Wallpaper {
 			bmp = BitmapFactory.decodeFile(getCacheFile().getAbsolutePath(), options);
 			width = bmp.getWidth();
 			height = bmp.getHeight();
-			// Log.d("Old Size",width+" x "+height);
 			Matrix matrix = new Matrix();
 			matrix.postScale((float)maxDim/(float)Math.min(width,height), (float)maxDim/(float)Math.min(width,height));
 			scaledBitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
 			bmp = null;
-			/*if(width > height){
-				bmp = Bitmap.createScaledBitmap(bmp, width*maxDim/height, maxDim, false);
-				// Log.d("New Size",(width*maxDim/height)+" x "+maxDim);
-			}
-			else{
-				bmp = Bitmap.createScaledBitmap(bmp, maxDim, height*maxDim/width, false);
-				// Log.d("New Size",maxDim+" x "+(height*maxDim/width));
-			}*/	
 			}
 			catch(Exception e){
 				return;
@@ -288,7 +277,7 @@ public class Wallpaper {
 			    }
 			}
 		}
-	}
+	}*/
 	public static List<File> getFavorites() {
 		File[] files = PIC_DIR.listFiles();
 
