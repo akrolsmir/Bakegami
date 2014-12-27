@@ -187,7 +187,7 @@ public class MainActivity extends Activity {
 					
 					@Override
 					public void onFinish() {
-						onNextBG(); // Signal app to refresh views
+						refreshAllViews(); // Signal app to refresh views
 					}
 				});
 				return true;
@@ -205,7 +205,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume() {
 		getActionBar().setTitle("");  
-		onNextBG();
+		refreshAllViews();
 		filtered = false;
 		if(menu != null)
 			menu.findItem(R.id.action_filter).setTitle("Filter");
@@ -226,22 +226,22 @@ public class MainActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent.getAction().equals(NEXT)) {
-				onNextBG();
+				refreshAllViews();
 			} else if (intent.getAction().equals(FAVORITE)) {
-				onFavorite();
+				refreshFavoriteViews();
 			}
 		}
 	};
 
-	private void onNextBG() {
+	private void refreshAllViews() {
 		ImageView currentBG = (ImageView) findViewById(R.id.currentBG);
 		Wallpaper wp = WallpaperManager.with(this).getCurrentWallpaper();
 		File file = wp.imageInFavorites() ? wp.getFavoriteFile() : wp.getCacheFile();
 		Picasso.with(this).load(file).fit().centerInside().into(currentBG);
-		onFavorite();
+		refreshFavoriteViews();
 	}
 
-	private void onFavorite() {
+	private void refreshFavoriteViews() {
 		((FavoritesView) findViewById(R.id.favorites)).onFavorite();
 
 		((ImageButton) findViewById(R.id.favButton))
