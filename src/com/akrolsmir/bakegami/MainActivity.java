@@ -3,8 +3,6 @@ package com.akrolsmir.bakegami;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.regex.Pattern;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,15 +13,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore.Images.Media;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -182,18 +177,10 @@ public class MainActivity extends Activity {
 			}
 			return true;
 		case R.id.action_reload:
-			ConnectivityManager connectivityManager = (ConnectivityManager) this
-					.getSystemService(Context.CONNECTIVITY_SERVICE);
-			NetworkInfo activeNetworkInfo;
-			if (SettingsActivity.allowData(this))
-				activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-			else
-				activeNetworkInfo = connectivityManager
-						.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-			if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
+			if (ConnectReceiver.hasInternet(this)) {
 				Toast.makeText(this, "Connect to the Internet and try again.",
 						Toast.LENGTH_LONG).show();
-			else {
+			} else {
 				final WallpaperManager wpm = WallpaperManager.with(MainActivity.this);
 				final Wallpaper wp = wpm.getCurrentWallpaper();
 				wp.reload(new Wallpaper.ReloadCallback() {

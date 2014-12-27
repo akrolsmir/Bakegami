@@ -1,35 +1,47 @@
 package com.akrolsmir.bakegami;
 
-import com.akrolsmir.bakegami.settings.SettingsActivity;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 
-public class ConnectReceiver extends BroadcastReceiver{
+import com.akrolsmir.bakegami.settings.SettingsActivity;
+
+/**
+ * Gets notified when the phone connects to the internet
+ */
+public class ConnectReceiver extends BroadcastReceiver {
 	private static boolean firstConnect = true;
+
+	/**
+	 * If this is the first time going online, fetch urls into queue
+	 */
 	public void onReceive(Context context, Intent intent) {
 		if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-		    	ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-				NetworkInfo activeNetworkInfo;
-				if(SettingsActivity.allowData(context))
-					activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-				else
-					activeNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-				// Log.d("nonet",""+intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false));
-				if(activeNetworkInfo != null && activeNetworkInfo.isConnected())
-				{
-					if(firstConnect){
-						firstConnect = false;
-						WallpaperManager.with(context).fetchNextUrls();
-					}	
+			if (ConnectReceiver.hasInternet(context)) {
+				if (firstConnect) {
+					firstConnect = false;
+					WallpaperManager.with(context).fetchNextUrls();
 				}
-				else
-					firstConnect = true;
+			} else {
+				firstConnect = true;
+			}
 		}
 	}
 
+	/**
+	 * Checks if internet is enabled
+	 */
+	public static boolean hasInternet(Context context) {
+		ConnectivityManager connectivityManager = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo activeNetworkInfo;
+		if (SettingsActivity.allowData(context))
+			activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+		else
+			activeNetworkInfo = connectivityManager
+					.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+	}
 }

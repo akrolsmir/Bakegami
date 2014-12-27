@@ -17,14 +17,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.akrolsmir.bakegami.settings.QueryActivity;
@@ -69,21 +66,17 @@ public class WallpaperManager {
 
 	public void nextWallpaper() {
 		if (!getQueue().contains(" ")) {
-			ConnectivityManager connectivityManager = (ConnectivityManager) context
-					.getSystemService(Context.CONNECTIVITY_SERVICE);
-			NetworkInfo activeNetworkInfo;
-			if(SettingsActivity.allowData(context))
-				activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-			else
-				activeNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-			if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
-				Toast.makeText(context,
-						"Connect to the Internet and try again.",
-						Toast.LENGTH_LONG).show();
-			else {
+			if (ConnectReceiver.hasInternet(context)) {
+				// No images in queue
+				advanceCurrent();
 				Toast.makeText(
 						context,
 						"Out of unique images. Try changing settings to avoid this issue.",
+						Toast.LENGTH_LONG).show();
+			} else {
+				// No internet
+				Toast.makeText(context,
+						"Connect to the Internet and try again.",
 						Toast.LENGTH_LONG).show();
 			}
 			return;
@@ -220,14 +213,7 @@ public class WallpaperManager {
 	}
 
 	public void fetchNextUrls( ) {
-		ConnectivityManager connectivityManager = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo activeNetworkInfo;
-		if(SettingsActivity.allowData(context))
-			activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-		else
-			activeNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-		if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
+		if (!ConnectReceiver.hasInternet(context))
 			return;
 		new Thread(new Runnable() {
 			@Override
@@ -256,20 +242,13 @@ public class WallpaperManager {
 												( SortPreference.getValues(context).length <= 1? "" : "t="+SortPreference.getValues(context)[1]+"&")+"limit=100&after="+offs[sr],
 										String.class);
 						}
-						catch(Exception e)
-						{
-							ConnectivityManager connectivityManager = (ConnectivityManager) context
-									.getSystemService(Context.CONNECTIVITY_SERVICE);
-							NetworkInfo activeNetworkInfo;
-							if(SettingsActivity.allowData(context))
-								activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+						catch(Exception e) {
+							if (ConnectReceiver.hasInternet(context))
+								continue;
 							else
-								activeNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-							if (activeNetworkInfo == null || !activeNetworkInfo.isConnected())
 								break;
-							continue;
 						}
-						if (!parseUrlFromReddit(rawJson)){
+						if (!parseUrlFromReddit(rawJson)) {
 							try{
 								offs[sr] = new JsonParser().parse(rawJson).getAsJsonObject().get("data").getAsJsonObject().get("after").getAsString();
 							}
