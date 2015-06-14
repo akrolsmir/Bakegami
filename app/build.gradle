@@ -26,8 +26,7 @@ android {
 dependencies {
     compile 'com.android.support:support-v4:19.1.0'
     compile 'com.google.code.gson:gson:2.2.2'
-    compile files('libs/picasso-2.2.0.jar')
     compile files('libs/spring-android-core-1.0.1.RELEASE.jar')
     compile files('libs/spring-android-rest-template-1.0.1.RELEASE.jar')
-    compile files('libs/universal-image-loader-1.8.6.jar')
+    compile 'com.squareup.picasso:picasso:2.5.2'
 }
