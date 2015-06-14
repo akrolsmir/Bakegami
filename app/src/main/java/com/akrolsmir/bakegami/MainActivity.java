@@ -67,17 +67,19 @@ public class MainActivity extends Activity {
 		});
 
 		final ImageButton playPauseButton = (ImageButton) findViewById(R.id.pausePlayButton);
-		playPauseButton
-				.setImageResource(RefreshService.isCycling(this) ? android.R.drawable.ic_media_pause
-						: android.R.drawable.ic_media_play);
+		playPauseButton.setImageResource(
+				RefreshService.isCycling(this) ?
+						R.drawable.ic_pause_white_36dp :
+						R.drawable.ic_play_arrow_white_36dp);
+
 		playPauseButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				playPauseButton.setImageResource(RefreshService
-						.isCycling(MainActivity.this) ? android.R.drawable.ic_media_play
-						: android.R.drawable.ic_media_pause);
-				Intent intent = new Intent(MainActivity.this,
-						RefreshService.class);
+				playPauseButton.setImageResource(
+						RefreshService.isCycling(MainActivity.this) ?
+								R.drawable.ic_play_arrow_white_36dp :
+								R.drawable.ic_pause_white_36dp);
+				Intent intent = new Intent(MainActivity.this, RefreshService.class);
 				startService(intent.setAction(RefreshService.TOGGLE));
 			}
 		});
@@ -244,10 +246,10 @@ public class MainActivity extends Activity {
 	private void refreshFavoriteViews() {
 		((FavoritesView) findViewById(R.id.favorites)).onFavorite();
 
-		((ImageButton) findViewById(R.id.favButton))
-				.setImageResource(WallpaperManager.with(this)
-						.getCurrentWallpaper().imageInFavorites() ? android.R.drawable.star_big_on
-						: android.R.drawable.star_big_off);
+		((ImageButton) findViewById(R.id.favButton)).setImageResource(
+				WallpaperManager.with(this).getCurrentWallpaper().imageInFavorites() ?
+						R.drawable.ic_star_white_36dp :
+						R.drawable.ic_star_border_white_36dp);
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -256,8 +258,7 @@ public class MainActivity extends Activity {
 					.getInstance(MainActivity.this);
 			Uri selectedImage = data.getData();
 			try {
-				Bitmap pic = Media.getBitmap(this.getContentResolver(),
-						selectedImage);
+				Bitmap pic = Media.getBitmap(this.getContentResolver(), selectedImage);
 				wpm.setBitmap(pic);
 				getContentResolver().delete(selectedImage, null, null);
 			} catch (FileNotFoundException e1) {

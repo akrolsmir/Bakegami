@@ -52,8 +52,8 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.wallpaper_control_widget);
 		remoteViews.setImageViewResource(R.id.favButton,
 				WallpaperManager.with(context).getCurrentWallpaper().imageInFavorites() ?
-					android.R.drawable.star_big_on : 
-					android.R.drawable.star_big_off);
+					R.drawable.ic_star_white_36dp :
+					R.drawable.ic_star_border_white_36dp);
 		ComponentName thisWidget = new ComponentName(context, WallpaperControlWidgetProvider.class);
 		AppWidgetManager.getInstance(context).updateAppWidget(thisWidget, remoteViews);
 	}

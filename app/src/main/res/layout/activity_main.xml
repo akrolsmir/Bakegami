@@ -34,25 +34,25 @@
                 android:id="@+id/favButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@android:drawable/star_big_off" />
+                android:src="@drawable/ic_star_border_white_36dp" />
 
             <ImageButton
                 android:id="@+id/pausePlayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_media_pause" />
+                android:src="@drawable/ic_pause_white_36dp" />
 
             <ImageButton
                 android:id="@+id/nextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_media_next" />
+                android:src="@drawable/ic_skip_next_white_36dp" />
 
             <ImageButton
                 android:id="@+id/cropButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_menu_crop" />
+                android:src="@drawable/ic_crop_white_36dp" />
 
             <TextView
                 android:layout_width="0dp"
