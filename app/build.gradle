@@ -1,0 +1,33 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "23.0.0 rc2"
+
+    packagingOptions {
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+    }
+
+    defaultConfig {
+        applicationId "com.akrolsmir.bakegami"
+        minSdkVersion 11
+        targetSdkVersion 19
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.google.code.gson:gson:2.2.2'
+    compile files('libs/picasso-2.2.0.jar')
+    compile files('libs/spring-android-core-1.0.1.RELEASE.jar')
+    compile files('libs/spring-android-rest-template-1.0.1.RELEASE.jar')
+    compile files('libs/universal-image-loader-1.8.6.jar')
+}
