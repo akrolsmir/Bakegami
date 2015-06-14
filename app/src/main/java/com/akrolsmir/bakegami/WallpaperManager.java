@@ -21,6 +21,8 @@ import com.akrolsmir.bakegami.settings.SortPreference;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -226,7 +228,7 @@ public class WallpaperManager {
 		// TODO ensure this accurately matches
 		@GET("/search.json")
 		void fromKeyword(
-				@Query("keyword") String keyword,
+				@Query("q") String keyword,
 				@Query("sort") String sort,
 				@QueryMap Map<String, String> options,
 				Callback<Listing> callback);
@@ -262,6 +264,10 @@ public class WallpaperManager {
 		if (!ConnectReceiver.hasInternet(context))
 			return;
 
+		if (getQueueLength() >= 3)
+			return;
+
+		// Set up retrofit adapter for
 		RestAdapter restAdapter = new RestAdapter.Builder()
 				.setEndpoint("http://www.reddit.com")
 				.build();
@@ -271,8 +277,13 @@ public class WallpaperManager {
 		final int sr = (int) (QueryActivity.numQueries(context) * Math.random());
 		String sort = SortPreference.getValues(context)[0];
 		String subreddit = getSubreddit(sr).substring(1);
-		// String keyword = URLEncoder.encode(subreddit, "UTF-8"); // TODO properly encode and except
-		String keyword = subreddit;
+		String keyword;
+		try {
+			keyword = URLEncoder.encode(subreddit, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// Directly use the entered string. Hacky.
+			keyword = subreddit;
+		}
 
 		Map<String, String> options = new HashMap<String, String>();
 		options.put("limit", "100");
@@ -289,11 +300,8 @@ public class WallpaperManager {
 				if (!parse(listing)) {
 					offsets[sr] = listing.data.after;
 				}
-
-				// Recursively continue if not enough pictures queued
-				if (getQueueLength() < 3) {
-					fetchNextUrls(offsets);
-				}
+				// Recursively continue
+				fetchNextUrls(offsets);
 			}
 
 			@Override
