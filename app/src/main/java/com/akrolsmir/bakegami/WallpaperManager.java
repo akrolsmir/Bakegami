@@ -1,14 +1,5 @@
 package com.akrolsmir.bakegami;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.regex.Pattern;
-
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,9 +18,22 @@ import android.widget.Toast;
 import com.akrolsmir.bakegami.settings.QueryActivity;
 import com.akrolsmir.bakegami.settings.SettingsActivity;
 import com.akrolsmir.bakegami.settings.SortPreference;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.http.GET;
+import retrofit.http.Path;
+import retrofit.http.Query;
+import retrofit.http.QueryMap;
 
 public class WallpaperManager {
 
@@ -122,13 +126,13 @@ public class WallpaperManager {
 		fetchNextUrls();
 	}
 	
+	// TODO move into Wallpaper
 	@SuppressLint("NewApi")
 	public void cropWallpaper( Context cont ) {
-		// TODO Try using WPM.getCropAndSetWallpaperIntent on sdk 19 and
-		// higher
 		android.app.WallpaperManager wpm = android.app.WallpaperManager
 				.getInstance(cont);
 		if (android.os.Build.VERSION.SDK_INT >= 19) {
+			// Try to use the built in crop for KitKat and up
 			try {
 				Uri contUri = Uri.parse(android.provider.MediaStore.Images.Media
 						.insertImage(cont.getContentResolver(),
@@ -140,7 +144,6 @@ public class WallpaperManager {
 				cropSetIntent.setDataAndType(contUri,"image/*");
 				cont.startActivity(cropSetIntent);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				backupCrop(wpm, cont);
 				e.printStackTrace();
 			} 
@@ -211,95 +214,136 @@ public class WallpaperManager {
 			}
 		}
 	}
+	
+	public interface RedditService {
+		@GET("/r/{subreddit}/{sort}.json")
+		void fromSubreddit(
+				@Path("subreddit") String subreddit,
+				@Path("sort") String sort,
+				@QueryMap Map<String, String> options,
+				Callback<Listing> callback);
 
-	public void fetchNextUrls( ) {
+		// TODO ensure this accurately matches
+		@GET("/search.json")
+		void fromKeyword(
+				@Query("keyword") String keyword,
+				@Query("sort") String sort,
+				@QueryMap Map<String, String> options,
+				Callback<Listing> callback);
+	}
+
+	class Listing {
+		ListingData data;
+
+		class ListingData {
+			List<Link> children;
+			String after;
+
+			class Link {
+				LinkData data;
+
+				class LinkData {
+					boolean over_18;
+					String url, permalink, subreddit, title;
+				}
+			}
+		}
+	}
+
+	public void fetchNextUrls() {
+		String[] offsets = new String[QueryActivity.numQueries(context)];
+		for (int i = 0; i < QueryActivity.numQueries(context); i++) {
+			offsets[i] = "";
+		}
+		fetchNextUrls(offsets);
+	}
+
+	private void fetchNextUrls(final String[] offsets) {
 		if (!ConnectReceiver.hasInternet(context))
 			return;
-		new Thread(new Runnable() {
+
+		RestAdapter restAdapter = new RestAdapter.Builder()
+				.setEndpoint("http://www.reddit.com")
+				.build();
+
+		RedditService service = restAdapter.create(RedditService.class);
+
+		final int sr = (int) (QueryActivity.numQueries(context) * Math.random());
+		String sort = SortPreference.getValues(context)[0];
+		String subreddit = getSubreddit(sr).substring(1);
+		// String keyword = URLEncoder.encode(subreddit, "UTF-8"); // TODO properly encode and except
+		String keyword = subreddit;
+
+		Map<String, String> options = new HashMap<String, String>();
+		options.put("limit", "100");
+		options.put("after", offsets[sr]);
+		if (SortPreference.getValues(context).length > 1) {
+			String time = SortPreference.getValues(context)[1];
+			options.put("t", time);
+		}
+
+		// Callback to be invoked after Retrofit finishes parsing Reddit's response
+		Callback<Listing> callback = new Callback<Listing>() {
 			@Override
-			public void run() {
-				String offs[]= new String[QueryActivity.numQueries(context)];
-				for(int i = 0; i <QueryActivity.numQueries(context);i++){
-					offs[i] = "";
+			public void success(Listing listing, Response response) {
+				if (!parse(listing)) {
+					offsets[sr] = listing.data.after;
 				}
-				RestTemplate restTemplate = new RestTemplate();
-				restTemplate.getMessageConverters().add(
-						new StringHttpMessageConverter());
-				String rawJson = "";
-				while(StringUtils.countOccurrencesOf(getQueue(), " ") < 3) {
-					int sr = (int) (QueryActivity.numQueries(context) * Math.random());
-						try{
-							if(getSubreddit(sr).startsWith("r"))
-						rawJson = restTemplate.getForObject(
-								"http://www.reddit.com/r/" + getSubreddit(sr).substring(1)
-										+ "/"+SortPreference.getValues(context)[0]+".json?"+
-										( SortPreference.getValues(context).length <= 1? "" : "t="+SortPreference.getValues(context)[1]+"&")+"limit=100&after="+offs[sr],
-								String.class);
-							else
-								rawJson = restTemplate.getForObject(
-										"http://www.reddit.com/search.json?q=/" + URLEncoder.encode(getSubreddit(sr).substring(1),"UTF-8")
-												+ "&sort="+SortPreference.getValues(context)[0]+"&"+
-												( SortPreference.getValues(context).length <= 1? "" : "t="+SortPreference.getValues(context)[1]+"&")+"limit=100&after="+offs[sr],
-										String.class);
-						}
-						catch(Exception e) {
-							if (ConnectReceiver.hasInternet(context))
-								continue;
-							else
-								break;
-						}
-						if (!parseUrlFromReddit(rawJson)) {
-							try{
-								offs[sr] = new JsonParser().parse(rawJson).getAsJsonObject().get("data").getAsJsonObject().get("after").getAsString();
-							}
-							catch(Exception e){}
-						}
-					}
+
+				// Recursively continue if not enough pictures queued
+				if (getQueueLength() < 3) {
+					fetchNextUrls(offsets);
+				}
 			}
-		}).start();
+
+			@Override
+			public void failure(RetrofitError error) {
+
+			}
+		};
+
+
+		if (getSubreddit(sr).startsWith("r")) {
+			service.fromSubreddit(subreddit, sort, options, callback);
+		} else {
+			service.fromKeyword(keyword, sort, options, callback);
+		}
+	}
+
+	private int getQueueLength() {
+		return getQueue().length() - getQueue().replace(" ", "").length();
 	}
 
 	private String getSubreddit(int index) {
 		return QueryActivity.getSubreddit(context, index);
 	}
 
-	private boolean parseUrlFromReddit(String rawJson) {
-		try {
-			JsonElement object = new JsonParser().parse(rawJson);
-			JsonArray children = object.getAsJsonObject().get("data")
-					.getAsJsonObject().get("children").getAsJsonArray();
-			for (JsonElement child : children) {
-				String url = child.getAsJsonObject().get("data")
-						.getAsJsonObject().get("url").getAsString();
-				boolean nsfw = child.getAsJsonObject().get("data")
-						.getAsJsonObject().get("over_18").getAsBoolean();
-				if (url.contains("imgur.com") && !url.contains("i.imgur.com")
-						&& !url.contains("imgur.com/gallery/")
-						&& !url.contains("imgur.com/a/"))
-					url += ".jpg";
-				if (validImageUrl(url)
-						&& (!nsfw || SettingsActivity.showNSFW(context))) {
-					String perma = child.getAsJsonObject().get("data")
-							.getAsJsonObject().get("permalink").getAsString();
-					String subreddit = child.getAsJsonObject().get("data")
-							.getAsJsonObject().get("subreddit").getAsString();
-					String title = child.getAsJsonObject().get("data")
-							.getAsJsonObject().get("title").getAsString();
-					String postURL = "http://www.i.reddit.com" + perma;
-					perma = perma.substring(0, perma.lastIndexOf('/'));
-					perma = perma.substring(perma.lastIndexOf('/') + 1)
-							+ url.substring(url.lastIndexOf('.'));
-					enqueueURL(url, perma);
-					addInfo(perma, subreddit, title, postURL, url);
-					return true;
-				}
+	private boolean parse(Listing listing) {
+		for (Listing.ListingData.Link child : listing.data.children) {
+			String url = child.data.url;
+
+			// Reformat particular imgur links
+			if (url.contains("imgur.com") && !url.contains("i.imgur.com")
+					&& !url.contains("imgur.com/gallery/")
+					&& !url.contains("imgur.com/a/"))
+				url += ".jpg";
+
+
+			// Add one link if it's valid and safe for work enough
+			if (validImageUrl(url) && (!child.data.over_18 || SettingsActivity.showNSFW(context))) {
+				String perma = child.data.permalink;
+				String postURL = "http://www.i.reddit.com" + perma;
+				perma = perma.substring(0, perma.lastIndexOf('/'));
+				perma = perma.substring(perma.lastIndexOf('/') + 1)
+						+ url.substring(url.lastIndexOf('.'));
+				enqueueURL(url, perma);
+				addInfo(perma, child.data.subreddit, child.data.title, postURL, url);
+				return true;
 			}
-		} catch (Exception e) {
-			return false;
 		}
+
+		// None of the links were valid, try next page
 		return false;
-		// TODO handle case when out of images
-		// return "http://i.imgur.com/iCQxSJZ.jpg";
 	}
 
 	// Returns true if URL has no spaces, ends in .jpg/.png and is not enqueued

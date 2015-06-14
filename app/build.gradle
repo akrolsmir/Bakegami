@@ -26,7 +26,6 @@ android {
 dependencies {
     compile 'com.android.support:support-v4:19.1.0'
     compile 'com.google.code.gson:gson:2.2.2'
-    compile files('libs/spring-android-core-1.0.1.RELEASE.jar')
-    compile files('libs/spring-android-rest-template-1.0.1.RELEASE.jar')
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
 }
