@@ -179,7 +179,7 @@ public class MainActivity extends Activity {
 			}
 			return true;
 		case R.id.action_reload:
-			if (ConnectReceiver.hasInternet(this)) {
+			if (!ConnectReceiver.hasInternet(this)) {
 				Toast.makeText(this, "Connect to the Internet and try again.",
 						Toast.LENGTH_LONG).show();
 			} else {
