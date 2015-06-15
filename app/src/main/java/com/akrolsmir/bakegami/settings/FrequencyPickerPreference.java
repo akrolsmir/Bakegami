@@ -1,61 +1,56 @@
 package com.akrolsmir.bakegami.settings;
 
-import java.util.Arrays;
-import java.util.List;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.preference.DialogPreference;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.akrolsmir.bakegami.R;
-import com.akrolsmir.bakegami.WallpaperControlWidgetProvider;
-import com.akrolsmir.bakegami.R.id;
-import com.akrolsmir.bakegami.R.layout;
 import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.RefreshService;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class FrequencyPickerPreference extends DialogPreference {
-    public FrequencyPickerPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        
-        setDialogLayoutResource(R.layout.frequencypicker_dialog);
-        setPositiveButtonText(android.R.string.ok);
-        setNegativeButtonText(android.R.string.cancel);
-        
-        setDialogIcon(null);
-    }
-    
-    /* Constants and static methods */
-    private final static List<CharSequence> TIMES = 
-    		Arrays.asList(new CharSequence[]{"minutes", "hours", "days", "weeks"});
-    private final static long[] TIMES_IN_MIN = {1, 60, 1440, 10080};
-    
-    private final static String DEFAULT_VALUE = "2 days";
-    
-    private static final String KEY = "pref_refresh_freq";
-    public static long getRefreshSeconds(Context context) { 
-    	String value = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY, DEFAULT_VALUE);
-    	long num = Long.parseLong(value.split(" ")[0]);
-    	return (num == 0 ? 1 : num) * TIMES_IN_MIN[TIMES.indexOf(value.split(" ")[1])] * 60;
-    }
-    
-    /* Instance variables and methods */
-    private Spinner spinner;
-    private EditText editText;
-    private String[] values = DEFAULT_VALUE.split(" ");
-    
-    @Override
-    protected View onCreateDialogView() {
-    	View view = super.onCreateDialogView();
+	public FrequencyPickerPreference(Context context, AttributeSet attrs) {
+		super(context, attrs);
+
+		setDialogLayoutResource(R.layout.frequencypicker_dialog);
+		setPositiveButtonText(android.R.string.ok);
+		setNegativeButtonText(android.R.string.cancel);
+
+		setDialogIcon(null);
+	}
+
+	/* Constants and static methods */
+	private final static List<CharSequence> TIMES =
+			Arrays.asList(new CharSequence[]{"minutes", "hours", "days", "weeks"});
+	private final static long[] TIMES_IN_MIN = {1, 60, 1440, 10080};
+
+	private final static String DEFAULT_VALUE = "2 days";
+
+	private static final String KEY = "pref_refresh_freq";
+
+	public static long getRefreshSeconds(Context context) {
+		String value = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY, DEFAULT_VALUE);
+		long num = Long.parseLong(value.split(" ")[0]);
+		return (num == 0 ? 1 : num) * TIMES_IN_MIN[TIMES.indexOf(value.split(" ")[1])] * 60;
+	}
+
+	/* Instance variables and methods */
+	private Spinner spinner;
+	private EditText editText;
+	private String[] values = DEFAULT_VALUE.split(" ");
+
+	@Override
+	protected View onCreateDialogView() {
+		View view = super.onCreateDialogView();
 		spinner = (Spinner) view.findViewById(R.id.spinner1);
 		// Create an ArrayAdapter using the string array and a default spinner layout
 		ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(
@@ -64,57 +59,57 @@ public class FrequencyPickerPreference extends DialogPreference {
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// Apply the adapter to the spinner
 		spinner.setAdapter(adapter);
-		
+
 		editText = (EditText) view.findViewById(R.id.editText1);
-		
-    	editText.setText(values[0]);
-    	spinner.setSelection(TIMES.indexOf(values[1]));
-    	return view;
-    }
-    
-    @Override
-    protected void onDialogClosed(boolean positiveResult) {
-    	super.onDialogClosed(positiveResult);
-        // When the user selects "OK", persist the new value
-        if (positiveResult) {
-        	setValue(editText.getText() + " " + spinner.getSelectedItem());
-        }
-    }
-    
-    private void setValue(String value) {
-    	values = value.split(" ");
-    	if(values[0].equals(""))
-    		values[0] = "1";
-    	persistString(values[0] + " " + values[1]);
-    	setSummary(freqString() + (RefreshService.isCycling(getContext()) ? "" : " (currently paused)"));
-    	// Update the refresh time
+
+		editText.setText(values[0]);
+		spinner.setSelection(TIMES.indexOf(values[1]));
+		return view;
+	}
+
+	@Override
+	protected void onDialogClosed(boolean positiveResult) {
+		super.onDialogClosed(positiveResult);
+		// When the user selects "OK", persist the new value
+		if (positiveResult) {
+			setValue(editText.getText() + " " + spinner.getSelectedItem());
+		}
+	}
+
+	private void setValue(String value) {
+		values = value.split(" ");
+		if (values[0].equals(""))
+			values[0] = "1";
+		persistString(values[0] + " " + values[1]);
+		setSummary(freqString() + (RefreshService.isCycling(getContext()) ? "" : " (currently paused)"));
+		// Update the refresh time
 		Intent intent = new Intent(getContext(), RefreshService.class);
 		getContext().startService(intent.setAction(RefreshService.UPDATE));
-    }
-    
-    @Override
-    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
-        if (restorePersistedValue) {
-            // Restore existing state
-        	setValue(getPersistedString(DEFAULT_VALUE));
-        } else {
-            // Set default state from the XML attribute
-            setValue((String) defaultValue);
-        }
-    }
-    
-    private String freqString() {
-    	int num = Integer.parseInt(values[0]);
-    	return "Every " + (num <= 1 ? values[1].substring(0, values[1].length() - 1) : num + " " + values[1]);
-    }
-    
-    @Override
-    protected Object onGetDefaultValue(TypedArray a, int index) {
-        return a.getString(index);
-    }
-    
+	}
+
+	@Override
+	protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
+		if (restorePersistedValue) {
+			// Restore existing state
+			setValue(getPersistedString(DEFAULT_VALUE));
+		} else {
+			// Set default state from the XML attribute
+			setValue((String) defaultValue);
+		}
+	}
+
+	private String freqString() {
+		int num = Integer.parseInt(values[0]);
+		return "Every " + (num <= 1 ? values[1].substring(0, values[1].length() - 1) : num + " " + values[1]);
+	}
+
+	@Override
+	protected Object onGetDefaultValue(TypedArray a, int index) {
+		return a.getString(index);
+	}
+
     /* Save and restore Preference state across restarts */
-    
+
 //    @Override
 //    protected Parcelable onSaveInstanceState() {
 //        final Parcelable superState = super.onSaveInstanceState();

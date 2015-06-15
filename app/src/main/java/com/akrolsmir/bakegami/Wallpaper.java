@@ -1,6 +1,5 @@
 package com.akrolsmir.bakegami;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.ActivityNotFoundException;
@@ -77,7 +76,7 @@ public class Wallpaper {
 						// Download stuff to cache folder
 						if (imageInFavorites())
 							copyFile(getFavoriteFile(), getCacheFile());
-						else{
+						else {
 							downloadFile(imageURL, getCacheFile());
 							//resize();
 						}
@@ -112,7 +111,7 @@ public class Wallpaper {
 							copyFile(getFavoriteFile(), getCacheFile());
 						else
 							downloadFile(imageURL, getCacheFile());
-					}   
+					}
 					FileInputStream fis = new FileInputStream(getCacheFile());
 					wpm.setStream(fis);
 					// Log.d("Changed wallpaper", imageURL);
@@ -126,11 +125,11 @@ public class Wallpaper {
 			}
 		}).start();
 	}
-	
+
 	interface ReloadCallback {
 		void onFinish();
 	}
-	
+
 	public void reload(final ReloadCallback callback) {
 		new AsyncTask<Void, Void, Void>() {
 
@@ -151,11 +150,11 @@ public class Wallpaper {
 				}
 				return null;
 			}
-			
+
 			protected void onPostExecute(Void result) {
 				callback.onFinish();
 			}
-			
+
 		}.execute();
 	}
 
@@ -197,9 +196,10 @@ public class Wallpaper {
 		} else {
 			try {
 				copyFile(getCacheFile(), getFavoriteFile());
-				context.sendBroadcast(new Intent(
-						Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri
-								.fromFile(getFavoriteFile())));
+				context.sendBroadcast(
+						new Intent(
+								Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+								Uri.fromFile(getFavoriteFile())));
 			} catch (IOException e) {
 				// TODO handle?
 				e.printStackTrace();
@@ -265,18 +265,18 @@ public class Wallpaper {
 			try {
 				String filename = getCacheFile().getAbsolutePath();
 				getCacheFile().delete();
-			    out = new FileOutputStream(filename);
-			    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+				out = new FileOutputStream(filename);
+				scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
 			} catch (Exception e) {
-			    e.printStackTrace();
+				e.printStackTrace();
 			} finally {
-			    try {
-			        if (out != null) {
-			            out.close();
-			        }
-			    } catch (IOException e) {
-			        e.printStackTrace();
-			    }
+				try {
+					if (out != null) {
+						out.close();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}*/
@@ -318,7 +318,7 @@ public class Wallpaper {
 		}
 	}
 
-	private void backupCrop( WallpaperManager wpm, Context cont) {
+	private void backupCrop(WallpaperManager wpm, Context cont) {
 		Intent cropIntent = new Intent("com.android.camera.action.CROP");
 		cropIntent.setDataAndType(Uri.fromFile(getCacheFile()), "image/*");
 		cropIntent.setClassName(
@@ -331,18 +331,15 @@ public class Wallpaper {
 		cropIntent.putExtra("outputY", wpm.getDesiredMinimumHeight());
 		cropIntent.putExtra("return-data", true);
 		try {
-			((Activity)cont).startActivityForResult(cropIntent, 1);
+			((Activity) cont).startActivityForResult(cropIntent, 1);
 		} catch (ActivityNotFoundException anfe) {
 			try {
-				cropIntent
-						.setClassName(
-								"com.google.android.apps.plus",
-								"com.google.android.apps.photoeditor.fragments.PlusCropActivity");
-				((Activity)cont).startActivityForResult(cropIntent, 1);
+				cropIntent.setClassName(
+						"com.google.android.apps.plus",
+						"com.google.android.apps.photoeditor.fragments.PlusCropActivity");
+				((Activity) cont).startActivityForResult(cropIntent, 1);
 			} catch (ActivityNotFoundException anfe2) {
-				Toast.makeText(context,
-						"Cropping requires the latest Google+.",
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(context, "Cropping requires the latest Google+.", Toast.LENGTH_LONG).show();
 			}
 		}
 	}

@@ -112,7 +112,7 @@ public class WallpaperManager {
 	public Wallpaper getCurrentWallpaper() {
 		return new Wallpaper(context, getCurrentWallpaperURL());
 	}
-	
+
 	public Wallpaper getNextWallpaper() {
 		return new Wallpaper(context, getNextWallpaperURL());
 	}
@@ -124,7 +124,7 @@ public class WallpaperManager {
 				file.delete();
 		fetchNextUrls();
 	}
-	
+
 	public void removeFavorite(File f) {
 		String canonicalPath = "";
 		try {
@@ -137,16 +137,15 @@ public class WallpaperManager {
 		final Uri uri = MediaStore.Files.getContentUri("external");
 		final int result = context.getContentResolver().delete(uri,
 				MediaStore.Files.FileColumns.DATA + "=?",
-				new String[] { canonicalPath });
+				new String[]{canonicalPath});
 		if (result == 0) {
 			final String absolutePath = f.getAbsolutePath();
 			if (!absolutePath.equals(canonicalPath)) {
-				if(context.getContentResolver().delete(uri,
+				if (context.getContentResolver().delete(uri,
 						MediaStore.Files.FileColumns.DATA + "=?",
-						new String[] { absolutePath }) == 0)
+						new String[]{absolutePath}) == 0)
 					f.delete();
-			}
-			else
+			} else
 				f.delete();
 		}
 	}
@@ -303,18 +302,16 @@ public class WallpaperManager {
 	private void enqueueURL(String imageURL, String imageName) {
 		// Log.d("enqueueURL", imageURL + "|" + imageName);
 		setQueue(getQueue() + imageURL + "|" + imageName + " ");
-		if (setNextWallpaperAsBG) { // || settings.getString(QUEUE, "").length
-									// == 0
+		if (setNextWallpaperAsBG) { // || settings.getString(QUEUE, "").length == 0
 			nextWallpaper();
 			setNextWallpaperAsBG = false;
 		} else {
 			new Wallpaper(context, imageURL + "|" + imageName).cache();
 		}
 	}
-	
 
-	private void addInfo(String name, String sr, String title, String postURL,
-			String url) {
+
+	private void addInfo(String name, String sr, String title, String postURL, String url) {
 		// Log.d("AddInfo", name);
 		settings.edit().putString(name + "_sr", sr).apply();
 		settings.edit().putString(name + "_title", title).apply();
@@ -337,14 +334,14 @@ public class WallpaperManager {
 
 	public void displayInfo(String name, final Context context) {
 		// Log.d("DisplayInfo", name);
-		final String[] rawInfo = { settings.getString(name + "_sr", "N/A"),
+		final String[] rawInfo = {settings.getString(name + "_sr", "N/A"),
 				settings.getString(name + "_postURL", "N/A"),
 				settings.getString(name + "_url", "N/A"),
-				settings.getString(name + "_title", "N/A") };
+				settings.getString(name + "_title", "N/A")};
 		Spanned[] info = {
 				Html.fromHtml("<b>Subreddit:</b><br/>" + rawInfo[0]),
 				Html.fromHtml("<b>Post Title:</b><br/>" + rawInfo[3]),
-				Html.fromHtml("<b>Image URL:</b><br/>" + rawInfo[2]) };
+				Html.fromHtml("<b>Image URL:</b><br/>" + rawInfo[2])};
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setTitle("Details")
 				.setItems(info, new DialogInterface.OnClickListener() {
@@ -360,7 +357,6 @@ public class WallpaperManager {
 										Uri.parse(rawInfo[which]));
 							context.startActivity(browserIntent);
 						}
-
 					}
 				})
 				.setPositiveButton("Done",
@@ -371,13 +367,14 @@ public class WallpaperManager {
 		builder.show();
 	}
 
-	public void dequeue(String imageURL){
-		setQueue(getQueue().replace(imageURL+" ", ""));
-		setHistory(getHistory()+imageURL+" ");
-		new Wallpaper(context,imageURL).uncache();
+	public void dequeue(String imageURL) {
+		setQueue(getQueue().replace(imageURL + " ", ""));
+		setHistory(getHistory() + imageURL + " ");
+		new Wallpaper(context, imageURL).uncache();
 		fetchNextUrls();
 		// Log.d("AFTER DEQUEUE",getQueue());
 	}
+
 	// The current wallpaper is at the top of the history stack
 	private String DEFAULT_URL = "http://pixabay.com/get/9a1e9044203f49270547/1414394710/spring-179584_1280.jpg|default0.jpg";
 
@@ -385,7 +382,7 @@ public class WallpaperManager {
 		String url = getHistory().split(" ")[0];
 		return url.contains("/") ? url : DEFAULT_URL;
 	}
-	
+
 	public String getNextWallpaperURL() {
 		String url = getQueue().split(" ")[0];
 		return url.contains("/") ? url : DEFAULT_URL;
@@ -400,21 +397,21 @@ public class WallpaperManager {
 
 		fetchNextUrls();
 	}
-	
+
 	private String HISTORY = "history", QUEUE = "queue";
-	
+
 	private String getHistory() {
 		return settings.getString(HISTORY, DEFAULT_URL + " ");
 	}
-	
+
 	private String getQueue() {
 		return settings.getString(QUEUE, DEFAULT_URL + " ");
 	}
-	
+
 	private void setHistory(String history) {
 		settings.edit().putString(HISTORY, history).apply();
 	}
-	
+
 	private void setQueue(String queue) {
 		settings.edit().putString(QUEUE, queue).apply();
 	}

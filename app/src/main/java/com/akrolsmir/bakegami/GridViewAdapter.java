@@ -1,10 +1,5 @@
 package com.akrolsmir.bakegami;
 
-import static android.widget.ImageView.ScaleType.CENTER_CROP;
-
-import java.io.File;
-import java.util.List;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -15,6 +10,11 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.util.List;
+
+import static android.widget.ImageView.ScaleType.CENTER_CROP;
+
 final class GridViewAdapter extends BaseAdapter {
 	private final Context context;
 	private List<File> favorites;
@@ -23,6 +23,7 @@ final class GridViewAdapter extends BaseAdapter {
 		this.context = context;
 		this.favorites = Wallpaper.getFavorites();
 	}
+
 	public GridViewAdapter(Context context, List<File> favorites) {
 		this.context = context;
 		this.favorites = favorites;
@@ -38,10 +39,10 @@ final class GridViewAdapter extends BaseAdapter {
 
 		// Trigger the download of the URL asynchronously into the image view.
 		Picasso.with(context) //
-		.load(getItem(position)) //
-		//.placeholder(R.drawable.placeholder) //
-		//.error(R.drawable.error) //
-		.fit().centerCrop().into(view);
+				.load(getItem(position)) //
+						//.placeholder(R.drawable.placeholder) //
+						//.error(R.drawable.error) //
+				.fit().centerCrop().into(view);
 
 		view.setBackgroundResource(R.drawable.gridview_background);
 
@@ -69,7 +70,9 @@ final class GridViewAdapter extends BaseAdapter {
 		return position;
 	}
 
-	/** An image view which always remains square with respect to its width. */
+	/**
+	 * An image view which always remains square with respect to its width.
+	 */
 	final class SquaredImageView extends ImageView implements Checkable {
 		public SquaredImageView(Context context) {
 			super(context);
@@ -87,7 +90,7 @@ final class GridViewAdapter extends BaseAdapter {
 
 		// Makes this ImageView checkable
 		private boolean checked = false;
-		private final int[] CHECKED_STATE_SET = { android.R.attr.state_checked };
+		private final int[] CHECKED_STATE_SET = {android.R.attr.state_checked};
 
 		@Override
 		public int[] onCreateDrawableState(int extraSpace) {

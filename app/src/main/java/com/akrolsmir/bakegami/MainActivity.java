@@ -1,9 +1,5 @@
 package com.akrolsmir.bakegami;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -35,17 +31,22 @@ import com.akrolsmir.bakegami.WallpaperControlWidgetProvider.RefreshService;
 import com.akrolsmir.bakegami.settings.SettingsActivity;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 public class MainActivity extends Activity {
 
 	private SharedPreferences prefs;
 	private boolean filtered;
 	private Menu menu;
 	public static final String FIRST_TIME = "need tutorial";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		filtered = false;
-		if(menu != null)
+		if (menu != null)
 			menu.findItem(R.id.action_filter).setTitle("Filter");
 		requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -104,18 +105,18 @@ public class MainActivity extends Activity {
 				startActivity(intent);
 			}
 		});
-		
+
 		// First time stuff
-		prefs = getSharedPreferences("com.akrolsmir.bakegami.main",0);
+		prefs = getSharedPreferences("com.akrolsmir.bakegami.main", 0);
 		if (prefs.getBoolean(FIRST_TIME, true)) {
 			// PRETTY UGLY HACKS ALL DAY
 			prefs.edit().putBoolean(FIRST_TIME, false).apply();
-			SharedPreferences prefs = getSharedPreferences("com.akrolsmir.bakegami.Query",0);
-			if(!prefs.contains("rq0")){
-	        	prefs.edit().putString("rq0","rwallpaper").apply();
-	        	prefs.edit().putString("rq1","qscenery").apply();
-	        	prefs.edit().putInt("numEntries", 2).apply();
-	        }
+			SharedPreferences prefs = getSharedPreferences("com.akrolsmir.bakegami.Query", 0);
+			if (!prefs.contains("rq0")) {
+				prefs.edit().putString("rq0", "rwallpaper").apply();
+				prefs.edit().putString("rq1", "qscenery").apply();
+				prefs.edit().putInt("numEntries", 2).apply();
+			}
 			new Wallpaper(this); // Creates the default wallpaper
 			playPauseButton.performClick();
 		}
@@ -130,73 +131,72 @@ public class MainActivity extends Activity {
 		this.menu = menu;
 		return true;
 	}
-	
+
 	@Override
-	public boolean onOptionsItemSelected(final MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.action_info:
-			WallpaperManager.with(this).displayInfo(this);
-			return true;
-		case R.id.action_filter:
-			if(filtered)
-			{
-				((FavoritesView)findViewById(R.id.favorites)).unfilter();
-				filtered = false;
-				item.setTitle("Filter");
-			}
-			else
-			{
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				final EditText input = new EditText(this);
-				input.setInputType(InputType.TYPE_CLASS_TEXT);
-				builder.setTitle("Filter Favorites by Keyword")
-						.setView(input)
-						.setPositiveButton("OK",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										InputMethodManager inputMethodManager = (InputMethodManager)  getSystemService(INPUT_METHOD_SERVICE);
-									    inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
-										((FavoritesView) findViewById(R.id.favorites)).filter(input.getText().toString());
-										filtered = true;
-										item.setTitle("Unfilter");
-									}
-								})
-						.setNegativeButton("Cancel",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										InputMethodManager inputMethodManager = (InputMethodManager)  getSystemService(INPUT_METHOD_SERVICE);
-									    inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
-										dialog.cancel();
-									}
-								});
-				AlertDialog ad = builder.create();
-				ad.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-				ad.show();
-			}
-			return true;
-		case R.id.action_reload:
-			if (!ConnectReceiver.hasInternet(this)) {
-				Toast.makeText(this, "Connect to the Internet and try again.",
-						Toast.LENGTH_LONG).show();
-			} else {
-				final WallpaperManager wpm = WallpaperManager.with(MainActivity.this);
-				final Wallpaper wp = wpm.getCurrentWallpaper();
-				wp.reload(new Wallpaper.ReloadCallback() {
-					
-					@Override
-					public void onFinish() {
-						refreshAllViews(); // Signal app to refresh views
-					}
-				});
+			case R.id.action_info:
+				WallpaperManager.with(this).displayInfo(this);
 				return true;
-			}
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.action_filter:
+				if (filtered) {
+					((FavoritesView) findViewById(R.id.favorites)).unfilter();
+					filtered = false;
+					item.setTitle("Filter");
+				} else {
+					showFilterDialog(item);
+				}
+				return true;
+			case R.id.action_reload:
+				if (!ConnectReceiver.hasInternet(this)) {
+					Toast.makeText(this, "Connect to the Internet and try again.",
+							Toast.LENGTH_LONG).show();
+				} else {
+					final WallpaperManager wpm = WallpaperManager.with(MainActivity.this);
+					final Wallpaper wp = wpm.getCurrentWallpaper();
+					wp.reload(new Wallpaper.ReloadCallback() {
+
+						@Override
+						public void onFinish() {
+							refreshAllViews(); // Signal app to refresh views
+						}
+					});
+					return true;
+				}
+			default:
+				return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private void showFilterDialog(final MenuItem item) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		final EditText input = new EditText(this);
+		input.setInputType(InputType.TYPE_CLASS_TEXT);
+		builder.setTitle("Filter Favorites by Keyword")
+				.setView(input)
+				.setPositiveButton("OK",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+								inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
+								((FavoritesView) findViewById(R.id.favorites)).filter(input.getText().toString());
+								filtered = true;
+								item.setTitle("Unfilter");
+							}
+						})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+								inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
+								dialog.cancel();
+							}
+						});
+		AlertDialog ad = builder.create();
+		ad.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+		ad.show();
 	}
 
 	/* Listen for changes made by services/the widget */
@@ -206,10 +206,10 @@ public class MainActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		getActionBar().setTitle("");  
+		getActionBar().setTitle("");
 		refreshAllViews();
 		filtered = false;
-		if(menu != null)
+		if (menu != null)
 			menu.findItem(R.id.action_filter).setTitle("Filter");
 		LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
 		manager.registerReceiver(updateReceiver, new IntentFilter(NEXT));

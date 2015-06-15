@@ -1,11 +1,5 @@
 package com.akrolsmir.bakegami;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,9 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.InputType;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -23,16 +15,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.GridView;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
 public class FavoritesView extends GridView {
-	
+
 	private SharedPreferences settings;
 	private Context context;
 	private GridViewAdapter gva;
 	private List<File> files;
-	
+
 	public FavoritesView(final Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.settings = context.getSharedPreferences(
@@ -62,14 +59,13 @@ public class FavoritesView extends GridView {
 
 			@Override
 			public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-					boolean checked) {
+												  boolean checked) {
 				// Here you can do something when items are selected/de-selected,
 				// such as update the title in the CAB
 				if (getCheckedItemCount() > 1) {
 					mode.getMenu().findItem(R.id.menu_item_view).setVisible(false);
 					mode.getMenu().findItem(R.id.menu_item_info).setVisible(false);
-				}
-				else if (getCheckedItemCount() == 1) {
+				} else if (getCheckedItemCount() == 1) {
 					mode.getMenu().findItem(R.id.menu_item_view).setVisible(true);
 					mode.getMenu().findItem(R.id.menu_item_info).setVisible(true);
 				}
@@ -81,62 +77,62 @@ public class FavoritesView extends GridView {
 				Intent intent = new Intent();
 				// Respond to clicks on the actions in the CAB
 				switch (item.getItemId()) {
-				case R.id.menu_item_view:
-					intent.setAction(Intent.ACTION_VIEW);
-					intent.setDataAndType(
-							Uri.fromFile(files.get(
-									checked.keyAt(0))), "image/*");
-					context.startActivity(intent);
-					mode.finish();
-					return true;
-				case R.id.menu_item_delete:
-					AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-					builder.setMessage("Unfavorite " + (getCheckedItemCount() == 1 ? 
-							"this image?" : "these " + getCheckedItemCount() + " images?"));
-					builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							// Count backwards to ensure correct index is used
-							for (int i = getAdapter().getCount() - 1; i >= 0; i--) {
-								if (checked.get(i)) {
-									WallpaperManager.with(context).removeFavorite(files.get(i));
+					case R.id.menu_item_view:
+						intent.setAction(Intent.ACTION_VIEW);
+						intent.setDataAndType(
+								Uri.fromFile(files.get(
+										checked.keyAt(0))), "image/*");
+						context.startActivity(intent);
+						mode.finish();
+						return true;
+					case R.id.menu_item_delete:
+						AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+						builder.setMessage("Unfavorite " + (getCheckedItemCount() == 1 ?
+								"this image?" : "these " + getCheckedItemCount() + " images?"));
+						builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								// Count backwards to ensure correct index is used
+								for (int i = getAdapter().getCount() - 1; i >= 0; i--) {
+									if (checked.get(i)) {
+										WallpaperManager.with(context).removeFavorite(files.get(i));
+									}
 								}
+								LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.FAVORITE));
+								mode.finish();
 							}
-							LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.FAVORITE));
-							mode.finish();
-						}
-					});
-					builder.setNegativeButton("Cancel", null);
-					builder.show();
-					
-					return true;
-				case R.id.menu_item_share:
-					intent.setAction(getCheckedItemCount() == 1 ? Intent.ACTION_SEND : Intent.ACTION_SEND_MULTIPLE);
-					intent.setType("image/*");
+						});
+						builder.setNegativeButton("Cancel", null);
+						builder.show();
 
-					ArrayList<Uri> fils = new ArrayList<Uri>();
-					for (int i = 0; i < getAdapter().getCount(); i++) {
-						if (checked.get(i)) {
-							fils.add(Uri.fromFile(files.get(i)));
-							if(fils.size() == getCheckedItemCount())
-								break;
+						return true;
+					case R.id.menu_item_share:
+						intent.setAction(getCheckedItemCount() == 1 ? Intent.ACTION_SEND : Intent.ACTION_SEND_MULTIPLE);
+						intent.setType("image/*");
+
+						ArrayList<Uri> fils = new ArrayList<Uri>();
+						for (int i = 0; i < getAdapter().getCount(); i++) {
+							if (checked.get(i)) {
+								fils.add(Uri.fromFile(files.get(i)));
+								if (fils.size() == getCheckedItemCount())
+									break;
+							}
 						}
-					}
-					intent.setType("image/*");
-					if(getCheckedItemCount() > 1)
-						intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, fils);
-					else
-						intent.putExtra(Intent.EXTRA_STREAM, fils.get(0));
-					context.startActivity(Intent.createChooser(intent, "Share via"));
-					mode.finish();
-					return true;
-				case R.id.menu_item_info:
-					String path = files.get(checked.keyAt(0)).getAbsolutePath();
-					WallpaperManager.with(context).displayInfo(path.substring(path.lastIndexOf("/")+1), context);
-					mode.finish();
-					return true;
-				default:
-					return false;
+						intent.setType("image/*");
+						if (getCheckedItemCount() > 1)
+							intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, fils);
+						else
+							intent.putExtra(Intent.EXTRA_STREAM, fils.get(0));
+						context.startActivity(Intent.createChooser(intent, "Share via"));
+						mode.finish();
+						return true;
+					case R.id.menu_item_info:
+						String path = files.get(checked.keyAt(0)).getAbsolutePath();
+						WallpaperManager.with(context).displayInfo(path.substring(path.lastIndexOf("/") + 1), context);
+						mode.finish();
+						return true;
+					default:
+						return false;
 				}
 			}
 
@@ -145,13 +141,10 @@ public class FavoritesView extends GridView {
 				// Inflate the menu for the CAB
 				MenuInflater inflater = mode.getMenuInflater();
 				inflater.inflate(R.menu.gridview_menu, menu);
-				if(getCheckedItemCount() > 1)
-				{
+				if (getCheckedItemCount() > 1) {
 					menu.findItem(R.id.menu_item_view).setVisible(false);
 					menu.findItem(R.id.menu_item_info).setVisible(false);
-				}
-				else if(getCheckedItemCount() == 1)
-				{
+				} else if (getCheckedItemCount() == 1) {
 					menu.findItem(R.id.menu_item_view).setVisible(true);
 					menu.findItem(R.id.menu_item_info).setVisible(true);
 				}
@@ -172,34 +165,31 @@ public class FavoritesView extends GridView {
 			}
 		});
 	}
-	
+
 	public void onFavorite() {
 		gva = new GridViewAdapter(context);
 		setAdapter(gva);
 		files = Wallpaper.getFavorites();
-		((GridViewAdapter)this.getAdapter()).notifyDataSetChanged();
+		((GridViewAdapter) this.getAdapter()).notifyDataSetChanged();
 	}
-	
-	public void filter(String query){
-		String name;
-		List<File> files = new ArrayList<File>();
-		File n;
-		Iterator<File> iterator = Wallpaper.getFavorites().iterator();
-		while(iterator.hasNext())
-		{
-			// Log.d("LOG","-");
-			n=iterator.next();
-			name = n.getName();
-			if(settings.getString(name+"_sr", "").toLowerCase(Locale.getDefault()).contains(query.toLowerCase(Locale.getDefault()))
-				||settings.getString(name+"_title", "").toLowerCase(Locale.getDefault()).contains(query.toLowerCase(Locale.getDefault())))
-				files.add(n);
+
+	public void filter(String query) {
+		files = new ArrayList<File>();
+		for (File file: Wallpaper.getFavorites()) {
+			String name = file.getName();
+			String subreddit = settings.getString(name + "_sr", "").toLowerCase();
+			String title = settings.getString(name + "_title", "").toLowerCase();
+			query = query.toLowerCase(Locale.getDefault());
+			if (subreddit.contains(query) || title.contains(query)) {
+				files.add(file);
+			}
 		}
-		gva = new GridViewAdapter(context,files);
-		this.files=files;
+
+		gva = new GridViewAdapter(context, files);
 		setAdapter(gva);
 	}
-	
-	public void unfilter(){
+
+	public void unfilter() {
 		gva = new GridViewAdapter(context);
 		setAdapter(gva);
 		files = Wallpaper.getFavorites();

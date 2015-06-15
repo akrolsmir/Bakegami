@@ -1,7 +1,5 @@
 package com.akrolsmir.bakegami;
 
-import com.akrolsmir.bakegami.settings.SettingsActivity;
-
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -12,8 +10,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.SystemClock;
-import android.util.Log;
 import android.widget.RemoteViews;
+
+import com.akrolsmir.bakegami.settings.SettingsActivity;
 
 public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
@@ -40,20 +39,20 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 			intent = new Intent(context, FavoriteWallpaperService.class);
 			pendingIntent = PendingIntent.getService(context, 0, intent, 0);
 			views.setOnClickPendingIntent(R.id.favButton, pendingIntent);
-			
+
 			updateViews(context);
 
 			// Tell the AppWidgetManager to perform an update on the current app widget
 			appWidgetManager.updateAppWidget(appWidgetId, views);
 		}
 	}
-	
-	public static void updateViews(Context context) { 
+
+	public static void updateViews(Context context) {
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.wallpaper_control_widget);
 		remoteViews.setImageViewResource(R.id.favButton,
 				WallpaperManager.with(context).getCurrentWallpaper().imageInFavorites() ?
-					R.drawable.ic_star_white_36dp :
-					R.drawable.ic_star_border_white_36dp);
+						R.drawable.ic_star_white_36dp :
+						R.drawable.ic_star_border_white_36dp);
 		ComponentName thisWidget = new ComponentName(context, WallpaperControlWidgetProvider.class);
 		AppWidgetManager.getInstance(context).updateAppWidget(thisWidget, remoteViews);
 	}
@@ -84,23 +83,24 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 	}
 
 	public static class RefreshService extends IntentService {
-		
+
 		public RefreshService() {
 			super("RefreshService");
 		}
-		
+
 		private static String KEY_CYCLING = "com.akrolsmir.bakegami.cycling";
-		
+
 		public static boolean isCycling(Context context) {
 			return context.getSharedPreferences(KEY_CYCLING, 0).getBoolean(KEY_CYCLING, false);
 		}
-		
+
 		private void setCycling(boolean value) {
 			getSharedPreferences(KEY_CYCLING, 0).edit().putBoolean(KEY_CYCLING, value).commit();
 		}
-		
-		public final static String TOGGLE = "com.akrolsmir.bakegami.TOGGLE",
-				BOOT = "com.akrolsmir.bakegami.BOOT", UPDATE = "com.akrolsmir.bakegami.UPDATE";
+
+		public final static String TOGGLE = "com.akrolsmir.bakegami.TOGGLE";
+		public final static String BOOT = "com.akrolsmir.bakegami.BOOT";
+		public final static String UPDATE = "com.akrolsmir.bakegami.UPDATE";
 
 		@Override
 		protected void onHandleIntent(Intent intent) {
@@ -112,7 +112,7 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
 			long period = SettingsActivity.getRefreshSeconds(this) * 1000;
 			alarmManager.cancel(pendingIntent); //Cancels any past refresh
-			
+
 			if (intent.getAction().equals(BOOT)) {
 				if (isCycling(this)) {
 					alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME,
@@ -126,8 +126,8 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 				}
 				setCycling(!isCycling(this));
 			} else if (intent.getAction().equals(UPDATE)) {
-				if(isCycling(this)) {
-					alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, 
+				if (isCycling(this)) {
+					alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME,
 							SystemClock.elapsedRealtime() + period, period, pendingIntent);
 				}
 			}
@@ -137,8 +137,9 @@ public class WallpaperControlWidgetProvider extends AppWidgetProvider {
 
 	// Restart alarm on boot
 	public static class BootBroadcastReceiver extends BroadcastReceiver {
-		
-		public BootBroadcastReceiver() {}
+
+		public BootBroadcastReceiver() {
+		}
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
