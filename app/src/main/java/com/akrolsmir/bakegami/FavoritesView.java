@@ -19,7 +19,6 @@ import android.widget.GridView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -175,7 +174,7 @@ public class FavoritesView extends GridView {
 
 	public void filter(String query) {
 		files = new ArrayList<File>();
-		for (File file: Wallpaper.getFavorites()) {
+		for (File file : Wallpaper.getFavorites()) {
 			String name = file.getName();
 			String subreddit = settings.getString(name + "_sr", "").toLowerCase();
 			String title = settings.getString(name + "_title", "").toLowerCase();

@@ -55,12 +55,12 @@ public class WallpaperManager {
 
 	public void setWallpaper(File file) {
 		getCurrentWallpaper().uncache();
-		String last = settings.getString((file.toURI() + "").substring((file.toURI() + "")
-				.lastIndexOf('/') + 1) + "_url", file.toURI() + "")
-				+ "|"
-				+ (file.toURI() + "").substring((file.toURI() + "").lastIndexOf('/') + 1) + " ";
+		String uri = file.toURI() + "";
+		String name = uri.substring(uri.lastIndexOf('/') + 1);
+		String last = settings.getString(name + "_url", uri) + "|" + name + " ";
 		setHistory(last + getHistory());
 		getCurrentWallpaper().setAsBackground();
+
 		// Notify MainActivity and the widget to update their views
 		LocalBroadcastManager.getInstance(context).sendBroadcast(
 				new Intent(MainActivity.NEXT));
