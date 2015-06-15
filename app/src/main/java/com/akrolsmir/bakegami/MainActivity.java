@@ -88,7 +88,7 @@ public class MainActivity extends Activity {
 		cropButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				WallpaperManager.with(MainActivity.this).cropWallpaper(MainActivity.this);
+				WallpaperManager.with(MainActivity.this).getCurrentWallpaper().crop(MainActivity.this);
 			}
 		});
 

@@ -1,5 +1,18 @@
 package com.akrolsmir.bakegami;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.WallpaperManager;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.widget.Toast;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,20 +27,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import android.app.WallpaperManager;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.util.DisplayMetrics;
-import android.util.Log;
 
 public class Wallpaper {
 
@@ -48,7 +47,10 @@ public class Wallpaper {
 		CACHE_DIR.mkdirs();
 		PIC_DIR.mkdirs();
 	}
-	
+
+	/**
+	 * Default wallpaper for the first run of the app.
+	 */
 	public Wallpaper(Context context) {
 		this.context = context;
 		this.imageURL = "http://pixabay.com/get/9a1e9044203f49270547/1414394710/spring-179584_1280.jpg";
@@ -292,5 +294,56 @@ public class Wallpaper {
 		});
 
 		return Arrays.asList(files);
+	}
+
+	public void crop(Context cont) {
+		WallpaperManager wpm = WallpaperManager.getInstance(context);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			// Try to use the built in crop for KitKat and up
+			try {
+				Uri contUri = Uri.parse(MediaStore.Images.Media.insertImage(
+						cont.getContentResolver(),
+						getCacheFile().getAbsolutePath(),
+						null,
+						null));
+				Intent cropSetIntent = wpm.getCropAndSetWallpaperIntent(contUri);
+				cropSetIntent.setDataAndType(contUri, "image/*");
+				cont.startActivity(cropSetIntent);
+			} catch (Exception e) {
+				backupCrop(wpm, cont);
+				e.printStackTrace();
+			}
+		} else {
+			backupCrop(wpm, cont);
+		}
+	}
+
+	private void backupCrop( WallpaperManager wpm, Context cont) {
+		Intent cropIntent = new Intent("com.android.camera.action.CROP");
+		cropIntent.setDataAndType(Uri.fromFile(getCacheFile()), "image/*");
+		cropIntent.setClassName(
+				"com.google.android.apps.plus",
+				"com.google.android.apps.photoeditor.fragments.PlusCropActivityAlias");
+		cropIntent.putExtra("crop", "true");
+		cropIntent.putExtra("aspectX", wpm.getDesiredMinimumWidth());
+		cropIntent.putExtra("aspectY", wpm.getDesiredMinimumHeight());
+		cropIntent.putExtra("outputX", wpm.getDesiredMinimumWidth());
+		cropIntent.putExtra("outputY", wpm.getDesiredMinimumHeight());
+		cropIntent.putExtra("return-data", true);
+		try {
+			((Activity)cont).startActivityForResult(cropIntent, 1);
+		} catch (ActivityNotFoundException anfe) {
+			try {
+				cropIntent
+						.setClassName(
+								"com.google.android.apps.plus",
+								"com.google.android.apps.photoeditor.fragments.PlusCropActivity");
+				((Activity)cont).startActivityForResult(cropIntent, 1);
+			} catch (ActivityNotFoundException anfe2) {
+				Toast.makeText(context,
+						"Cropping requires the latest Google+.",
+						Toast.LENGTH_LONG).show();
+			}
+		}
 	}
 }

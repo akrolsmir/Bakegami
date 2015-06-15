@@ -1,9 +1,6 @@
 package com.akrolsmir.bakegami;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -128,32 +125,6 @@ public class WallpaperManager {
 		fetchNextUrls();
 	}
 	
-	// TODO move into Wallpaper
-	@SuppressLint("NewApi")
-	public void cropWallpaper( Context cont ) {
-		android.app.WallpaperManager wpm = android.app.WallpaperManager
-				.getInstance(cont);
-		if (android.os.Build.VERSION.SDK_INT >= 19) {
-			// Try to use the built in crop for KitKat and up
-			try {
-				Uri contUri = Uri.parse(android.provider.MediaStore.Images.Media
-						.insertImage(cont.getContentResolver(),
-								getCurrentWallpaper()
-										.getCacheFile()
-										.getAbsolutePath(), null, null));
-				Intent cropSetIntent = wpm
-						.getCropAndSetWallpaperIntent(contUri);
-				cropSetIntent.setDataAndType(contUri,"image/*");
-				cont.startActivity(cropSetIntent);
-			} catch (Exception e) {
-				backupCrop(wpm, cont);
-				e.printStackTrace();
-			} 
-		} else {
-			backupCrop(wpm, cont);
-		}
-	}
-	
 	public void removeFavorite(File f) {
 		String canonicalPath = "";
 		try {
@@ -181,42 +152,6 @@ public class WallpaperManager {
 	}
 
 	/* Private helper methods */
-
-	private void backupCrop( android.app.WallpaperManager wpm, Context cont)
-	{
-		Intent cropIntent = new Intent(
-				"com.android.camera.action.CROP");
-		cropIntent.setDataAndType(
-				Uri.fromFile(getCurrentWallpaper().getCacheFile()),
-				"image/*");
-		cropIntent
-				.setClassName("com.google.android.apps.plus",
-						"com.google.android.apps.photoeditor.fragments.PlusCropActivityAlias");
-		cropIntent.putExtra("crop", "true");
-		cropIntent.putExtra("aspectX", wpm.getDesiredMinimumWidth());
-		cropIntent.putExtra("aspectY",
-				wpm.getDesiredMinimumHeight());
-		cropIntent.putExtra("outputX", wpm.getDesiredMinimumWidth());
-		cropIntent.putExtra("outputY",
-				wpm.getDesiredMinimumHeight());
-		cropIntent.putExtra("return-data", true);
-		try {
-			((Activity)cont).startActivityForResult(cropIntent, 1);
-		} catch (ActivityNotFoundException anfe) {
-			try {
-				cropIntent
-						.setClassName(
-								"com.google.android.apps.plus",
-								"com.google.android.apps.photoeditor.fragments.PlusCropActivity");
-				((Activity)cont).startActivityForResult(cropIntent, 1);
-			} catch (ActivityNotFoundException anfe2) {
-				Toast.makeText(context,
-						"Cropping requires the latest Google+.",
-						Toast.LENGTH_LONG).show();
-			}
-		}
-	}
-	
 	public interface RedditService {
 		@GET("/r/{subreddit}/{sort}.json")
 		void fromSubreddit(
