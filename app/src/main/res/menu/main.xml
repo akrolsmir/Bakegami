@@ -1,23 +1,23 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/action_settings"
-        android:showAsAction="always"
         android:icon="@drawable/ic_settings_white_24dp"
-        android:title="@string/action_settings"/>
-    
+        android:showAsAction="always"
+        android:title="@string/action_settings" />
+
     <item
         android:id="@+id/action_info"
         android:showAsAction="never"
-        android:title="Details"/>
-    
+        android:title="Details" />
+
     <item
         android:id="@+id/action_reload"
         android:showAsAction="never"
-        android:title="Reload"/>
-    
+        android:title="Reload" />
+
     <item
         android:id="@+id/action_filter"
         android:showAsAction="never"
-        android:title="Filter"/>
+        android:title="Filter" />
 </menu>

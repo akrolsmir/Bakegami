@@ -4,12 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity" >
+    tools:context=".MainActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.45" >
+        android:layout_weight="0.45">
 
         <ImageView
             android:id="@+id/currentBG"
@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/currentBG"
-            android:layout_centerHorizontal="true" >
+            android:layout_centerHorizontal="true">
 
             <TextView
                 android:layout_width="0dp"
@@ -67,7 +67,6 @@
         android:layout_height="0dp"
         android:layout_weight="0.55"
         android:drawSelectorOnTop="true"
-        android:numColumns="3" >
-    </com.akrolsmir.bakegami.FavoritesView>
+        android:numColumns="3"></com.akrolsmir.bakegami.FavoritesView>
 
 </LinearLayout>

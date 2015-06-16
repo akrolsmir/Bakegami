@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-	android:key="preferenceKey" 
-	android:title="Settings" >
+    android:key="preferenceKey"
+    android:title="Settings">
 
-	<Preference
-		android:key="pref_subreddits"
-		android:title="@string/title_activity_query"
-		android:summary="r/wallpaper">
-		      
-	</Preference>
-	
-	<com.akrolsmir.bakegami.settings.SortPreference
-		android:defaultValue="Hot"
-		android:key="pref_sort"
-		android:summary = "Hot"
-		android:title="Sort by" />
+    <Preference
+        android:key="pref_subreddits"
+        android:title="@string/title_activity_query"
+        android:summary="r/wallpaper">
+
+    </Preference>
+
+    <com.akrolsmir.bakegami.settings.SortPreference
+        android:defaultValue="Hot"
+        android:key="pref_sort"
+        android:summary="Hot"
+        android:title="Sort by" />
 
     <com.akrolsmir.bakegami.settings.FrequencyPickerPreference
         android:defaultValue="2 days"
         android:key="pref_refresh_freq"
         android:summary="Every 2 days (currently paused)"
         android:title="Change wallpapers" />
-    
-    <CheckBoxPreference 
+
+    <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_allow_data"
-        android:title="Allow data usage"/>
-        
-    <CheckBoxPreference 
+        android:title="Allow data usage" />
+
+    <CheckBoxPreference
         android:defaultValue="false"
         android:key="pref_show_nsfw"
-        android:title="Show NSFW content"/>
+        android:title="Show NSFW content" />
 </PreferenceScreen>

@@ -4,12 +4,11 @@
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    tools:context="com.akrolsmir.bakegami.settings.QueryActivity" >
+    tools:context="com.akrolsmir.bakegami.settings.QueryActivity">
 
-	    <ListView
-              android:id="@+id/list"
-              android:layout_height="wrap_content"
-              android:layout_width="match_parent">
-         </ListView>
+    <ListView
+        android:id="@+id/list"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"></ListView>
 
 </RelativeLayout>
