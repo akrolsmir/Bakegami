@@ -67,6 +67,6 @@
         android:layout_height="0dp"
         android:layout_weight="0.55"
         android:drawSelectorOnTop="true"
-        android:numColumns="3"></com.akrolsmir.bakegami.FavoritesView>
+        android:numColumns="3" />
 
 </LinearLayout>
