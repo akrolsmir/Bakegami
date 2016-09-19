@@ -274,7 +274,7 @@ public class WallpaperManager {
 			// Add one link if it's valid and safe for work enough
 			if (validImageUrl(url) && (!child.data.over_18 || SettingsActivity.showNSFW(context))) {
 				String perma = child.data.permalink;
-				String postURL = "http://www.i.reddit.com" + perma;
+				String postURL = "http://m.reddit.com" + perma;
 				perma = perma.substring(0, perma.lastIndexOf('/'));
 				perma = perma.substring(perma.lastIndexOf('/') + 1)
 						+ url.substring(url.lastIndexOf('.'));
@@ -350,7 +350,7 @@ public class WallpaperManager {
 							Intent browserIntent;
 							if (which == 0)
 								browserIntent = new Intent(Intent.ACTION_VIEW,
-										Uri.parse("http://www.i.reddit.com/r/"
+										Uri.parse("http://m.reddit.com/r/"
 												+ rawInfo[which]));
 							else
 								browserIntent = new Intent(Intent.ACTION_VIEW,
