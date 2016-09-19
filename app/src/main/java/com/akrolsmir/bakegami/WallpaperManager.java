@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.akrolsmir.bakegami.settings.QueryActivity;
@@ -25,14 +26,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.http.GET;
-import retrofit.http.Path;
-import retrofit.http.Query;
-import retrofit.http.QueryMap;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
 
 public class WallpaperManager {
 
@@ -152,20 +154,18 @@ public class WallpaperManager {
 
 	/* Private helper methods */
 	public interface RedditService {
-		@GET("/r/{subreddit}/{sort}.json")
-		void fromSubreddit(
+		@GET("r/{subreddit}/{sort}.json")
+		Call<Listing> fromSubreddit(
 				@Path("subreddit") String subreddit,
 				@Path("sort") String sort,
-				@QueryMap Map<String, String> options,
-				Callback<Listing> callback);
+				@QueryMap Map<String, String> options);
 
 		// TODO ensure this accurately matches
-		@GET("/search.json")
-		void fromKeyword(
+		@GET("search.json")
+		Call<Listing> fromKeyword(
 				@Query("q") String keyword,
 				@Query("sort") String sort,
-				@QueryMap Map<String, String> options,
-				Callback<Listing> callback);
+				@QueryMap Map<String, String> options);
 	}
 
 	class Listing {
@@ -202,11 +202,12 @@ public class WallpaperManager {
 			return;
 
 		// Set up retrofit adapter for
-		RestAdapter restAdapter = new RestAdapter.Builder()
-				.setEndpoint("http://www.reddit.com")
+		Retrofit retrofit = new Retrofit.Builder()
+				.baseUrl("http://www.reddit.com/")
+				.addConverterFactory(GsonConverterFactory.create())
 				.build();
 
-		RedditService service = restAdapter.create(RedditService.class);
+		RedditService service = retrofit.create(RedditService.class);
 
 		final int sr = (int) (QueryActivity.numQueries(context) * Math.random());
 		String sort = SortPreference.getValues(context)[0];
@@ -230,7 +231,8 @@ public class WallpaperManager {
 		// Callback to be invoked after Retrofit finishes parsing Reddit's response
 		Callback<Listing> callback = new Callback<Listing>() {
 			@Override
-			public void success(Listing listing, Response response) {
+			public void onResponse(Call<Listing> call, Response<Listing> response) {
+				Listing listing = response.body();
 				if (!parse(listing)) {
 					offsets[sr] = listing.data.after;
 				}
@@ -239,16 +241,16 @@ public class WallpaperManager {
 			}
 
 			@Override
-			public void failure(RetrofitError error) {
-
+			public void onFailure(Call<Listing> call, Throwable t) {
+				Log.e("fetchNextUrls", "Retrofit Error:", t);
 			}
 		};
 
 
 		if (getSubreddit(sr).startsWith("r")) {
-			service.fromSubreddit(subreddit, sort, options, callback);
+			service.fromSubreddit(subreddit, sort, options).enqueue(callback);
 		} else {
-			service.fromKeyword(keyword, sort, options, callback);
+			service.fromKeyword(keyword, sort, options);
 		}
 	}
 
